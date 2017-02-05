@@ -158,17 +158,23 @@ func resourceCosmicNetworkCreate(d *schema.ResourceData, meta interface{}) error
 	}
 
 	// Set the needed IP config
-	p.SetGateway(m["gateway"])
-	p.SetNetmask(m["netmask"])
+	if no.Guestiptype != "Private" {
 
-	// Only set the start IP if we have one
-	if startip, ok := m["startip"]; ok {
-		p.SetStartip(startip)
-	}
+		p.SetGateway(m["gateway"])
+		p.SetNetmask(m["netmask"])
+		// Only set the start IP if we have one
+		if startip, ok := m["startip"]; ok {
+			p.SetStartip(startip)
+		}
 
-	// Only set the end IP if we have one
-	if endip, ok := m["endip"]; ok {
-		p.SetEndip(endip)
+		// Only set the end IP if we have one
+		if endip, ok := m["endip"]; ok {
+			p.SetEndip(endip)
+		}
+
+	} else {
+		// Set the needed IP config
+		p.SetCidr(d.Get("cidr").(string))
 	}
 
 	// Set the network domain if we have one

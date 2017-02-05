@@ -26,12 +26,12 @@ func TestAccCosmicEgressFirewall_basic(t *testing.T) {
 						"cosmic_egress_firewall.foo", "rule.#", "1"),
 					resource.TestCheckResourceAttr(
 						"cosmic_egress_firewall.foo",
-						"rule.2905891128.cidr_list.3378711023",
+						"rule.2542690345.cidr_list.522183319",
 						CLOUDSTACK_NETWORK_1_IPADDRESS1+"/32"),
 					resource.TestCheckResourceAttr(
-						"cosmic_egress_firewall.foo", "rule.2905891128.protocol", "tcp"),
+						"cosmic_egress_firewall.foo", "rule.2542690345.protocol", "tcp"),
 					resource.TestCheckResourceAttr(
-						"cosmic_egress_firewall.foo", "rule.2905891128.ports.32925333", "8080"),
+						"cosmic_egress_firewall.foo", "rule.2542690345.ports.32925333", "8080"),
 				),
 			},
 		},
@@ -54,12 +54,12 @@ func TestAccCosmicEgressFirewall_update(t *testing.T) {
 						"cosmic_egress_firewall.foo", "rule.#", "1"),
 					resource.TestCheckResourceAttr(
 						"cosmic_egress_firewall.foo",
-						"rule.2905891128.cidr_list.3378711023",
+						"rule.2542690345.cidr_list.522183319",
 						CLOUDSTACK_NETWORK_1_IPADDRESS1+"/32"),
 					resource.TestCheckResourceAttr(
-						"cosmic_egress_firewall.foo", "rule.2905891128.protocol", "tcp"),
+						"cosmic_egress_firewall.foo", "rule.2542690345.protocol", "tcp"),
 					resource.TestCheckResourceAttr(
-						"cosmic_egress_firewall.foo", "rule.2905891128.ports.32925333", "8080"),
+						"cosmic_egress_firewall.foo", "rule.2542690345.ports.32925333", "8080"),
 				),
 			},
 
@@ -73,24 +73,24 @@ func TestAccCosmicEgressFirewall_update(t *testing.T) {
 						"cosmic_egress_firewall.foo", "rule.#", "2"),
 					resource.TestCheckResourceAttr(
 						"cosmic_egress_firewall.foo",
-						"rule.3593527682.cidr_list.1910468234",
+						"rule.316961573.cidr_list.2812511730",
 						CLOUDSTACK_NETWORK_1_IPADDRESS2+"/32"),
 					resource.TestCheckResourceAttr(
 						"cosmic_egress_firewall.foo",
-						"rule.3593527682.cidr_list.3378711023",
+						"rule.1790767400.cidr_list.522183319",
 						CLOUDSTACK_NETWORK_1_IPADDRESS1+"/32"),
 					resource.TestCheckResourceAttr(
-						"cosmic_egress_firewall.foo", "rule.3593527682.protocol", "tcp"),
+						"cosmic_egress_firewall.foo", "rule.316961573.protocol", "tcp"),
 					resource.TestCheckResourceAttr(
-						"cosmic_egress_firewall.foo", "rule.3593527682.ports.32925333", "8080"),
+						"cosmic_egress_firewall.foo", "rule.316961573.ports.32925333", "8080"),
 					resource.TestCheckResourceAttr(
 						"cosmic_egress_firewall.foo",
-						"rule.739924765.cidr_list.3378711023",
+						"rule.1790767400.cidr_list.522183319",
 						CLOUDSTACK_NETWORK_1_IPADDRESS1+"/32"),
 					resource.TestCheckResourceAttr(
-						"cosmic_egress_firewall.foo", "rule.739924765.protocol", "tcp"),
+						"cosmic_egress_firewall.foo", "rule.1790767400.protocol", "tcp"),
 					resource.TestCheckResourceAttr(
-						"cosmic_egress_firewall.foo", "rule.739924765.ports.1889509032", "80"),
+						"cosmic_egress_firewall.foo", "rule.1790767400.ports.1889509032", "80"),
 				),
 			},
 		},

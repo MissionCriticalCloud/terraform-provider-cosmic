@@ -96,6 +96,9 @@ func testAccPreCheck(t *testing.T) {
 	if v := os.Getenv("CLOUDSTACK_NETWORK_2_CIDR"); v == "" {
 		t.Fatal("CLOUDSTACK_NETWORK_2_CIDR must be set for acceptance tests")
 	}
+	if v := os.Getenv("CLOUDSTACK_NETWORK_2_GATEWAY"); v == "" {
+		t.Fatal("CLOUDSTACK_NETWORK_2_GATEWAY must be set for acceptance tests")
+	}
 	if v := os.Getenv("CLOUDSTACK_NETWORK_2_OFFERING"); v == "" {
 		t.Fatal("CLOUDSTACK_NETWORK_2_OFFERING must be set for acceptance tests")
 	}
@@ -114,8 +117,14 @@ func testAccPreCheck(t *testing.T) {
 	if v := os.Getenv("CLOUDSTACK_VPC_NETWORK_CIDR"); v == "" {
 		t.Fatal("CLOUDSTACK_VPC_NETWORK_CIDR must be set for acceptance tests")
 	}
+	if v := os.Getenv("CLOUDSTACK_VPC_NETWORK_GATEWAY"); v == "" {
+		t.Fatal("CLOUDSTACK_VPC_NETWORK_GATEWAY must be set for acceptance tests")
+	}
 	if v := os.Getenv("CLOUDSTACK_VPC_NETWORK_OFFERING"); v == "" {
 		t.Fatal("CLOUDSTACK_VPC_NETWORK_OFFERING must be set for acceptance tests")
+	}
+	if v := os.Getenv("CLOUDSTACK_VPC_NETWORK_IPADDRESS"); v == "" {
+		t.Fatal("CLOUDSTACK_VPC_NETWORK_IPADDRESS must be set for acceptance tests")
 	}
 	if v := os.Getenv("CLOUDSTACK_PUBLIC_IPADDRESS"); v == "" {
 		t.Fatal("CLOUDSTACK_PUBLIC_IPADDRESS must be set for acceptance tests")
@@ -144,20 +153,20 @@ func testAccPreCheck(t *testing.T) {
 	if v := os.Getenv("CLOUDSTACK_ZONE"); v == "" {
 		t.Fatal("CLOUDSTACK_ZONE must be set for acceptance tests")
 	}
-	if v := os.Getenv("CLOUDSTACK_PRIVGW_GATEWAY"); v == "" {
-		t.Fatal("CLOUDSTACK_PRIVGW_GATEWAY must be set for acceptance tests")
+	if v := os.Getenv("CLOUDSTACK_PRIVNW_CIDR"); v == "" {
+		t.Fatal("CLOUDSTACK_PRIVNW_CIDR must be set for acceptance tests")
+	}
+	if v := os.Getenv("CLOUDSTACK_PRIVNW_OFFERING"); v == "" {
+		t.Fatal("CLOUDSTACK_PRIVNW_OFFERING must be set for acceptance tests")
 	}
 	if v := os.Getenv("CLOUDSTACK_PRIVGW_IPADDRESS"); v == "" {
 		t.Fatal("CLOUDSTACK_PRIVGW_IPADDRESS must be set for acceptance tests")
 	}
-	if v := os.Getenv("CLOUDSTACK_PRIVGW_NETMASK"); v == "" {
-		t.Fatal("CLOUDSTACK_PRIVGW_NETMASK must be set for acceptance tests")
-	}
-	if v := os.Getenv("CLOUDSTACK_PRIVGW_VLAN"); v == "" {
-		t.Fatal("CLOUDSTACK_PRIVGW_VLAN must be set for acceptance tests")
-	}
 	if v := os.Getenv("CLOUDSTACK_STATIC_ROUTE_CIDR"); v == "" {
 		t.Fatal("CLOUDSTACK_STATIC_ROUTE_CIDR must be set for acceptance tests")
+	}
+	if v := os.Getenv("CLOUDSTACK_STATIC_ROUTE_NEXTHOP"); v == "" {
+		t.Fatal("CLOUDSTACK_STATIC_ROUTE_NEXTHOP must be set for acceptance tests")
 	}
 }
 
@@ -188,6 +197,9 @@ var CLOUDSTACK_NETWORK_2 = os.Getenv("CLOUDSTACK_NETWORK_2")
 // Any range
 var CLOUDSTACK_NETWORK_2_CIDR = os.Getenv("CLOUDSTACK_NETWORK_2_CIDR")
 
+// An IP address in CLOUDSTACK_NETWORK_2_CIDR to be used as the gateway
+var CLOUDSTACK_NETWORK_2_GATEWAY = os.Getenv("CLOUDSTACK_NETWORK_2_GATEWAY")
+
 // Name of an available network offering with specifyvlan=false
 var CLOUDSTACK_NETWORK_2_OFFERING = os.Getenv("CLOUDSTACK_NETWORK_2_OFFERING")
 
@@ -211,6 +223,9 @@ var CLOUDSTACK_VPC_OFFERING = os.Getenv("CLOUDSTACK_VPC_OFFERING")
 
 // A sub-range of CLOUDSTACK_VPC_CIDR_1 with same starting point
 var CLOUDSTACK_VPC_NETWORK_CIDR = os.Getenv("CLOUDSTACK_VPC_NETWORK_CIDR")
+
+// A sub-range of CLOUDSTACK_VPC_CIDR_1 with same starting point
+var CLOUDSTACK_VPC_NETWORK_GATEWAY = os.Getenv("CLOUDSTACK_VPC_NETWORK_GATEWAY")
 
 // Name of an available network offering with forvpc=true
 var CLOUDSTACK_VPC_NETWORK_OFFERING = os.Getenv("CLOUDSTACK_VPC_NETWORK_OFFERING")
@@ -248,4 +263,6 @@ var CLOUDSTACK_PRIVNW_OFFERING = os.Getenv("CLOUDSTACK_PRIVNW_OFFERING")
 var CLOUDSTACK_PRIVGW_IPADDRESS = os.Getenv("CLOUDSTACK_PRIVGW_IPADDRESS")
 
 // Details of the static route that will be added to private gateway testing this.
+// nexthop should be in CLOUDSTACK_PRIVNW_CIDR
 var CLOUDSTACK_STATIC_ROUTE_CIDR = os.Getenv("CLOUDSTACK_STATIC_ROUTE_CIDR")
+var CLOUDSTACK_STATIC_ROUTE_NEXTHOP = os.Getenv("CLOUDSTACK_STATIC_ROUTE_NEXTHOP")

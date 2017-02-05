@@ -179,8 +179,10 @@ func resourceCosmicDiskUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	if d.HasChange("disk_offering") || d.HasChange("size") {
 		// Detach the volume (re-attach is done at the end of this function)
-		if err := resourceCosmicDiskDetach(d, meta); err != nil {
-			return fmt.Errorf("Error detaching disk %s from virtual machine: %s", name, err)
+		if !isCosmic(cs) {
+			if err := resourceCosmicDiskDetach(d, meta); err != nil {
+				return fmt.Errorf("Error detaching disk %s from virtual machine: %s", name, err)
+			}
 		}
 
 		// Create a new parameter struct
@@ -369,4 +371,14 @@ func retryableAttachVolumeFunc(
 		}
 		return r, nil
 	}
+}
+
+func isCosmic(cs *cosmic.CosmicClient) (bool) {
+	l := cs.Configuration.NewListCapabilitiesParams()
+	c, err  := cs.Configuration.ListCapabilities(l)
+	if err != nil {
+		fmt.Errorf("Unable to retrieve capabilities: %s", err)
+		return false
+	}
+	return c.Capabilities.Cosmic
 }

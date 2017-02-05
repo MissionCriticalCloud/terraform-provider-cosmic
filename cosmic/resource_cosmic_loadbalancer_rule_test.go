@@ -327,6 +327,7 @@ resource "cosmic_vpc" "foobar" {
 resource "cosmic_network" "foo" {
   name = "terraform-network"
   cidr = "%s"
+  gateway = "%s"
   network_offering = "%s"
   vpc_id = "${cosmic_vpc.foobar.id}"
   zone = "${cosmic_vpc.foobar.zone}"
@@ -359,6 +360,7 @@ resource "cosmic_loadbalancer_rule" "foo" {
 	CLOUDSTACK_VPC_OFFERING,
 	CLOUDSTACK_ZONE,
 	CLOUDSTACK_VPC_NETWORK_CIDR,
+	CLOUDSTACK_VPC_NETWORK_GATEWAY,
 	CLOUDSTACK_VPC_NETWORK_OFFERING,
 	CLOUDSTACK_SERVICE_OFFERING_1,
 	CLOUDSTACK_TEMPLATE)
@@ -374,6 +376,7 @@ resource "cosmic_vpc" "foobar" {
 resource "cosmic_network" "foo" {
   name = "terraform-network"
   cidr = "%s"
+  gateway = "%s"
   network_offering = "%s"
   vpc_id = "${cosmic_vpc.foobar.id}"
   zone = "${cosmic_vpc.foobar.zone}"
@@ -416,6 +419,7 @@ resource "cosmic_loadbalancer_rule" "foo" {
 	CLOUDSTACK_VPC_OFFERING,
 	CLOUDSTACK_ZONE,
 	CLOUDSTACK_VPC_NETWORK_CIDR,
+	CLOUDSTACK_VPC_NETWORK_GATEWAY,
 	CLOUDSTACK_VPC_NETWORK_OFFERING,
 	CLOUDSTACK_SERVICE_OFFERING_1,
 	CLOUDSTACK_TEMPLATE,
