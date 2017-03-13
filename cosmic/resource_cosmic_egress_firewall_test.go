@@ -21,17 +21,15 @@ func TestAccCosmicEgressFirewall_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCosmicEgressFirewallRulesExist("cosmic_egress_firewall.foo"),
 					resource.TestCheckResourceAttr(
-						"cosmic_egress_firewall.foo", "network_id", CLOUDSTACK_NETWORK_1),
-					resource.TestCheckResourceAttr(
 						"cosmic_egress_firewall.foo", "rule.#", "1"),
 					resource.TestCheckResourceAttr(
 						"cosmic_egress_firewall.foo",
-						"rule.2542690345.cidr_list.522183319",
-						CLOUDSTACK_NETWORK_1_IPADDRESS1+"/32"),
+						"rule.813975931.cidr_list.1700444180",
+						"10.10.10.10/32"),
 					resource.TestCheckResourceAttr(
-						"cosmic_egress_firewall.foo", "rule.2542690345.protocol", "tcp"),
+						"cosmic_egress_firewall.foo", "rule.813975931.protocol", "tcp"),
 					resource.TestCheckResourceAttr(
-						"cosmic_egress_firewall.foo", "rule.2542690345.ports.32925333", "8080"),
+						"cosmic_egress_firewall.foo", "rule.813975931.ports.32925333", "8080"),
 				),
 			},
 		},
@@ -49,17 +47,15 @@ func TestAccCosmicEgressFirewall_update(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCosmicEgressFirewallRulesExist("cosmic_egress_firewall.foo"),
 					resource.TestCheckResourceAttr(
-						"cosmic_egress_firewall.foo", "network_id", CLOUDSTACK_NETWORK_1),
-					resource.TestCheckResourceAttr(
 						"cosmic_egress_firewall.foo", "rule.#", "1"),
 					resource.TestCheckResourceAttr(
 						"cosmic_egress_firewall.foo",
-						"rule.2542690345.cidr_list.522183319",
-						CLOUDSTACK_NETWORK_1_IPADDRESS1+"/32"),
+						"rule.813975931.cidr_list.1700444180",
+						"10.10.10.10/32"),
 					resource.TestCheckResourceAttr(
-						"cosmic_egress_firewall.foo", "rule.2542690345.protocol", "tcp"),
+						"cosmic_egress_firewall.foo", "rule.813975931.protocol", "tcp"),
 					resource.TestCheckResourceAttr(
-						"cosmic_egress_firewall.foo", "rule.2542690345.ports.32925333", "8080"),
+						"cosmic_egress_firewall.foo", "rule.813975931.ports.32925333", "8080"),
 				),
 			},
 
@@ -68,29 +64,27 @@ func TestAccCosmicEgressFirewall_update(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCosmicEgressFirewallRulesExist("cosmic_egress_firewall.foo"),
 					resource.TestCheckResourceAttr(
-						"cosmic_egress_firewall.foo", "network_id", CLOUDSTACK_NETWORK_1),
-					resource.TestCheckResourceAttr(
 						"cosmic_egress_firewall.foo", "rule.#", "2"),
 					resource.TestCheckResourceAttr(
 						"cosmic_egress_firewall.foo",
-						"rule.316961573.cidr_list.2812511730",
-						CLOUDSTACK_NETWORK_1_IPADDRESS2+"/32"),
+						"rule.233813027.cidr_list.3722895217",
+						"10.10.10.11/32"),
 					resource.TestCheckResourceAttr(
 						"cosmic_egress_firewall.foo",
-						"rule.1790767400.cidr_list.522183319",
-						CLOUDSTACK_NETWORK_1_IPADDRESS1+"/32"),
+						"rule.3600316628.cidr_list.1700444180",
+						"10.10.10.10/32"),
 					resource.TestCheckResourceAttr(
-						"cosmic_egress_firewall.foo", "rule.316961573.protocol", "tcp"),
+						"cosmic_egress_firewall.foo", "rule.233813027.protocol", "tcp"),
 					resource.TestCheckResourceAttr(
-						"cosmic_egress_firewall.foo", "rule.316961573.ports.32925333", "8080"),
+						"cosmic_egress_firewall.foo", "rule.3600316628.ports.32925333", "8080"),
 					resource.TestCheckResourceAttr(
 						"cosmic_egress_firewall.foo",
-						"rule.1790767400.cidr_list.522183319",
-						CLOUDSTACK_NETWORK_1_IPADDRESS1+"/32"),
+						"rule.3600316628.cidr_list.3722895217",
+						"10.10.10.11/32"),
 					resource.TestCheckResourceAttr(
-						"cosmic_egress_firewall.foo", "rule.1790767400.protocol", "tcp"),
+						"cosmic_egress_firewall.foo", "rule.3600316628.protocol", "tcp"),
 					resource.TestCheckResourceAttr(
-						"cosmic_egress_firewall.foo", "rule.1790767400.ports.1889509032", "80"),
+						"cosmic_egress_firewall.foo", "rule.233813027.ports.1889509032", "80"),
 				),
 			},
 		},
@@ -157,35 +151,53 @@ func testAccCheckCosmicEgressFirewallDestroy(s *terraform.State) error {
 }
 
 var testAccCosmicEgressFirewall_basic = fmt.Sprintf(`
+resource "cosmic_network" "foo" {
+  name = "terraform-network"
+  cidr = "10.10.10.0/24"
+  network_offering = "%s"
+  zone = "%s"
+  tags = {
+    terraform-tag = "true"
+  }
+}
+
 resource "cosmic_egress_firewall" "foo" {
-  network_id = "%s"
+  network_id = "${cosmic_network.foo.id}"
 
   rule {
-    cidr_list = ["%s/32"]
+    cidr_list = ["10.10.10.10/32"]
     protocol = "tcp"
     ports = ["8080"]
   }
 }`,
-	CLOUDSTACK_NETWORK_1,
-	CLOUDSTACK_NETWORK_1_IPADDRESS1)
+	CLOUDSTACK_NETWORK_2_OFFERING,
+	CLOUDSTACK_ZONE)
 
 var testAccCosmicEgressFirewall_update = fmt.Sprintf(`
+resource "cosmic_network" "foo" {
+  name = "terraform-network"
+  cidr = "10.10.10.0/24"
+  network_offering = "%s"
+  zone = "%s"
+  tags = {
+    terraform-tag = "true"
+  }
+}
+
 resource "cosmic_egress_firewall" "foo" {
-  network_id = "%s"
+  network_id = "${cosmic_network.foo.id}"
 
   rule {
-    cidr_list = ["%s/32", "%s/32"]
+    cidr_list = ["10.10.10.10/32", "10.10.10.11/32"]
     protocol = "tcp"
     ports = ["8080"]
   }
 
   rule {
-    cidr_list = ["%s/32"]
+    cidr_list = ["10.10.10.11/32"]
     protocol = "tcp"
     ports = ["80", "1000-2000"]
   }
 }`,
-	CLOUDSTACK_NETWORK_1,
-	CLOUDSTACK_NETWORK_1_IPADDRESS1,
-	CLOUDSTACK_NETWORK_1_IPADDRESS2,
-	CLOUDSTACK_NETWORK_1_IPADDRESS1)
+	CLOUDSTACK_NETWORK_2_OFFERING,
+	CLOUDSTACK_ZONE)
