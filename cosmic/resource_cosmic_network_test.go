@@ -108,8 +108,7 @@ func testAccCheckCosmicNetworkExists(
 	}
 }
 
-func testAccCheckCosmicNetworkBasicAttributes(
-	network *cosmic.Network) resource.TestCheckFunc {
+func testAccCheckCosmicNetworkBasicAttributes(network *cosmic.Network) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		if network.Name != "terraform-network" {
@@ -132,8 +131,7 @@ func testAccCheckCosmicNetworkBasicAttributes(
 	}
 }
 
-func testAccCheckNetworkTags(
-	n *cosmic.Network, key string, value string) resource.TestCheckFunc {
+func testAccCheckNetworkTags(n *cosmic.Network, key string, value string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		tags := make(map[string]string)
 		for item := range n.Tags {
@@ -143,8 +141,7 @@ func testAccCheckNetworkTags(
 	}
 }
 
-func testAccCheckCosmicNetworkVPCAttributes(
-	network *cosmic.Network) resource.TestCheckFunc {
+func testAccCheckCosmicNetworkVPCAttributes(network *cosmic.Network) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		if network.Name != "terraform-network" {
@@ -213,6 +210,7 @@ resource "cosmic_vpc" "foobar" {
 resource "cosmic_network" "foo" {
 	name = "terraform-network"
 	cidr = "%s"
+	gateway = "%s"
 	network_offering = "%s"
 	vpc_id = "${cosmic_vpc.foobar.id}"
 	zone = "${cosmic_vpc.foobar.zone}"
@@ -221,6 +219,7 @@ resource "cosmic_network" "foo" {
 	CLOUDSTACK_VPC_OFFERING,
 	CLOUDSTACK_ZONE,
 	CLOUDSTACK_VPC_NETWORK_CIDR,
+	CLOUDSTACK_VPC_NETWORK_GATEWAY,
 	CLOUDSTACK_VPC_NETWORK_OFFERING)
 
 var testAccCosmicNetwork_acl = fmt.Sprintf(`
@@ -239,6 +238,7 @@ resource "cosmic_network_acl" "foo" {
 resource "cosmic_network" "foo" {
 	name = "terraform-network"
 	cidr = "%s"
+	gateway = "%s"
 	network_offering = "%s"
 	vpc_id = "${cosmic_vpc.foobar.id}"
 	acl_id = "${cosmic_network_acl.foo.id}"
@@ -248,6 +248,7 @@ resource "cosmic_network" "foo" {
 	CLOUDSTACK_VPC_OFFERING,
 	CLOUDSTACK_ZONE,
 	CLOUDSTACK_VPC_NETWORK_CIDR,
+	CLOUDSTACK_VPC_NETWORK_GATEWAY,
 	CLOUDSTACK_VPC_NETWORK_OFFERING)
 
 var testAccCosmicNetwork_updateACL = fmt.Sprintf(`
@@ -266,6 +267,7 @@ resource "cosmic_network_acl" "bar" {
 resource "cosmic_network" "foo" {
 	name = "terraform-network"
 	cidr = "%s"
+	gateway = "%s"
 	network_offering = "%s"
 	vpc_id = "${cosmic_vpc.foobar.id}"
 	acl_id = "${cosmic_network_acl.bar.id}"
@@ -275,4 +277,5 @@ resource "cosmic_network" "foo" {
 	CLOUDSTACK_VPC_OFFERING,
 	CLOUDSTACK_ZONE,
 	CLOUDSTACK_VPC_NETWORK_CIDR,
+	CLOUDSTACK_VPC_NETWORK_GATEWAY,
 	CLOUDSTACK_VPC_NETWORK_OFFERING)

@@ -135,3 +135,13 @@ func setProjectid(p cosmic.ProjectIDSetter, cs *cosmic.CosmicClient, d *schema.R
 
 	return nil
 }
+
+func isCosmic(cs *cosmic.CosmicClient) (bool) {
+	l := cs.Configuration.NewListCapabilitiesParams()
+	c, err  := cs.Configuration.ListCapabilities(l)
+	if err != nil {
+		fmt.Errorf("Unable to retrieve capabilities: %s", err)
+		return false
+	}
+	return c.Capabilities.Cosmic
+}

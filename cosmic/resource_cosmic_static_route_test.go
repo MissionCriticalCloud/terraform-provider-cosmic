@@ -93,29 +93,42 @@ func testAccCheckCosmicStaticRouteDestroy(s *terraform.State) error {
 
 var testAccCosmicStaticRoute_basic = fmt.Sprintf(`
 resource "cosmic_vpc" "foobar" {
-  name = "terraform-vpc"
-  cidr = "%s"
-  vpc_offering = "%s"
-  zone = "%s"
+	name = "terraform-vpc"
+	cidr = "%s"
+	vpc_offering = "%s"
+	zone = "%s"
 }
 
 resource "cosmic_network" "foo" {
 	name = "terraform-network"
 	cidr = "%s"
 	network_offering = "%s"
-	vpc_id = "${cosmic_vpc.foobar.id}"
 	zone = "${cosmic_vpc.foobar.zone}"
 }
 
+resource "cosmic_network_acl" "foo" {
+	name = "terraform-acl"
+	vpc_id = "${cosmic_vpc.foobar.id}"
+}
+
+resource "cosmic_private_gateway" "foo" {
+	ip_address = "%s"
+	network_id = "${cosmic_network.foo.id}"
+	acl_id = "${cosmic_network_acl.foo.id}"
+	vpc_id = "${cosmic_vpc.foobar.id}"
+}
+
 resource "cosmic_static_route" "bar" {
-  cidr = "%s"
+	depends_on = ["cosmic_private_gateway.foo"]
+	cidr = "%s"
 	nexthop = "%s"
-  vpc_id = "${cosmic_vpc.foobar.id}"
+	vpc_id = "${cosmic_vpc.foobar.id}"
 }`,
 	CLOUDSTACK_VPC_CIDR_1,
 	CLOUDSTACK_VPC_OFFERING,
 	CLOUDSTACK_ZONE,
-	CLOUDSTACK_VPC_NETWORK_CIDR,
-	CLOUDSTACK_VPC_NETWORK_OFFERING,
+	CLOUDSTACK_PRIVNW_CIDR,
+	CLOUDSTACK_PRIVNW_OFFERING,
+	CLOUDSTACK_PRIVGW_IPADDRESS,
 	CLOUDSTACK_STATIC_ROUTE_CIDR,
-	CLOUDSTACK_VPC_NETWORK_IPADDRESS)
+	CLOUDSTACK_STATIC_ROUTE_NEXTHOP)
