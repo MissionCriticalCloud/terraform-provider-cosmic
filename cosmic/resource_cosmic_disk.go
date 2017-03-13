@@ -372,13 +372,3 @@ func retryableAttachVolumeFunc(
 		return r, nil
 	}
 }
-
-func isCosmic(cs *cosmic.CosmicClient) (bool) {
-	l := cs.Configuration.NewListCapabilitiesParams()
-	c, err  := cs.Configuration.ListCapabilities(l)
-	if err != nil {
-		fmt.Errorf("Unable to retrieve capabilities: %s", err)
-		return false
-	}
-	return c.Capabilities.Cosmic
-}
