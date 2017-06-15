@@ -178,13 +178,6 @@ func resourceCosmicDiskUpdate(d *schema.ResourceData, meta interface{}) error {
 	name := d.Get("name").(string)
 
 	if d.HasChange("disk_offering") || d.HasChange("size") {
-		// Detach the volume (re-attach is done at the end of this function)
-		if !isCosmic(cs) {
-			if err := resourceCosmicDiskDetach(d, meta); err != nil {
-				return fmt.Errorf("Error detaching disk %s from virtual machine: %s", name, err)
-			}
-		}
-
 		// Create a new parameter struct
 		p := cs.Volume.NewResizeVolumeParams(d.Id())
 

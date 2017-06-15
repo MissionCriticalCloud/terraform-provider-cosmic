@@ -59,6 +59,16 @@ func resourceCosmicVPC() *schema.Resource {
 				Computed: true,
 			},
 
+			"source_nat_list": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+
+			"syslog_server_list": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+
 			"zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
@@ -111,6 +121,18 @@ func resourceCosmicVPCCreate(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
+	// If there is a sourcenatlist supplied, make sure to add it to the request
+	if sourceNatList, ok := d.GetOk("source_nat_list"); ok {
+		// Set the Source NAT list
+		p.SetSourcenatlist(sourceNatList.(string))
+	}
+
+	// If there is a syslogserverlist supplied, make sure to add it to the request
+	if syslogServerList, ok := d.GetOk("syslog_server_list"); ok {
+		// Set the syslog server list
+		p.SetSyslogserverlist(syslogServerList.(string))
+	}
+
 	// Create the new VPC
 	r, err := cs.VPC.CreateVPC(p)
 	if err != nil {
@@ -145,6 +167,8 @@ func resourceCosmicVPCRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("display_text", v.Displaytext)
 	d.Set("cidr", v.Cidr)
 	d.Set("network_domain", v.Networkdomain)
+	d.Set("syslogserverlist", v.Syslogserverlist)
+	d.Set("sourcenatlist", v.Sourcenatlist)
 
 	// Get the VPC offering details
 	o, _, err := cs.VPC.GetVPCOfferingByID(v.Vpcofferingid)
@@ -184,42 +208,49 @@ func resourceCosmicVPCUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	name := d.Get("name").(string)
 
+	// Create a new parameter struct
+	p := cs.VPC.NewUpdateVPCParams(d.Id())
+
 	// Check if the name is changed
 	if d.HasChange("name") {
-		// Create a new parameter struct
-		p := cs.VPC.NewUpdateVPCParams(d.Id())
-
 		// Set the new name
 		p.SetName(name)
-
-		// Update the VPC
-		_, err := cs.VPC.UpdateVPC(p)
-		if err != nil {
-			return fmt.Errorf(
-				"Error updating name of VPC %s: %s", name, err)
-		}
 	}
 
 	// Check if the display text is changed
 	if d.HasChange("display_text") {
-		// Create a new parameter struct
-		p := cs.VPC.NewUpdateVPCParams(d.Id())
-
 		// Set the display text
 		displaytext, ok := d.GetOk("display_text")
 		if !ok {
-			displaytext = d.Get("name")
+			displaytext = name
 		}
 
 		// Set the new display text
 		p.SetDisplaytext(displaytext.(string))
+	}
 
-		// Update the VPC
-		_, err := cs.VPC.UpdateVPC(p)
-		if err != nil {
-			return fmt.Errorf(
-				"Error updating display test of VPC %s: %s", name, err)
-		}
+	// Check if the source nat list is changed
+	if d.HasChange("source_nat_list") {
+		// Set the source nat list
+		sourcenatlist := d.Get("source_nat_list")
+
+		// Set the new display text
+		p.SetSourcenatlist(sourcenatlist.(string))
+	}
+
+	// Check if the syslog server list is changed
+	if d.HasChange("syslog_server_list") {
+		// Set the syslog server list
+		syslogserverlist := d.Get("syslog_server_list")
+
+		// Set the new display text
+		p.SetSyslogserverlist(syslogserverlist.(string))
+	}
+
+	// Update the VPC
+	_, err := cs.VPC.UpdateVPC(p)
+	if err != nil {
+		return fmt.Errorf("Error updating name of VPC %s: %s", name, err)
 	}
 
 	return resourceCosmicVPCRead(d, meta)

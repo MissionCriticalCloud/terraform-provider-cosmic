@@ -102,6 +102,12 @@ func resourceCosmicNetwork() *schema.Resource {
 
 			"acl_id": aclidSchema,
 
+			"ip_exclusion_list": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+			},
+
 			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -186,12 +192,17 @@ func resourceCosmicNetworkCreate(d *schema.ResourceData, meta interface{}) error
 		p.SetVlan(strconv.Itoa(vlan.(int)))
 	}
 
+	// Set the ip exclusion list if we have one
+	if ipExclusionList, ok := d.GetOk("ip_exclusion_list"); ok {
+		p.SetIpexclusionlist(ipExclusionList.(string))
+	}
+
 	// Check is this network needs to be created in a VPC
 	if vpcid, ok := d.GetOk("vpc_id"); ok {
 		// Set the vpc id
 		p.SetVpcid(vpcid.(string))
 
-		// Since we're in a VPC, check if we want to assiciate an ACL list
+		// Since we're in a VPC, check if we want to associate an ACL list
 		if aclid, ok := d.GetOk("acl_id"); ok && aclid.(string) != none {
 			// Set the acl ID
 			p.SetAclid(aclid.(string))
@@ -244,6 +255,7 @@ func resourceCosmicNetworkRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("gateway", n.Gateway)
 	d.Set("network_domain", n.Networkdomain)
 	d.Set("vpc_id", n.Vpcid)
+	d.Set("ip_exclusion_list", n.Ipexclusionlist)
 
 	if n.Aclid == "" {
 		n.Aclid = none
@@ -291,6 +303,11 @@ func resourceCosmicNetworkUpdate(d *schema.ResourceData, meta interface{}) error
 	// Check if the network domain is changed
 	if d.HasChange("network_domain") {
 		p.SetNetworkdomain(d.Get("network_domain").(string))
+	}
+
+	// Check if the ip exclusion list is changed
+	if d.HasChange("ip_exclusion_list") {
+		p.SetIpexclusionlist(d.Get("ip_exclusion_list").(string))
 	}
 
 	// Check if the network offering is changed
