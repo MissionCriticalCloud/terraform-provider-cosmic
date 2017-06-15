@@ -22,9 +22,11 @@ func resourceCosmicVPNCustomerGateway() *schema.Resource {
 				Required: true,
 			},
 
-			"cidr": &schema.Schema{
-				Type:     schema.TypeString,
+			"cidr_list": &schema.Schema{
+				Type:     schema.TypeSet,
 				Required: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 			},
 
 			"esp_policy": &schema.Schema{
@@ -73,7 +75,7 @@ func resourceCosmicVPNCustomerGatewayCreate(d *schema.ResourceData, meta interfa
 
 	// Create a new parameter struct
 	p := cs.VPN.NewCreateVpnCustomerGatewayParams(
-		d.Get("cidr").(string),
+		createCidrList(d.Get("cidr_list").(*schema.Set)),
 		d.Get("esp_policy").(string),
 		d.Get("gateway").(string),
 		d.Get("ike_policy").(string),
@@ -139,7 +141,7 @@ func resourceCosmicVPNCustomerGatewayUpdate(d *schema.ResourceData, meta interfa
 
 	// Create a new parameter struct
 	p := cs.VPN.NewUpdateVpnCustomerGatewayParams(
-		d.Get("cidr").(string),
+		createCidrList(d.Get("cidr_list").(*schema.Set)),
 		d.Get("esp_policy").(string),
 		d.Get("gateway").(string),
 		d.Id(),

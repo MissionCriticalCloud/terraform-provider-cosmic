@@ -95,9 +95,11 @@ func resourceCosmicIPAddressCreate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Error associating a new IP address: %s", err)
 	}
 
+	d.SetId(r.Id)
+
 	// Set the ACL if we are on a VPC and acl_id is supplied
 	if _, ok := d.GetOk("vpc_id"); ok {
-		if aclid, ok := d.GetOk("acl_id"); ok {
+		if aclid, ok := d.GetOk("acl_id"); ok && aclid.(string) != none {
 			p := cs.NetworkACL.NewReplaceNetworkACLListParams(aclid.(string))
 			p.SetPublicipid(d.Id())
 
@@ -107,8 +109,6 @@ func resourceCosmicIPAddressCreate(d *schema.ResourceData, meta interface{}) err
 			}
 		}
 	}
-
-	d.SetId(r.Id)
 
 	return resourceCosmicIPAddressRead(d, meta)
 }

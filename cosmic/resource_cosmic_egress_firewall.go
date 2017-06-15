@@ -160,11 +160,7 @@ func createEgressFirewallRule(d *schema.ResourceData, meta interface{}, rule map
 	p := cs.Firewall.NewCreateEgressFirewallRuleParams(d.Id(), rule["protocol"].(string))
 
 	// Set the CIDR list
-	var cidrList []string
-	for _, cidr := range rule["cidr_list"].(*schema.Set).List() {
-		cidrList = append(cidrList, cidr.(string))
-	}
-	p.SetCidrlist(cidrList)
+	p.SetCidrlist(createCidrList(rule["cidr_list"].(*schema.Set)))
 
 	// If the protocol is ICMP set the needed ICMP parameters
 	if rule["protocol"].(string) == "icmp" {

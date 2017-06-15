@@ -186,11 +186,7 @@ func createNetworkACLRule(d *schema.ResourceData, meta interface{}, rule map[str
 	p.SetAction(rule["action"].(string))
 
 	// Set the CIDR list
-	var cidrList []string
-	for _, cidr := range rule["cidr_list"].(*schema.Set).List() {
-		cidrList = append(cidrList, cidr.(string))
-	}
-	p.SetCidrlist(cidrList)
+	p.SetCidrlist(createCidrList(rule["cidr_list"].(*schema.Set)))
 
 	// Set the traffic type
 	p.SetTraffictype(rule["traffic_type"].(string))

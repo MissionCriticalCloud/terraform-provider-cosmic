@@ -253,9 +253,9 @@ func resourceCosmicNetworkRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("display_text", n.Displaytext)
 	d.Set("cidr", n.Cidr)
 	d.Set("gateway", n.Gateway)
+	d.Set("ip_exclusion_list", n.Ipexclusionlist)
 	d.Set("network_domain", n.Networkdomain)
 	d.Set("vpc_id", n.Vpcid)
-	d.Set("ip_exclusion_list", n.Ipexclusionlist)
 
 	if n.Aclid == "" {
 		n.Aclid = none

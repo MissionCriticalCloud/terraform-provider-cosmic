@@ -145,3 +145,11 @@ func isCosmic(cs *cosmic.CosmicClient) (bool) {
 	}
 	return c.Capabilities.Cosmic
 }
+
+func createCidrList(cidrs *schema.Set) []string {
+	var cidrList []string
+	for _, cidr := range cidrs.List() {
+		cidrList = append(cidrList, cidr.(string))
+	}
+	return cidrList
+}
