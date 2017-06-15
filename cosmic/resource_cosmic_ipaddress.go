@@ -10,9 +10,28 @@ import (
 )
 
 func resourceCosmicIPAddress() *schema.Resource {
+	aclidSchema := &schema.Schema{
+		Type:     schema.TypeString,
+		Optional: true,
+		Default:  none,
+	}
+
+	aclidSchema.StateFunc = func(v interface{}) string {
+		value := v.(string)
+
+		if value == none {
+			aclidSchema.ForceNew = true
+		} else {
+			aclidSchema.ForceNew = false
+		}
+
+		return value
+	}
+
 	return &schema.Resource{
 		Create: resourceCosmicIPAddressCreate,
 		Read:   resourceCosmicIPAddressRead,
+		Update: resourceCosmicIPAddressUpdate,
 		Delete: resourceCosmicIPAddressDelete,
 
 		Schema: map[string]*schema.Schema{
@@ -39,6 +58,8 @@ func resourceCosmicIPAddress() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+
+			"acl_id": aclidSchema,
 		},
 	}
 }
@@ -72,6 +93,19 @@ func resourceCosmicIPAddressCreate(d *schema.ResourceData, meta interface{}) err
 	r, err := cs.Address.AssociateIpAddress(p)
 	if err != nil {
 		return fmt.Errorf("Error associating a new IP address: %s", err)
+	}
+
+	// Set the ACL if we are on a VPC and acl_id is supplied
+	if _, ok := d.GetOk("vpc_id"); ok {
+		if aclid, ok := d.GetOk("acl_id"); ok {
+			p := cs.NetworkACL.NewReplaceNetworkACLListParams(aclid.(string))
+			p.SetPublicipid(d.Id())
+
+			_, err := cs.NetworkACL.ReplaceNetworkACLList(p)
+			if err != nil {
+				return fmt.Errorf("Error replacing ACL: %s", err)
+			}
+		}
 	}
 
 	d.SetId(r.Id)
@@ -109,9 +143,32 @@ func resourceCosmicIPAddressRead(d *schema.ResourceData, meta interface{}) error
 		d.Set("vpc_id", ip.Vpcid)
 	}
 
+	if ip.Aclid == "" {
+		ip.Aclid = none
+	}
+	d.Set("acl_id", ip.Aclid)
+
 	setValueOrID(d, "project", ip.Project, ip.Projectid)
 
 	return nil
+}
+
+
+func resourceCosmicIPAddressUpdate(d *schema.ResourceData, meta interface{}) error {
+	cs := meta.(*cosmic.CosmicClient)
+
+	// Replace the ACL if the ID has changed
+	if d.HasChange("acl_id") {
+		p := cs.NetworkACL.NewReplaceNetworkACLListParams(d.Get("acl_id").(string))
+		p.SetPublicipid(d.Id())
+
+		_, err := cs.NetworkACL.ReplaceNetworkACLList(p)
+		if err != nil {
+			return fmt.Errorf("Error replacing ACL: %s", err)
+		}
+	}
+
+	return resourceCosmicIPAddressRead(d, meta)
 }
 
 func resourceCosmicIPAddressDelete(d *schema.ResourceData, meta interface{}) error {
