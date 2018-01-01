@@ -288,10 +288,23 @@ func resourceCosmicNetworkACLRuleRead(d *schema.ResourceData, meta interface{}) 
 	p := cs.NetworkACL.NewListNetworkACLsParams()
 	p.SetAclid(d.Id())
 	p.SetListall(true)
+	pg := 1
 
-	l, err := cs.NetworkACL.ListNetworkACLs(p)
-	if err != nil {
-		return err
+	done := false
+	var l cosmic.ListNetworkACLsResponse
+	for !done {
+		tl, err := cs.NetworkACL.ListNetworkACLs(p)
+		if err != nil {
+			return err
+		}
+		l.Count = tl.Count
+		l.NetworkACLs = append(l.NetworkACLs, tl.NetworkACLs...)
+		done = len(l.NetworkACLs) >= l.Count
+		if !done && pg == 1 {
+			p.SetPagesize(len(tl.NetworkACLs))
+		}
+		pg++
+		p.SetPage(pg)
 	}
 
 	// Make a map of all the rules so we can easily find a rule
