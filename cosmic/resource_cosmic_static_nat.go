@@ -99,7 +99,7 @@ func resourceCosmicStaticNATExists(d *schema.ResourceData, meta interface{}) (bo
 	cs := meta.(*cosmic.CosmicClient)
 
 	// Get the IP address details
-	ip, count, err := cs.Address.GetPublicIpAddressByID(
+	ip, count, err := cs.PublicIPAddress.GetPublicIpAddressByID(
 		d.Id(),
 		cosmic.WithProject(d.Get("project").(string)),
 	)
@@ -119,7 +119,7 @@ func resourceCosmicStaticNATRead(d *schema.ResourceData, meta interface{}) error
 	cs := meta.(*cosmic.CosmicClient)
 
 	// Get the IP address details
-	ip, count, err := cs.Address.GetPublicIpAddressByID(
+	ip, count, err := cs.PublicIPAddress.GetPublicIpAddressByID(
 		d.Id(),
 		cosmic.WithProject(d.Get("project").(string)),
 	)

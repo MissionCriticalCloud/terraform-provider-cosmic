@@ -181,7 +181,7 @@ func resourceCosmicVPCRead(d *schema.ResourceData, meta interface{}) error {
 	setValueOrID(d, "zone", v.Zonename, v.Zoneid)
 
 	// Create a new parameter struct
-	p := cs.Address.NewListPublicIpAddressesParams()
+	p := cs.PublicIPAddress.NewListPublicIpAddressesParams()
 	p.SetVpcid(d.Id())
 	p.SetIssourcenat(true)
 
@@ -191,7 +191,7 @@ func resourceCosmicVPCRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	// Get the source NAT IP assigned to the VPC
-	l, err := cs.Address.ListPublicIpAddresses(p)
+	l, err := cs.PublicIPAddress.ListPublicIpAddresses(p)
 	if err != nil {
 		return err
 	}
