@@ -198,7 +198,7 @@ func resourceCosmicPortForwardRead(d *schema.ResourceData, meta interface{}) err
 	cs := meta.(*cosmic.CosmicClient)
 
 	// First check if the IP address is still associated
-	_, count, err := cs.Address.GetPublicIpAddressByID(
+	_, count, err := cs.PublicIPAddress.GetPublicIpAddressByID(
 		d.Id(),
 		cosmic.WithProject(d.Get("project").(string)),
 	)

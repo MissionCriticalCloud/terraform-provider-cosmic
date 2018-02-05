@@ -72,7 +72,7 @@ func resourceCosmicIPAddressCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	// Create a new parameter struct
-	p := cs.Address.NewAssociateIpAddressParams()
+	p := cs.PublicIPAddress.NewAssociateIpAddressParams()
 
 	if networkid, ok := d.GetOk("network_id"); ok {
 		// Set the networkid
@@ -90,7 +90,7 @@ func resourceCosmicIPAddressCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	// Associate a new IP address
-	r, err := cs.Address.AssociateIpAddress(p)
+	r, err := cs.PublicIPAddress.AssociateIpAddress(p)
 	if err != nil {
 		return fmt.Errorf("Error associating a new IP address: %s", err)
 	}
@@ -117,7 +117,7 @@ func resourceCosmicIPAddressRead(d *schema.ResourceData, meta interface{}) error
 	cs := meta.(*cosmic.CosmicClient)
 
 	// Get the IP address details
-	ip, count, err := cs.Address.GetPublicIpAddressByID(
+	ip, count, err := cs.PublicIPAddress.GetPublicIpAddressByID(
 		d.Id(),
 		cosmic.WithProject(d.Get("project").(string)),
 	)
@@ -175,10 +175,10 @@ func resourceCosmicIPAddressDelete(d *schema.ResourceData, meta interface{}) err
 	cs := meta.(*cosmic.CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.Address.NewDisassociateIpAddressParams(d.Id())
+	p := cs.PublicIPAddress.NewDisassociateIpAddressParams(d.Id())
 
 	// Disassociate the IP address
-	if _, err := cs.Address.DisassociateIpAddress(p); err != nil {
+	if _, err := cs.PublicIPAddress.DisassociateIpAddress(p); err != nil {
 		// This is a very poor way to be told the ID does no longer exist :(
 		if strings.Contains(err.Error(), fmt.Sprintf(
 			"Invalid parameter id value=%s due to incorrect long value format, "+
