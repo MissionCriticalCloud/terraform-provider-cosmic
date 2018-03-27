@@ -15,6 +15,9 @@ func resourceCosmicVPC() *schema.Resource {
 		Read:   resourceCosmicVPCRead,
 		Update: resourceCosmicVPCUpdate,
 		Delete: resourceCosmicVPCDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
