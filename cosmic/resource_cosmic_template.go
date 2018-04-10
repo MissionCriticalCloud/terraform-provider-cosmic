@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/MissionCriticalCloud/go-cosmic/cosmic"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/xanzy/go-cosmic/cosmic"
 )
 
 func resourceCosmicTemplate() *schema.Resource {
