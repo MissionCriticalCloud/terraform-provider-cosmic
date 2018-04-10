@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/MissionCriticalCloud/go-cosmic/cosmic"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/xanzy/go-cosmic/cosmic"
 )
 
 func TestAccCosmicFirewall_basic(t *testing.T) {

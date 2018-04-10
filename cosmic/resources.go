@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/MissionCriticalCloud/go-cosmic/cosmic"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/xanzy/go-cosmic/cosmic"
 )
 
 // Define a regexp for parsing the port
@@ -136,9 +136,9 @@ func setProjectid(p cosmic.ProjectIDSetter, cs *cosmic.CosmicClient, d *schema.R
 	return nil
 }
 
-func isCosmic(cs *cosmic.CosmicClient) (bool) {
+func isCosmic(cs *cosmic.CosmicClient) bool {
 	l := cs.Configuration.NewListCapabilitiesParams()
-	c, err  := cs.Configuration.ListCapabilities(l)
+	c, err := cs.Configuration.ListCapabilities(l)
 	if err != nil {
 		fmt.Errorf("Unable to retrieve capabilities: %s", err)
 		return false

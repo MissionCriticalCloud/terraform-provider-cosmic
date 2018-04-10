@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/MissionCriticalCloud/go-cosmic/cosmic"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/xanzy/go-cosmic/cosmic"
 )
 
 func resourceCosmicDisk() *schema.Resource {
