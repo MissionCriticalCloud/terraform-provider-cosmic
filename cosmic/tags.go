@@ -3,8 +3,8 @@ package cosmic
 import (
 	"log"
 
+	"github.com/MissionCriticalCloud/go-cosmic/cosmic"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/xanzy/go-cosmic/cosmic"
 )
 
 // tagsSchema returns the schema to use for tags

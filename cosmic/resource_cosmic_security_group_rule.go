@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/MissionCriticalCloud/go-cosmic/cosmic"
 	multierror "github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/xanzy/go-cosmic/cosmic"
 )
 
 type authorizeSecurityGroupParams interface {

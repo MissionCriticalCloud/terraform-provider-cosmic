@@ -5,8 +5,8 @@ import (
 	"log"
 	"strings"
 
+	"github.com/MissionCriticalCloud/go-cosmic/cosmic"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/xanzy/go-cosmic/cosmic"
 )
 
 func resourceCosmicIPAddress() *schema.Resource {
@@ -152,7 +152,6 @@ func resourceCosmicIPAddressRead(d *schema.ResourceData, meta interface{}) error
 
 	return nil
 }
-
 
 func resourceCosmicIPAddressUpdate(d *schema.ResourceData, meta interface{}) error {
 	cs := meta.(*cosmic.CosmicClient)
