@@ -60,6 +60,13 @@ func resourceCosmicLoadBalancerRule() *schema.Resource {
 				ForceNew: true,
 			},
 
+			"protocol": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				ForceNew: true,
+			},
+
 			"member_ids": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
@@ -79,6 +86,12 @@ func resourceCosmicLoadBalancerRule() *schema.Resource {
 
 func resourceCosmicLoadBalancerRuleCreate(d *schema.ResourceData, meta interface{}) error {
 	cs := meta.(*cosmic.CosmicClient)
+
+	// Make sure all required parameters are there
+	if err := verifyLoadBalancerRule(d); err != nil {
+		return err
+	}
+
 	d.Partial(true)
 
 	// Create a new parameter struct
@@ -104,6 +117,11 @@ func resourceCosmicLoadBalancerRuleCreate(d *schema.ResourceData, meta interface
 		p.SetNetworkid(networkid.(string))
 	}
 
+	// Set the protocol
+	if protocol, ok := d.GetOk("protocol"); ok {
+		p.SetProtocol(protocol.(string))
+	}
+
 	// Set the ipaddress id
 	p.SetPublicipid(d.Get("ip_address_id").(string))
 
@@ -122,6 +140,7 @@ func resourceCosmicLoadBalancerRuleCreate(d *schema.ResourceData, meta interface
 	d.SetPartial("algorithm")
 	d.SetPartial("private_port")
 	d.SetPartial("public_port")
+	d.SetPartial("protocol")
 
 	// Create a new parameter struct
 	ap := cs.LoadBalancer.NewAssignToLoadBalancerRuleParams(r.Id)
@@ -234,6 +253,21 @@ func resourceCosmicLoadBalancerRuleDelete(d *schema.ResourceData, meta interface
 			"Invalid parameter id value=%s due to incorrect long value format, "+
 				"or entity does not exist", d.Id())) {
 			return err
+		}
+	}
+
+	return nil
+}
+
+func verifyLoadBalancerRule(d *schema.ResourceData) error {
+	if protocol, ok := d.GetOk("protocol"); ok {
+		protocol := protocol.(string)
+
+		switch protocol {
+		case "tcp", "tcp-proxy":
+		default:
+			return fmt.Errorf(
+				"%q is not a valid protocol. Valid options are 'tcp' and 'tcp-proxy'", protocol)
 		}
 	}
 
