@@ -15,12 +15,6 @@ archive:
   replacements:
     darwin: mac
   format: binary
-checksum:
-  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
-release:
-  draft: true
-  prerelease: false
-  name_template: "{{.ProjectName}}-v{{.Version}}"
 changelog:
   filters:
     exclude:
