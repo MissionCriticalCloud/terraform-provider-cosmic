@@ -1,0 +1,19 @@
+# .goreleaser.yml
+# Build customization
+builds:
+  -
+    binary: terraform-provider-cosmic
+    ldflags: -s -w
+    goos:
+      - windows
+      - darwin
+      - linux
+    goarch:
+      - amd64
+archive:
+  name_template: "{{ .Binary }}_{{ .Os }}_{{ .Arch }}"
+  replacements:
+    darwin: mac
+  format: binary
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
