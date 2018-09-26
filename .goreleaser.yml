@@ -1,15 +1,19 @@
+# .goreleaser.yml
+# Build customization
 builds:
- - main: main.go
-   binary: hello-world
-   goos:
-     - windows
-     - darwin
-   goarch:
-     - amd64
+  -
+    binary: terraform-provider-cosmic
+    ldflags: -s -w
+    goos:
+      - windows
+      - darwin
+      - linux
+    goarch:
+      - amd64
 archive:
-  format: tar.gz
+  name_template: "{{ .Binary }}_{{ .Os }}_{{ .Arch }}"
   replacements:
-    amd64: 64-bit
-    darwin: macOS
-  files:
-    - hello-world.license.txt
+    darwin: mac
+  format: binary
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
