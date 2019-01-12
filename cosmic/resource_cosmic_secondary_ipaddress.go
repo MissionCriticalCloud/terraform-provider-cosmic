@@ -14,6 +14,9 @@ func resourceCosmicSecondaryIPAddress() *schema.Resource {
 		Create: resourceCosmicSecondaryIPAddressCreate,
 		Read:   resourceCosmicSecondaryIPAddressRead,
 		Delete: resourceCosmicSecondaryIPAddressDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"ip_address": &schema.Schema{

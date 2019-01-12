@@ -14,6 +14,9 @@ func resourceCosmicVPNGateway() *schema.Resource {
 		Create: resourceCosmicVPNGatewayCreate,
 		Read:   resourceCosmicVPNGatewayRead,
 		Delete: resourceCosmicVPNGatewayDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"vpc_id": &schema.Schema{

@@ -14,6 +14,9 @@ func resourceCosmicNIC() *schema.Resource {
 		Create: resourceCosmicNICCreate,
 		Read:   resourceCosmicNICRead,
 		Delete: resourceCosmicNICDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"network_id": &schema.Schema{

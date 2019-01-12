@@ -14,6 +14,9 @@ func resourceCosmicDisk() *schema.Resource {
 		Read:   resourceCosmicDiskRead,
 		Update: resourceCosmicDiskUpdate,
 		Delete: resourceCosmicDiskDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{

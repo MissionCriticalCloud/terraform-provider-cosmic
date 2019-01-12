@@ -14,6 +14,9 @@ func resourceCosmicStaticRoute() *schema.Resource {
 		Create: resourceCosmicStaticRouteCreate,
 		Read:   resourceCosmicStaticRouteRead,
 		Delete: resourceCosmicStaticRouteDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"cidr": &schema.Schema{

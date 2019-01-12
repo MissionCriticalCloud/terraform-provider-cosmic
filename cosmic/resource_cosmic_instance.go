@@ -18,6 +18,9 @@ func resourceCosmicInstance() *schema.Resource {
 		Read:   resourceCosmicInstanceRead,
 		Update: resourceCosmicInstanceUpdate,
 		Delete: resourceCosmicInstanceDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {

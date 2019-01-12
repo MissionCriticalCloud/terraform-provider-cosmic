@@ -15,6 +15,9 @@ func resourceCosmicLoadBalancerRule() *schema.Resource {
 		Read:   resourceCosmicLoadBalancerRuleRead,
 		Update: resourceCosmicLoadBalancerRuleUpdate,
 		Delete: resourceCosmicLoadBalancerRuleDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{

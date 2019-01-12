@@ -16,6 +16,9 @@ func resourceCosmicTemplate() *schema.Resource {
 		Read:   resourceCosmicTemplateRead,
 		Update: resourceCosmicTemplateUpdate,
 		Delete: resourceCosmicTemplateDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{

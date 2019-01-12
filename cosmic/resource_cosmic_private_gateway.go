@@ -14,6 +14,9 @@ func resourceCosmicPrivateGateway() *schema.Resource {
 		Create: resourceCosmicPrivateGatewayCreate,
 		Read:   resourceCosmicPrivateGatewayRead,
 		Delete: resourceCosmicPrivateGatewayDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"ip_address": &schema.Schema{
