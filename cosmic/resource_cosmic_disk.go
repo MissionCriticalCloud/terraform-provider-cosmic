@@ -25,6 +25,11 @@ func resourceCosmicDisk() *schema.Resource {
 				ForceNew: true,
 			},
 
+			"disk_offering": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+			},
+
 			"attach": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -35,11 +40,6 @@ func resourceCosmicDisk() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
-			},
-
-			"disk_offering": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
 			},
 
 			"size": &schema.Schema{
