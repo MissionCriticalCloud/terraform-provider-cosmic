@@ -14,6 +14,9 @@ func resourceCosmicSSHKeyPair() *schema.Resource {
 		Create: resourceCosmicSSHKeyPairCreate,
 		Read:   resourceCosmicSSHKeyPairRead,
 		Delete: resourceCosmicSSHKeyPairDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{

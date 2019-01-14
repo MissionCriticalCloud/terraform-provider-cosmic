@@ -33,6 +33,9 @@ func resourceCosmicIPAddress() *schema.Resource {
 		Read:   resourceCosmicIPAddressRead,
 		Update: resourceCosmicIPAddressUpdate,
 		Delete: resourceCosmicIPAddressDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceCosmicIPAddressImporter,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"network_id": &schema.Schema{
@@ -189,6 +192,21 @@ func resourceCosmicIPAddressDelete(d *schema.ResourceData, meta interface{}) err
 	}
 
 	return nil
+}
+
+func resourceCosmicIPAddressImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	cs := meta.(*cosmic.CosmicClient)
+	ip, _, _ := cs.PublicIPAddress.GetPublicIpAddressByID(
+		d.Id(),
+		cosmic.WithProject(d.Get("project").(string)),
+	)
+
+	// Set the vpc_id if the IP is attached to a VPC.
+	if ip.Vpcid != "" {
+		d.Set("vpc_id", ip.Vpcid)
+	}
+
+	return []*schema.ResourceData{d}, nil
 }
 
 func verifyIPAddressParams(d *schema.ResourceData) error {

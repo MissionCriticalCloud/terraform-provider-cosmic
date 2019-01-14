@@ -18,6 +18,9 @@ func resourceCosmicEgressFirewall() *schema.Resource {
 		Read:   resourceCosmicEgressFirewallRead,
 		Update: resourceCosmicEgressFirewallUpdate,
 		Delete: resourceCosmicEgressFirewallDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"network_id": &schema.Schema{

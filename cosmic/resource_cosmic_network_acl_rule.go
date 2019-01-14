@@ -19,6 +19,9 @@ func resourceCosmicNetworkACLRule() *schema.Resource {
 		Read:   resourceCosmicNetworkACLRuleRead,
 		Update: resourceCosmicNetworkACLRuleUpdate,
 		Delete: resourceCosmicNetworkACLRuleDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"acl_id": &schema.Schema{

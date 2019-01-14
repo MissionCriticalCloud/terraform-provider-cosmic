@@ -37,6 +37,9 @@ func resourceCosmicNetwork() *schema.Resource {
 		Read:   resourceCosmicNetworkRead,
 		Update: resourceCosmicNetworkUpdate,
 		Delete: resourceCosmicNetworkDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{

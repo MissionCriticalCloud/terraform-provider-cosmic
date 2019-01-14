@@ -14,6 +14,9 @@ func resourceCosmicAffinityGroup() *schema.Resource {
 		Create: resourceCosmicAffinityGroupCreate,
 		Read:   resourceCosmicAffinityGroupRead,
 		Delete: resourceCosmicAffinityGroupDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{

@@ -15,6 +15,9 @@ func resourceCosmicStaticNAT() *schema.Resource {
 		Exists: resourceCosmicStaticNATExists,
 		Read:   resourceCosmicStaticNATRead,
 		Delete: resourceCosmicStaticNATDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"ip_address_id": &schema.Schema{

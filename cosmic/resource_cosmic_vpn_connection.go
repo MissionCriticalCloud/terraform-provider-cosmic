@@ -14,6 +14,9 @@ func resourceCosmicVPNConnection() *schema.Resource {
 		Create: resourceCosmicVPNConnectionCreate,
 		Read:   resourceCosmicVPNConnectionRead,
 		Delete: resourceCosmicVPNConnectionDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"customer_gateway_id": &schema.Schema{

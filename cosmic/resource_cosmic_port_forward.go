@@ -19,6 +19,9 @@ func resourceCosmicPortForward() *schema.Resource {
 		Read:   resourceCosmicPortForwardRead,
 		Update: resourceCosmicPortForwardUpdate,
 		Delete: resourceCosmicPortForwardDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"ip_address_id": &schema.Schema{

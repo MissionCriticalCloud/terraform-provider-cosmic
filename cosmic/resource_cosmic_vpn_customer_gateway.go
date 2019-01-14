@@ -15,6 +15,9 @@ func resourceCosmicVPNCustomerGateway() *schema.Resource {
 		Read:   resourceCosmicVPNCustomerGatewayRead,
 		Update: resourceCosmicVPNCustomerGatewayUpdate,
 		Delete: resourceCosmicVPNCustomerGatewayDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
