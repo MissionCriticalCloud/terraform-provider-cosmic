@@ -65,6 +65,16 @@ func resourceCosmicLoadBalancerRule() *schema.Resource {
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
+				ValidateFunc: func(val interface{}, key string) (warns []string, errs []error) {
+					v := val.(string)
+					switch v {
+					case "tcp", "tcp-proxy":
+					default:
+						errs = append(errs, fmt.Errorf("%q must be either 'tcp' or 'tcp-proxy', got: %q", key, v))
+					}
+
+					return
+				},
 			},
 
 			"member_ids": &schema.Schema{
@@ -86,11 +96,6 @@ func resourceCosmicLoadBalancerRule() *schema.Resource {
 
 func resourceCosmicLoadBalancerRuleCreate(d *schema.ResourceData, meta interface{}) error {
 	cs := meta.(*cosmic.CosmicClient)
-
-	// Make sure all required parameters are there
-	if err := verifyLoadBalancerRule(d); err != nil {
-		return err
-	}
 
 	d.Partial(true)
 
@@ -253,21 +258,6 @@ func resourceCosmicLoadBalancerRuleDelete(d *schema.ResourceData, meta interface
 			"Invalid parameter id value=%s due to incorrect long value format, "+
 				"or entity does not exist", d.Id())) {
 			return err
-		}
-	}
-
-	return nil
-}
-
-func verifyLoadBalancerRule(d *schema.ResourceData) error {
-	if protocol, ok := d.GetOk("protocol"); ok {
-		protocol := protocol.(string)
-
-		switch protocol {
-		case "tcp", "tcp-proxy":
-		default:
-			return fmt.Errorf(
-				"%q is not a valid protocol. Valid options are 'tcp' and 'tcp-proxy'", protocol)
 		}
 	}
 
