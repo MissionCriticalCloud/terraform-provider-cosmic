@@ -60,6 +60,23 @@ func resourceCosmicLoadBalancerRule() *schema.Resource {
 				ForceNew: true,
 			},
 
+			"protocol": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				ForceNew: true,
+				ValidateFunc: func(val interface{}, key string) (warns []string, errs []error) {
+					v := val.(string)
+					switch v {
+					case "tcp", "tcp-proxy":
+					default:
+						errs = append(errs, fmt.Errorf("%q must be either 'tcp' or 'tcp-proxy', got: %q", key, v))
+					}
+
+					return
+				},
+			},
+
 			"member_ids": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
@@ -79,6 +96,7 @@ func resourceCosmicLoadBalancerRule() *schema.Resource {
 
 func resourceCosmicLoadBalancerRuleCreate(d *schema.ResourceData, meta interface{}) error {
 	cs := meta.(*cosmic.CosmicClient)
+
 	d.Partial(true)
 
 	// Create a new parameter struct
@@ -104,6 +122,11 @@ func resourceCosmicLoadBalancerRuleCreate(d *schema.ResourceData, meta interface
 		p.SetNetworkid(networkid.(string))
 	}
 
+	// Set the protocol
+	if protocol, ok := d.GetOk("protocol"); ok {
+		p.SetProtocol(protocol.(string))
+	}
+
 	// Set the ipaddress id
 	p.SetPublicipid(d.Get("ip_address_id").(string))
 
@@ -122,6 +145,7 @@ func resourceCosmicLoadBalancerRuleCreate(d *schema.ResourceData, meta interface
 	d.SetPartial("algorithm")
 	d.SetPartial("private_port")
 	d.SetPartial("public_port")
+	d.SetPartial("protocol")
 
 	// Create a new parameter struct
 	ap := cs.LoadBalancer.NewAssignToLoadBalancerRuleParams(r.Id)

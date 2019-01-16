@@ -108,6 +108,8 @@ func TestAccCosmicLoadBalancerRule_forceNew(t *testing.T) {
 						"cosmic_loadbalancer_rule.foo", "public_port", "443"),
 					resource.TestCheckResourceAttr(
 						"cosmic_loadbalancer_rule.foo", "private_port", "443"),
+					resource.TestCheckResourceAttr(
+						"cosmic_loadbalancer_rule.foo", "protocol", "tcp-proxy"),
 				),
 			},
 		},
@@ -307,6 +309,7 @@ resource "cosmic_loadbalancer_rule" "foo" {
   algorithm = "leastconn"
   public_port = 443
   private_port = 443
+  protocol = "tcp-proxy"
   member_ids = ["${cosmic_instance.foobar1.id}"]
 }
 `,
