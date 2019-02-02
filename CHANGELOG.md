@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ## Unreleased
 
 - Add option to configure provider using `COSMIC_CONFIG` and `COSMIC_PROFILE` environment variables
+- Add ability to use protocol numbers for `cosmic_network_acl_rule`'s `protocol` option (instead of only `icmp`, `tcp`, `udp`, `all`)
 - Changing `cosmic_loadbalancer_rule`'s `member_ids`, `private_port`, `public_port` or `protocol` options no longer recreates the resource
 - Changing `cosmic_network`'s `ip_exclusion_list` option no longer recreates the resource
 - Changing `cosmic_vpc`'s `vpc_offering` option no longer recreates the resource
