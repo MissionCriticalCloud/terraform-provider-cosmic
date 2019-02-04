@@ -175,6 +175,54 @@ resource "cosmic_network" "foo" {
 	COSMIC_VPC_ID,
 	COSMIC_ZONE)
 
+var testAccCosmicNetwork_vpc = fmt.Sprintf(`
+resource "cosmic_vpc" "foobar" {
+	name = "terraform-vpc"
+	cidr = "%s"
+	vpc_offering = "%s"
+	zone = "%s"
+}
+
+resource "cosmic_network" "foo" {
+	name = "terraform-network"
+	cidr = "%s"
+	gateway = "%s"
+	network_offering = "%s"
+	vpc_id = "${cosmic_vpc.foobar.id}"
+	zone = "${cosmic_vpc.foobar.zone}"
+}`,
+	COSMIC_VPC_CIDR_1,
+	COSMIC_VPC_OFFERING,
+	COSMIC_ZONE,
+	COSMIC_VPC_NETWORK_CIDR,
+	COSMIC_VPC_NETWORK_GATEWAY,
+	COSMIC_VPC_NETWORK_OFFERING)
+
+var testAccCosmicNetworkDNS_vpc = fmt.Sprintf(`
+resource "cosmic_vpc" "foobar" {
+	name = "terraform-vpc"
+	cidr = "%s"
+	vpc_offering = "%s"
+	zone = "%s"
+}
+
+resource "cosmic_network" "foo" {
+	name = "terraform-network"
+	cidr = "%s"
+	gateway = "%s"
+	dns = "%s"
+	network_offering = "%s"
+	vpc_id = "${cosmic_vpc.foobar.id}"
+	zone = "${cosmic_vpc.foobar.zone}"
+}`,
+	COSMIC_VPC_CIDR_1,
+	COSMIC_VPC_OFFERING,
+	COSMIC_ZONE,
+	COSMIC_VPC_NETWORK_CIDR,
+	COSMIC_VPC_NETWORK_GATEWAY,
+	COSMIC_VPC_NETWORK_DNS,
+	COSMIC_VPC_NETWORK_OFFERING)
+
 var testAccCosmicNetwork_acl = fmt.Sprintf(`
 resource "cosmic_network_acl" "foo" {
   name   = "foo"
