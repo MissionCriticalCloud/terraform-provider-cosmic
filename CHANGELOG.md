@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## 0.2.0 (2019-02-28)
 
 - Add option to configure provider using `COSMIC_CONFIG` and `COSMIC_PROFILE` environment variables
 - Add ability to use protocol numbers for `cosmic_network_acl_rule`'s `protocol` option (instead of only `icmp`, `tcp`, `udp`, `all`)
