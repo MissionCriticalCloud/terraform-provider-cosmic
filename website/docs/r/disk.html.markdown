@@ -19,6 +19,7 @@ resource "cosmic_disk" "default" {
   attach             = "true"
   disk_offering      = "custom"
   size               = 50
+  disk_controller    = "VIRTIO"
   virtual_machine_id = "server-1"
   zone               = "zone-1"
 }
@@ -43,6 +44,9 @@ The following arguments are supported:
 
 * `shrink_ok` - (Optional) Verifies if the disk volume is allowed to shrink when
     resizing (defaults false).
+
+* `disk_controller` - (Optional) Set the disk controller type for this disk. Allowed 
+     options are IDE, SCSI and VIRTIO. Changing this forces a new resource to be created.
 
 * `virtual_machine_id` - (Optional) The ID of the virtual machine to which you want
     to attach the disk volume.
