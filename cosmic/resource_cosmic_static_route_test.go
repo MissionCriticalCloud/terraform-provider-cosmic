@@ -10,6 +10,10 @@ import (
 )
 
 func TestAccCosmicStaticRoute_basic(t *testing.T) {
+	if COSMIC_VPC_ID == "" {
+		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	}
+
 	var route cosmic.StaticRoute
 
 	resource.Test(t, resource.TestCase{

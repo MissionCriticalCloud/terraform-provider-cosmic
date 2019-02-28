@@ -10,6 +10,10 @@ import (
 )
 
 func TestAccCosmicVPC_basic(t *testing.T) {
+	if COSMIC_VPC_ID == "" {
+		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	}
+
 	var vpc cosmic.VPC
 
 	resource.Test(t, resource.TestCase{

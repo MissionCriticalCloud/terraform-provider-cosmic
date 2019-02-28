@@ -11,6 +11,10 @@ import (
 )
 
 func TestAccCosmicNetworkACLRule_basic(t *testing.T) {
+	if COSMIC_VPC_ID == "" {
+		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	}
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -55,6 +59,10 @@ func TestAccCosmicNetworkACLRule_basic(t *testing.T) {
 }
 
 func TestAccCosmicNetworkACLRule_update(t *testing.T) {
+	if COSMIC_VPC_ID == "" {
+		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	}
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
