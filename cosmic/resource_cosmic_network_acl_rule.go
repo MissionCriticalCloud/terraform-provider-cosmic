@@ -194,8 +194,9 @@ func createNetworkACLRule(d *schema.ResourceData, meta interface{}, rule map[str
 	// Set the traffic type
 	p.SetTraffictype(rule["traffic_type"].(string))
 
+	switch {
 	// If the protocol is ICMP set the needed ICMP parameters
-	if rule["protocol"].(string) == "icmp" {
+	case rule["protocol"].(string) == "icmp":
 		p.SetIcmptype(rule["icmp_type"].(int))
 		p.SetIcmpcode(rule["icmp_code"].(int))
 
@@ -205,22 +206,18 @@ func createNetworkACLRule(d *schema.ResourceData, meta interface{}, rule map[str
 		}
 
 		uuids["icmp"] = r.(*cosmic.CreateNetworkACLResponse).Id
-		rule["uuids"] = uuids
-	}
 
 	// If the protocol is ALL set the needed parameters
-	if rule["protocol"].(string) == "all" {
+	case rule["protocol"].(string) == "all":
 		r, err := Retry(4, retryableACLCreationFunc(cs, p))
 		if err != nil {
 			return err
 		}
 
 		uuids["all"] = r.(*cosmic.CreateNetworkACLResponse).Id
-		rule["uuids"] = uuids
-	}
 
 	// If protocol is TCP or UDP, loop through all ports
-	if rule["protocol"].(string) == "tcp" || rule["protocol"].(string) == "udp" {
+	case rule["protocol"].(string) == "tcp" || rule["protocol"].(string) == "udp":
 		if ps := rule["ports"].(*schema.Set); ps.Len() > 0 {
 
 			// Create an empty schema.Set to hold all processed ports
@@ -260,10 +257,20 @@ func createNetworkACLRule(d *schema.ResourceData, meta interface{}, rule map[str
 				rule["ports"] = ports
 
 				uuids[port.(string)] = r.(*cosmic.CreateNetworkACLResponse).Id
-				rule["uuids"] = uuids
 			}
 		}
+
+	// If the rule doesn't have protocol set to "all" or "icmp", or doesn't have ports
+	// defined, just create it as is
+	default:
+		r, err := Retry(4, retryableACLCreationFunc(cs, p))
+		if err != nil {
+			return err
+		}
+
+		uuids[rule["protocol"].(string)] = r.(*cosmic.CreateNetworkACLResponse).Id
 	}
+	rule["uuids"] = uuids
 
 	return nil
 }
@@ -312,7 +319,8 @@ func resourceCosmicNetworkACLRuleRead(d *schema.ResourceData, meta interface{}) 
 			rule := rule.(map[string]interface{})
 			uuids := rule["uuids"].(map[string]interface{})
 
-			if rule["protocol"].(string) == "icmp" {
+			switch {
+			case rule["protocol"].(string) == "icmp":
 				id, ok := uuids["icmp"]
 				if !ok {
 					continue
@@ -342,9 +350,8 @@ func resourceCosmicNetworkACLRuleRead(d *schema.ResourceData, meta interface{}) 
 				rule["traffic_type"] = strings.ToLower(r.Traffictype)
 				rule["cidr_list"] = cidrs
 				rules.Add(rule)
-			}
 
-			if rule["protocol"].(string) == "all" {
+			case rule["protocol"].(string) == "all":
 				id, ok := uuids["all"]
 				if !ok {
 					continue
@@ -372,10 +379,9 @@ func resourceCosmicNetworkACLRuleRead(d *schema.ResourceData, meta interface{}) 
 				rule["traffic_type"] = strings.ToLower(r.Traffictype)
 				rule["cidr_list"] = cidrs
 				rules.Add(rule)
-			}
 
 			// If protocol is tcp or udp, loop through all ports
-			if rule["protocol"].(string) == "tcp" || rule["protocol"].(string) == "udp" {
+			case rule["protocol"].(string) == "tcp" || rule["protocol"].(string) == "udp":
 				if ps := rule["ports"].(*schema.Set); ps.Len() > 0 {
 
 					// Create an empty schema.Set to hold all ports
@@ -418,6 +424,38 @@ func resourceCosmicNetworkACLRuleRead(d *schema.ResourceData, meta interface{}) 
 						rules.Add(rule)
 					}
 				}
+			default:
+				id, ok := uuids[rule["protocol"].(string)]
+				if !ok {
+					continue
+				}
+
+				// Get the rule
+				r, ok := ruleMap[id.(string)]
+				if !ok {
+					delete(uuids, rule["protocol"].(string))
+					continue
+				}
+
+				// Delete the known rule so only unknown rules remain in the ruleMap
+				delete(ruleMap, id.(string))
+
+				// Create a set with all CIDR's
+				cidrs := &schema.Set{F: schema.HashString}
+				for _, cidr := range strings.Split(r.Cidrlist, ",") {
+					cidrs.Add(cidr)
+				}
+
+				// Update the values
+				rule["action"] = strings.ToLower(r.Action)
+				rule["protocol"] = r.Protocol
+				if strings.ToLower(r.Protocol) == "icmp" {
+					rule["icmp_type"] = r.Icmptype
+					rule["icmp_code"] = r.Icmpcode
+				}
+				rule["traffic_type"] = strings.ToLower(r.Traffictype)
+				rule["cidr_list"] = cidrs
+				rules.Add(rule)
 			}
 		}
 	}
