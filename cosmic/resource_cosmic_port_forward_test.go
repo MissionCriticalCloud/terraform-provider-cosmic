@@ -11,6 +11,26 @@ import (
 )
 
 func TestAccCosmicPortForward_basic(t *testing.T) {
+	if COSMIC_DEFAULT_ALLOW_ACL_ID == "" {
+		t.Skip("This test requires a \"default_allow\" ACL ID (set it by exporting COSMIC_DEFAULT_ALLOW_ACL_ID)")
+	}
+
+	if COSMIC_SERVICE_OFFERING_1 == "" {
+		t.Skip("This test requires an existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_1)")
+	}
+
+	if COSMIC_TEMPLATE == "" {
+		t.Skip("This test requires an existing instance template (set it by exporting COSMIC_TEMPLATE)")
+	}
+
+	if COSMIC_VPC_ID == "" {
+		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	}
+
+	if COSMIC_VPC_NETWORK_OFFERING == "" {
+		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
+	}
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -29,6 +49,26 @@ func TestAccCosmicPortForward_basic(t *testing.T) {
 }
 
 func TestAccCosmicPortForward_update(t *testing.T) {
+	if COSMIC_DEFAULT_ALLOW_ACL_ID == "" {
+		t.Skip("This test requires a \"default_allow\" ACL ID (set it by exporting COSMIC_DEFAULT_ALLOW_ACL_ID)")
+	}
+
+	if COSMIC_SERVICE_OFFERING_1 == "" {
+		t.Skip("This test requires an existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_1)")
+	}
+
+	if COSMIC_TEMPLATE == "" {
+		t.Skip("This test requires an existing instance template (set it by exporting COSMIC_TEMPLATE)")
+	}
+
+	if COSMIC_VPC_ID == "" {
+		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	}
+
+	if COSMIC_VPC_NETWORK_OFFERING == "" {
+		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
+	}
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,

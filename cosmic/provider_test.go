@@ -60,38 +60,10 @@ func testAccPreCheck(t *testing.T) {
 	if v := os.Getenv("COSMIC_SECRET_KEY"); v == "" {
 		t.Fatal("COSMIC_SECRET_KEY must be set for acceptance tests")
 	}
-	if v := os.Getenv("COSMIC_DISK_OFFERING_1"); v == "" {
-		t.Fatal("COSMIC_DISK_OFFERING_1 must be set for acceptance tests")
 	}
-	if v := os.Getenv("COSMIC_DISK_OFFERING_2"); v == "" {
-		t.Fatal("COSMIC_DISK_OFFERING_2 must be set for acceptance tests")
-	}
-	if v := os.Getenv("COSMIC_SERVICE_OFFERING_1"); v == "" {
-		t.Fatal("COSMIC_SERVICE_OFFERING_1 must be set for acceptance tests")
-	}
-	if v := os.Getenv("COSMIC_SERVICE_OFFERING_2"); v == "" {
-		t.Fatal("COSMIC_SERVICE_OFFERING_2 must be set for acceptance tests")
-	}
-	if v := os.Getenv("COSMIC_VPC_ID"); v == "" {
-		t.Fatal("COSMIC_VPC_ID must be set for acceptance tests")
-	}
-	if v := os.Getenv("COSMIC_VPC_OFFERING"); v == "" {
-		t.Fatal("COSMIC_VPC_OFFERING must be set for acceptance tests")
-	}
-	if v := os.Getenv("COSMIC_VPC_NETWORK_OFFERING"); v == "" {
-		t.Fatal("COSMIC_VPC_NETWORK_OFFERING must be set for acceptance tests")
-	}
-	if v := os.Getenv("COSMIC_TEMPLATE"); v == "" {
-		t.Fatal("COSMIC_TEMPLATE must be set for acceptance tests")
-	}
-	if v := os.Getenv("COSMIC_PROJECT_NAME"); v == "" {
-		t.Fatal("COSMIC_PROJECT_NAME must be set for acceptance tests")
 	}
 	if v := os.Getenv("COSMIC_ZONE"); v == "" {
 		t.Fatal("COSMIC_ZONE must be set for acceptance tests")
-	}
-	if v := os.Getenv("COSMIC_DEFAULT_ALLOW_ACL_ID"); v == "" {
-		t.Fatal("COSMIC_DEFAULT_ALLOW_ACL_ID must be set for acceptance tests")
 	}
 }
 

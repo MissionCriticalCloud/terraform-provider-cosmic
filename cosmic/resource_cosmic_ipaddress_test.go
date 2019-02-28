@@ -10,6 +10,14 @@ import (
 )
 
 func TestAccCosmicIPAddress_basic(t *testing.T) {
+	if COSMIC_DEFAULT_ALLOW_ACL_ID == "" {
+		t.Skip("This test requires a \"default_allow\" ACL ID (set it by exporting COSMIC_DEFAULT_ALLOW_ACL_ID)")
+	}
+
+	if COSMIC_VPC_ID == "" {
+		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	}
+
 	var ipaddr cosmic.PublicIpAddress
 
 	resource.Test(t, resource.TestCase{

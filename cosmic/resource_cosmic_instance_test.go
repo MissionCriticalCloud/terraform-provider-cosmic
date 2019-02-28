@@ -10,6 +10,26 @@ import (
 )
 
 func TestAccCosmicInstance_basic(t *testing.T) {
+	if COSMIC_SERVICE_OFFERING_1 == "" {
+		t.Skip("This test requires an existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_1)")
+	}
+
+	if COSMIC_SERVICE_OFFERING_2 == "" {
+		t.Skip("This test requires a second existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_2)")
+	}
+
+	if COSMIC_TEMPLATE == "" {
+		t.Skip("This test requires an existing instance template (set it by exporting COSMIC_TEMPLATE)")
+	}
+
+	if COSMIC_VPC_ID == "" {
+		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	}
+
+	if COSMIC_VPC_NETWORK_OFFERING == "" {
+		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
+	}
+
 	var instance cosmic.VirtualMachine
 
 	resource.Test(t, resource.TestCase{
@@ -32,6 +52,26 @@ func TestAccCosmicInstance_basic(t *testing.T) {
 }
 
 func TestAccCosmicInstance_update(t *testing.T) {
+	if COSMIC_SERVICE_OFFERING_1 == "" {
+		t.Skip("This test requires an existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_1)")
+	}
+
+	if COSMIC_SERVICE_OFFERING_2 == "" {
+		t.Skip("This test requires a second existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_2)")
+	}
+
+	if COSMIC_TEMPLATE == "" {
+		t.Skip("This test requires an existing instance template (set it by exporting COSMIC_TEMPLATE)")
+	}
+
+	if COSMIC_VPC_ID == "" {
+		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	}
+
+	if COSMIC_VPC_NETWORK_OFFERING == "" {
+		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
+	}
+
 	var instance cosmic.VirtualMachine
 
 	resource.Test(t, resource.TestCase{
@@ -69,6 +109,26 @@ func TestAccCosmicInstance_update(t *testing.T) {
 }
 
 func TestAccCosmicInstance_fixedIP(t *testing.T) {
+	if COSMIC_SERVICE_OFFERING_1 == "" {
+		t.Skip("This test requires an existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_1)")
+	}
+
+	if COSMIC_SERVICE_OFFERING_2 == "" {
+		t.Skip("This test requires a second existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_2)")
+	}
+
+	if COSMIC_TEMPLATE == "" {
+		t.Skip("This test requires an existing instance template (set it by exporting COSMIC_TEMPLATE)")
+	}
+
+	if COSMIC_VPC_ID == "" {
+		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	}
+
+	if COSMIC_VPC_NETWORK_OFFERING == "" {
+		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
+	}
+
 	var instance cosmic.VirtualMachine
 
 	resource.Test(t, resource.TestCase{
@@ -90,6 +150,26 @@ func TestAccCosmicInstance_fixedIP(t *testing.T) {
 }
 
 func TestAccCosmicInstance_keyPair(t *testing.T) {
+	if COSMIC_SERVICE_OFFERING_1 == "" {
+		t.Skip("This test requires an existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_1)")
+	}
+
+	if COSMIC_SERVICE_OFFERING_2 == "" {
+		t.Skip("This test requires a second existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_2)")
+	}
+
+	if COSMIC_TEMPLATE == "" {
+		t.Skip("This test requires an existing instance template (set it by exporting COSMIC_TEMPLATE)")
+	}
+
+	if COSMIC_VPC_ID == "" {
+		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	}
+
+	if COSMIC_VPC_NETWORK_OFFERING == "" {
+		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
+	}
+
 	var instance cosmic.VirtualMachine
 
 	resource.Test(t, resource.TestCase{
@@ -111,6 +191,30 @@ func TestAccCosmicInstance_keyPair(t *testing.T) {
 }
 
 func TestAccCosmicInstance_project(t *testing.T) {
+	if COSMIC_PROJECT_NAME == "" {
+		t.Skip("This test requires an existing project (set it by exporting COSMIC_PROJECT_NAME)")
+	}
+
+	if COSMIC_SERVICE_OFFERING_1 == "" {
+		t.Skip("This test requires an existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_1)")
+	}
+
+	if COSMIC_SERVICE_OFFERING_2 == "" {
+		t.Skip("This test requires a second existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_2)")
+	}
+
+	if COSMIC_TEMPLATE == "" {
+		t.Skip("This test requires an existing instance template (set it by exporting COSMIC_TEMPLATE)")
+	}
+
+	if COSMIC_VPC_ID == "" {
+		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	}
+
+	if COSMIC_VPC_NETWORK_OFFERING == "" {
+		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
+	}
+
 	var instance cosmic.VirtualMachine
 
 	resource.Test(t, resource.TestCase{

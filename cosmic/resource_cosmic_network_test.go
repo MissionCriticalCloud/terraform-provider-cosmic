@@ -10,6 +10,14 @@ import (
 )
 
 func TestAccCosmicNetwork_basic(t *testing.T) {
+	if COSMIC_VPC_ID == "" {
+		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	}
+
+	if COSMIC_VPC_NETWORK_OFFERING == "" {
+		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
+	}
+
 	var network cosmic.Network
 
 	resource.Test(t, resource.TestCase{
@@ -31,6 +39,14 @@ func TestAccCosmicNetwork_basic(t *testing.T) {
 }
 
 func TestAccCosmicNetwork_updateACL(t *testing.T) {
+	if COSMIC_VPC_ID == "" {
+		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	}
+
+	if COSMIC_VPC_NETWORK_OFFERING == "" {
+		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
+	}
+
 	var network cosmic.Network
 
 	resource.Test(t, resource.TestCase{
