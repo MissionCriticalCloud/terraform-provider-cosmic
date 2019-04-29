@@ -123,6 +123,14 @@ func testAccCheckCosmicNetworkBasicAttributes(network *cosmic.Network) resource.
 			return fmt.Errorf("Bad network offering: %s", network.Networkofferingname)
 		}
 
+		if network.Dns1 != "10.0.10.1" {
+			return fmt.Errorf("Bad DNS1: %s", network.Dns1)
+		}
+
+		if network.Dns2 != "10.0.10.2" {
+			return fmt.Errorf("Bad DNS2: %s", network.Dns2)
+		}
+
 		return nil
 	}
 }
@@ -163,6 +171,8 @@ resource "cosmic_network" "foo" {
   name             = "terraform-network"
   cidr             = "10.0.10.0/24"
   gateway          = "10.0.10.1"
+  dns1             = "10.0.10.1"
+  dns2             = "10.0.10.2"
   network_offering = "%s"
   vpc_id           = "%s"
   zone             = "%s"
@@ -185,6 +195,8 @@ resource "cosmic_network" "foo" {
   name             = "terraform-network"
   cidr             = "10.0.10.0/24"
   gateway          = "10.0.10.1"
+  dns1             = "10.0.10.1"
+  dns2             = "10.0.10.2"
   network_offering = "%s"
   vpc_id           = "${cosmic_network_acl.foo.vpc_id}"
   acl_id           = "${cosmic_network_acl.foo.id}"
@@ -204,6 +216,8 @@ resource "cosmic_network" "foo" {
   name             = "terraform-network"
   cidr             = "10.0.10.0/24"
   gateway          = "10.0.10.1"
+  dns1             = "10.0.10.1"
+  dns2             = "10.0.10.2"
   network_offering = "%s"
   vpc_id           = "${cosmic_network_acl.bar.vpc_id}"
   acl_id           = "${cosmic_network_acl.bar.id}"

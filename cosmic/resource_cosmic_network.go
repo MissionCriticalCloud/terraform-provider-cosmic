@@ -66,6 +66,16 @@ func resourceCosmicNetwork() *schema.Resource {
 				ForceNew: true,
 			},
 
+			"dns1": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+
+			"dns2": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+
 			"startip": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -194,6 +204,14 @@ func resourceCosmicNetworkCreate(d *schema.ResourceData, meta interface{}) error
 		p.SetVlan(strconv.Itoa(vlan.(int)))
 	}
 
+	// Set DNS configuration if we have one
+	if dns1, ok := d.GetOk("dns1"); ok {
+		p.SetDns1(dns1.(string))
+	}
+	if dns2, ok := d.GetOk("dns2"); ok {
+		p.SetDns2(dns2.(string))
+	}
+
 	// Set the ip exclusion list if we have one
 	if ipExclusionList, ok := d.GetOk("ip_exclusion_list"); ok {
 		p.SetIpexclusionlist(ipExclusionList.(string))
@@ -255,6 +273,8 @@ func resourceCosmicNetworkRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("display_text", n.Displaytext)
 	d.Set("cidr", n.Cidr)
 	d.Set("gateway", n.Gateway)
+	d.Set("dns1", n.Dns1)
+	d.Set("dns2", n.Dns2)
 	d.Set("ip_exclusion_list", n.Ipexclusionlist)
 	d.Set("network_domain", n.Networkdomain)
 	d.Set("vpc_id", n.Vpcid)
@@ -305,6 +325,14 @@ func resourceCosmicNetworkUpdate(d *schema.ResourceData, meta interface{}) error
 	// Check if the network domain is changed
 	if d.HasChange("network_domain") {
 		p.SetNetworkdomain(d.Get("network_domain").(string))
+	}
+
+	// Check if the DNS settings have changed
+	if d.HasChange("dns1") {
+		p.SetDns1(d.Get("dns1").(string))
+	}
+	if d.HasChange("dns2") {
+		p.SetDns2(d.Get("dns2").(string))
 	}
 
 	// Check if the ip exclusion list is changed
