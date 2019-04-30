@@ -60,8 +60,6 @@ func testAccPreCheck(t *testing.T) {
 	if v := os.Getenv("COSMIC_SECRET_KEY"); v == "" {
 		t.Fatal("COSMIC_SECRET_KEY must be set for acceptance tests")
 	}
-	}
-	}
 	if v := os.Getenv("COSMIC_ZONE"); v == "" {
 		t.Fatal("COSMIC_ZONE must be set for acceptance tests")
 	}

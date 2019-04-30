@@ -80,6 +80,14 @@ func resourceCosmicNetwork() *schema.Resource {
 				ForceNew: true,
 			},
 
+			"dns": &schema.Schema{
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Optional: true,
+			},
+
 			"network_domain": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -190,6 +198,17 @@ func resourceCosmicNetworkCreate(d *schema.ResourceData, meta interface{}) error
 		p.SetNetworkdomain(networkDomain.(string))
 	}
 
+	// Set the DNS resolver values if we have some
+	if dns, ok := d.GetOk("dns"); ok {
+		r := dns.([]interface{})
+		if len(r) > 0 {
+			p.SetDns1(r[0].(string))
+		}
+		if len(r) > 1 {
+			p.SetDns2(r[1].(string))
+		}
+	}
+
 	if vlan, ok := d.GetOk("vlan"); ok {
 		p.SetVlan(strconv.Itoa(vlan.(int)))
 	}
@@ -235,7 +254,7 @@ func resourceCosmicNetworkCreate(d *schema.ResourceData, meta interface{}) error
 func resourceCosmicNetworkRead(d *schema.ResourceData, meta interface{}) error {
 	cs := meta.(*cosmic.CosmicClient)
 
-	// Get the virtual machine details
+	// Get the network details
 	n, count, err := cs.Network.GetNetworkByID(
 		d.Id(),
 		cosmic.WithProject(d.Get("project").(string)),
@@ -250,6 +269,22 @@ func resourceCosmicNetworkRead(d *schema.ResourceData, meta interface{}) error {
 
 		return err
 	}
+
+	// Get network DNS resolvers and only set values it not empty strings
+	dns := []string{}
+	if n.Dns1 != "" {
+		dns = append(dns, n.Dns1)
+	}
+	if n.Dns2 != "" {
+		dns = append(dns, n.Dns2)
+	}
+	if len(dns) > 0 {
+		if err := d.Set("dns", dns); err != nil {
+			return err
+		}
+	}
+	log.Printf("[DEBUG] Network %s DNS1: ", n.Dns1)
+	log.Printf("[DEBUG] Network %s DNS2: ", n.Dns2)
 
 	d.Set("name", n.Name)
 	d.Set("display_text", n.Displaytext)
@@ -300,6 +335,21 @@ func resourceCosmicNetworkUpdate(d *schema.ResourceData, meta interface{}) error
 	// Check if the cidr is changed
 	if d.HasChange("cidr") {
 		p.SetGuestvmcidr(d.Get("cidr").(string))
+	}
+
+	// Check if the network DNS resolvers is changed
+	if d.HasChange("dns") {
+		r := []string{"", ""}
+		if dns, ok := d.GetOk("dns"); ok {
+			s := dns.([]interface{})
+			for i := range s {
+				r[i] = s[i].(string)
+			}
+		}
+		log.Printf("[DEBUG] Setting DNS1 for network %s to %#v", d.Id(), r[0])
+		p.SetDns1(r[0])
+		log.Printf("[DEBUG] Setting DNS2 for network %s to %#v", d.Id(), r[1])
+		p.SetDns2(r[1])
 	}
 
 	// Check if the network domain is changed
