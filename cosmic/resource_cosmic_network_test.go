@@ -31,7 +31,94 @@ func TestAccCosmicNetwork_basic(t *testing.T) {
 					testAccCheckCosmicNetworkExists(
 						"cosmic_network.foo", &network),
 					testAccCheckCosmicNetworkBasicAttributes(&network),
+					resource.TestCheckResourceAttr(
+						"cosmic_network.foo", "cidr", "10.0.10.0/24"),
+					resource.TestCheckResourceAttr(
+						"cosmic_network.foo", "gateway", "10.0.10.1"),
 					testAccCheckNetworkTags(&network, "terraform-tag", "true"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccCosmicNetwork_update(t *testing.T) {
+	if COSMIC_VPC_ID == "" {
+		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	}
+
+	if COSMIC_VPC_NETWORK_OFFERING == "" {
+		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
+	}
+
+	var network cosmic.Network
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckCosmicNetworkDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCosmicNetwork_basic,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckCosmicNetworkExists(
+						"cosmic_network.foo", &network),
+					testAccCheckCosmicNetworkBasicAttributes(&network),
+					resource.TestCheckResourceAttr(
+						"cosmic_network.foo", "cidr", "10.0.10.0/24"),
+					resource.TestCheckResourceAttr(
+						"cosmic_network.foo", "gateway", "10.0.10.1"),
+				),
+			},
+
+			{
+				Config: testAccCosmicNetwork_update,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckCosmicNetworkExists(
+						"cosmic_network.foo", &network),
+					testAccCheckCosmicNetworkBasicAttributes(&network),
+					resource.TestCheckResourceAttr(
+						"cosmic_network.foo", "cidr", "10.0.10.0/25"),
+					// resource.TestCheckResourceAttr(
+					// 	"cosmic_network.foo", "dns", "10.0.10.10"),
+					resource.TestCheckResourceAttr(
+						"cosmic_network.foo", "gateway", "10.0.10.100"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccCosmicNetwork_dns(t *testing.T) {
+	if COSMIC_VPC_ID == "" {
+		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	}
+
+	if COSMIC_VPC_NETWORK_OFFERING == "" {
+		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
+	}
+
+	var network cosmic.Network
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckCosmicNetworkDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCosmicNetwork_dns,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckCosmicNetworkExists(
+						"cosmic_network.foo", &network),
+					testAccCheckCosmicNetworkBasicAttributes(&network),
+					resource.TestCheckResourceAttr(
+						"cosmic_network.foo", "cidr", "10.0.10.0/24"),
+					resource.TestCheckResourceAttr(
+						"cosmic_network.foo", "dns.#", "1"),
+					resource.TestCheckResourceAttr(
+						"cosmic_network.foo", "dns.0", "10.10.10.10"),
+					resource.TestCheckResourceAttr(
+						"cosmic_network.foo", "gateway", "10.0.10.1"),
 				),
 			},
 		},
@@ -115,10 +202,6 @@ func testAccCheckCosmicNetworkBasicAttributes(network *cosmic.Network) resource.
 			return fmt.Errorf("Bad display name: %s", network.Displaytext)
 		}
 
-		if network.Cidr != "10.0.10.0/24" {
-			return fmt.Errorf("Bad CIDR: %s", network.Cidr)
-		}
-
 		if network.Networkofferingname != COSMIC_VPC_NETWORK_OFFERING {
 			return fmt.Errorf("Bad network offering: %s", network.Networkofferingname)
 		}
@@ -175,53 +258,41 @@ resource "cosmic_network" "foo" {
 	COSMIC_VPC_ID,
 	COSMIC_ZONE)
 
-var testAccCosmicNetwork_vpc = fmt.Sprintf(`
-resource "cosmic_vpc" "foobar" {
-	name = "terraform-vpc"
-	cidr = "%s"
-	vpc_offering = "%s"
-	zone = "%s"
-}
-
+var testAccCosmicNetwork_update = fmt.Sprintf(`
 resource "cosmic_network" "foo" {
-	name = "terraform-network"
-	cidr = "%s"
-	gateway = "%s"
-	network_offering = "%s"
-	vpc_id = "${cosmic_vpc.foobar.id}"
-	zone = "${cosmic_vpc.foobar.zone}"
+  name             = "terraform-network"
+  cidr             = "10.0.10.0/25"
+  gateway          = "10.0.10.100"
+  dns              = ["10.10.10.10"]
+  network_offering = "%s"
+  vpc_id           = "%s"
+  zone             = "%s"
+
+  tags = {
+    terraform-tag = "true"
+  }
 }`,
-	COSMIC_VPC_CIDR_1,
-	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
-	COSMIC_VPC_NETWORK_CIDR,
-	COSMIC_VPC_NETWORK_GATEWAY,
-	COSMIC_VPC_NETWORK_OFFERING)
+	COSMIC_VPC_NETWORK_OFFERING,
+	COSMIC_VPC_ID,
+	COSMIC_ZONE)
 
-var testAccCosmicNetworkDNS_vpc = fmt.Sprintf(`
-resource "cosmic_vpc" "foobar" {
-	name = "terraform-vpc"
-	cidr = "%s"
-	vpc_offering = "%s"
-	zone = "%s"
-}
-
+var testAccCosmicNetwork_dns = fmt.Sprintf(`
 resource "cosmic_network" "foo" {
-	name = "terraform-network"
-	cidr = "%s"
-	gateway = "%s"
-	dns = "%s"
-	network_offering = "%s"
-	vpc_id = "${cosmic_vpc.foobar.id}"
-	zone = "${cosmic_vpc.foobar.zone}"
+  name             = "terraform-network"
+  cidr             = "10.0.10.0/24"
+  gateway          = "10.0.10.1"
+  dns              = ["10.10.10.10"]
+  network_offering = "%s"
+  vpc_id           = "%s"
+  zone             = "%s"
+
+  tags = {
+    terraform-tag = "true"
+  }
 }`,
-	COSMIC_VPC_CIDR_1,
-	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
-	COSMIC_VPC_NETWORK_CIDR,
-	COSMIC_VPC_NETWORK_GATEWAY,
-	COSMIC_VPC_NETWORK_DNS,
-	COSMIC_VPC_NETWORK_OFFERING)
+	COSMIC_VPC_NETWORK_OFFERING,
+	COSMIC_VPC_ID,
+	COSMIC_ZONE)
 
 var testAccCosmicNetwork_acl = fmt.Sprintf(`
 resource "cosmic_network_acl" "foo" {
