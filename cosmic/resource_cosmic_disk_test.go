@@ -86,8 +86,8 @@ func TestAccCosmicDisk_attachBasic(t *testing.T) {
 		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
 	}
 
-	if COSMIC_VPC_NETWORK_OFFERING == "" {
-		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
+	if COSMIC_VPC_NETWORK_ID == "" {
+		t.Skip("This test requires an existing VPC network ID (set it by exporting COSMIC_VPC_NETWORK_ID)")
 	}
 
 	var disk cosmic.Volume
@@ -122,8 +122,8 @@ func TestAccCosmicDisk_attachUpdate(t *testing.T) {
 		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
 	}
 
-	if COSMIC_VPC_NETWORK_OFFERING == "" {
-		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
+	if COSMIC_VPC_NETWORK_ID == "" {
+		t.Skip("This test requires an existing VPC network ID (set it by exporting COSMIC_VPC_NETWORK_ID)")
 	}
 
 	var disk cosmic.Volume
@@ -170,8 +170,8 @@ func TestAccCosmicDisk_attachDeviceID(t *testing.T) {
 		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
 	}
 
-	if COSMIC_VPC_NETWORK_OFFERING == "" {
-		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
+	if COSMIC_VPC_NETWORK_ID == "" {
+		t.Skip("This test requires an existing VPC network ID (set it by exporting COSMIC_VPC_NETWORK_ID)")
 	}
 
 	var disk cosmic.Volume
@@ -209,6 +209,8 @@ func TestAccCosmicDisk_diskController(t *testing.T) {
 					testAccCheckCosmicDiskExists(
 						"cosmic_disk.foo", &disk),
 					testAccCheckCosmicDiskAttributes(&disk),
+					resource.TestCheckResourceAttr(
+						"cosmic_disk.foo", "disk_controller", "SCSI"),
 				),
 			},
 		},
@@ -229,6 +231,8 @@ func TestAccCosmicDisk_attachDiskController(t *testing.T) {
 					testAccCheckCosmicDiskExists(
 						"cosmic_disk.foo", &disk),
 					testAccCheckCosmicDiskAttributes(&disk),
+					resource.TestCheckResourceAttr(
+						"cosmic_disk.foo", "disk_controller", "SCSI"),
 				),
 			},
 		},
@@ -336,22 +340,13 @@ resource "cosmic_disk" "foo" {
 	COSMIC_ZONE)
 
 var testAccCosmicDisk_attachBasic = fmt.Sprintf(`
-resource "cosmic_network" "foo" {
-  name             = "terraform-network"
-  cidr             = "10.0.10.0/24"
-  gateway          = "10.0.10.1"
-  network_offering = "%s"
-  vpc_id           = "%s"
-  zone             = "%s"
-}
-
 resource "cosmic_instance" "foo" {
   name             = "terraform-test"
   display_name     = "terraform"
   service_offering = "%s"
-  network_id       = "${cosmic_network.foo.id}"
+  network_id       = "%s"
   template         = "%s"
-  zone             = "${cosmic_network.foo.zone}"
+  zone             = "%s"
   expunge          = true
 }
 
@@ -363,30 +358,20 @@ resource "cosmic_disk" "foo" {
   virtual_machine_id = "${cosmic_instance.foo.id}"
   zone               = "${cosmic_instance.foo.zone}"
 }`,
-	COSMIC_VPC_NETWORK_OFFERING,
-	COSMIC_VPC_ID,
-	COSMIC_ZONE,
 	COSMIC_SERVICE_OFFERING_1,
+	COSMIC_VPC_NETWORK_ID,
 	COSMIC_TEMPLATE,
+	COSMIC_ZONE,
 	COSMIC_DISK_OFFERING_1)
 
 var testAccCosmicDisk_attachDiskController = fmt.Sprintf(`
-resource "cosmic_network" "foo" {
-  name             = "terraform-network"
-  cidr             = "10.0.10.0/24"
-  gateway          = "10.0.10.1"
-  network_offering = "%s"
-  vpc_id           = "%s"
-  zone             = "%s"
-}
-
 resource "cosmic_instance" "foo" {
   name             = "terraform-test"
   display_name     = "terraform"
   service_offering = "%s"
-  network_id       = "${cosmic_network.foo.id}"
+  network_id       = "%s"
   template         = "%s"
-  zone             = "${cosmic_network.foo.zone}"
+  zone             = "%s"
   expunge          = true
 }
 
@@ -399,30 +384,20 @@ resource "cosmic_disk" "foo" {
   virtual_machine_id = "${cosmic_instance.foo.id}"
   zone               = "${cosmic_instance.foo.zone}"
 }`,
-	COSMIC_VPC_NETWORK_OFFERING,
-	COSMIC_VPC_ID,
-	COSMIC_ZONE,
 	COSMIC_SERVICE_OFFERING_1,
+	COSMIC_VPC_NETWORK_ID,
 	COSMIC_TEMPLATE,
+	COSMIC_ZONE,
 	COSMIC_DISK_OFFERING_1)
 
 var testAccCosmicDisk_attachDeviceID = fmt.Sprintf(`
-resource "cosmic_network" "foo" {
-  name             = "terraform-network"
-  cidr             = "10.0.10.0/24"
-  gateway          = "10.0.10.1"
-  network_offering = "%s"
-  vpc_id           = "%s"
-  zone             = "%s"
-}
-
 resource "cosmic_instance" "foo" {
   name             = "terraform-test"
   display_name     = "terraform"
   service_offering = "%s"
-  network_id       = "${cosmic_network.foo.id}"
+  network_id       = "%s"
   template         = "%s"
-  zone             = "${cosmic_network.foo.zone}"
+  zone             = "%s"
   expunge          = true
 }
 
@@ -435,30 +410,20 @@ resource "cosmic_disk" "foo" {
   virtual_machine_id = "${cosmic_instance.foo.id}"
   zone               = "${cosmic_instance.foo.zone}"
 }`,
-	COSMIC_VPC_NETWORK_OFFERING,
-	COSMIC_VPC_ID,
-	COSMIC_ZONE,
 	COSMIC_SERVICE_OFFERING_1,
+	COSMIC_VPC_NETWORK_ID,
 	COSMIC_TEMPLATE,
+	COSMIC_ZONE,
 	COSMIC_DISK_OFFERING_1)
 
 var testAccCosmicDisk_attachUpdate = fmt.Sprintf(`
-resource "cosmic_network" "foo" {
-  name             = "terraform-network"
-  cidr             = "10.0.10.0/24"
-  gateway          = "10.0.10.1"
-  network_offering = "%s"
-  vpc_id           = "%s"
-  zone             = "%s"
-}
-
 resource "cosmic_instance" "foo" {
   name             = "terraform-test"
   display_name     = "terraform"
   service_offering = "%s"
-  network_id       = "${cosmic_network.foo.id}"
+  network_id       = "%s"
   template         = "%s"
-  zone             = "${cosmic_network.foo.zone}"
+  zone             = "%s"
   expunge          = true
 }
 
@@ -470,9 +435,8 @@ resource "cosmic_disk" "foo" {
   virtual_machine_id = "${cosmic_instance.foo.id}"
   zone               = "${cosmic_instance.foo.zone}"
 }`,
-	COSMIC_VPC_NETWORK_OFFERING,
-	COSMIC_VPC_ID,
-	COSMIC_ZONE,
 	COSMIC_SERVICE_OFFERING_1,
+	COSMIC_VPC_NETWORK_ID,
 	COSMIC_TEMPLATE,
+	COSMIC_ZONE,
 	COSMIC_DISK_OFFERING_1)
