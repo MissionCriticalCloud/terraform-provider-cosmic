@@ -108,6 +108,40 @@ func TestAccCosmicInstance_update(t *testing.T) {
 	})
 }
 
+func TestAccCosmicInstance_diskController(t *testing.T) {
+	if COSMIC_SERVICE_OFFERING_1 == "" {
+		t.Skip("This test requires an existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_1)")
+	}
+
+	if COSMIC_TEMPLATE == "" {
+		t.Skip("This test requires an existing instance template (set it by exporting COSMIC_TEMPLATE)")
+	}
+
+	if COSMIC_VPC_NETWORK_ID == "" {
+		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	}
+
+	var instance cosmic.VirtualMachine
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckCosmicInstanceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCosmicInstance_diskController,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckCosmicInstanceExists(
+						"cosmic_instance.foo", &instance),
+					testAccCheckCosmicInstanceAttributes(&instance),
+					resource.TestCheckResourceAttr(
+						"cosmic_instance.foo", "user_data", "0cf3dcdc356ec8369494cb3991985ecd5296cdd5"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccCosmicInstance_fixedIP(t *testing.T) {
 	if COSMIC_SERVICE_OFFERING_1 == "" {
 		t.Skip("This test requires an existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_1)")
@@ -390,6 +424,23 @@ resource "cosmic_instance" "foo" {
 	COSMIC_ZONE,
 	COSMIC_SERVICE_OFFERING_2,
 	COSMIC_TEMPLATE)
+
+var testAccCosmicInstance_diskController = fmt.Sprintf(`
+resource "cosmic_instance" "foo" {
+  name             = "terraform-test"
+  display_name     = "terraform-test"
+  service_offering = "%s"
+  network_id       = "%s"
+  template         = "%s"
+  zone             = "%s"
+  disk_controller  = "SCSI"
+  user_data        = "foobar\nfoo\nbar"
+  expunge          = true
+}`,
+	COSMIC_SERVICE_OFFERING_1,
+	COSMIC_VPC_NETWORK_ID,
+	COSMIC_TEMPLATE,
+	COSMIC_ZONE)
 
 var testAccCosmicInstance_fixedIP = fmt.Sprintf(`
 resource "cosmic_network" "foo" {

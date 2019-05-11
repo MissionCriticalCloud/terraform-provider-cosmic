@@ -120,6 +120,23 @@ func resourceCosmicInstance() *schema.Resource {
 				},
 			},
 
+			"disk_controller": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				ForceNew: true,
+				ValidateFunc: func(val interface{}, key string) (warns []string, errs []error) {
+					v := val.(string)
+					switch v {
+					case "IDE", "SCSI", "VIRTIO":
+					default:
+						errs = append(errs, fmt.Errorf("%q must be either 'IDE', 'SCSI' or 'VIRTIO', got: %q", key, v))
+					}
+
+					return
+				},
+			},
+
 			"optimise_for": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -193,6 +210,11 @@ func resourceCosmicInstanceCreate(d *schema.ResourceData, meta interface{}) erro
 	// If there is a ipaddres supplied, add it to the parameter struct
 	if ipaddress, ok := d.GetOk("ip_address"); ok {
 		p.SetIpaddress(ipaddress.(string))
+	}
+
+	// Set the disk_controller type if configured
+	if diskcontroller, ok := d.GetOk("disk_controller"); ok {
+		p.SetDiskcontroller(diskcontroller.(string))
 	}
 
 	// If optimise_for is supplied add it to the parameter struct
@@ -282,6 +304,7 @@ func resourceCosmicInstanceRead(d *schema.ResourceData, meta interface{}) error 
 	d.Set("name", vm.Name)
 	d.Set("display_name", vm.Displayname)
 	d.Set("group", vm.Group)
+	d.Set("disk_controller", vm.Rootdevicecontroller)
 
 	// In some rare cases (when destroying a machine failes) it can happen that
 	// an instance does not have any attached NIC anymore.
