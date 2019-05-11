@@ -59,6 +59,16 @@ func resourceCosmicDisk() *schema.Resource {
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
+				ValidateFunc: func(val interface{}, key string) (warns []string, errs []error) {
+					v := val.(string)
+					switch v {
+					case "IDE", "SCSI", "VIRTIO":
+					default:
+						errs = append(errs, fmt.Errorf("%q must be either 'IDE', 'SCSI' or 'VIRTIO', got: %q", key, v))
+					}
+
+					return
+				},
 			},
 
 			"virtual_machine_id": &schema.Schema{
@@ -106,11 +116,8 @@ func resourceCosmicDiskCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	// Set the disk_controller type if configured
-	if diskcontroller := strings.ToUpper(d.Get("disk_controller").(string)); diskcontroller != "" {
-
-		if diskcontroller == "IDE" || diskcontroller == "SCSI" || diskcontroller == "VIRTIO" {
-			p.SetDiskcontroller(diskcontroller)
-		}
+	if diskcontroller, ok := d.GetOk("disk_controller"); ok {
+		p.SetDiskcontroller(diskcontroller.(string))
 	}
 
 	// If there is a project supplied, we retrieve and set the project id
