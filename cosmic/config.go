@@ -1,6 +1,6 @@
 package cosmic
 
-import "github.com/MissionCriticalCloud/go-cosmic/cosmic"
+import "github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 
 // Config is the configuration structure used to instantiate a
 // new Cosmic client.

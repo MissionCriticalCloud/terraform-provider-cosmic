@@ -3,7 +3,7 @@ module github.com/MissionCriticalCloud/terraform-provider-cosmic
 go 1.12
 
 require (
-	github.com/MissionCriticalCloud/go-cosmic v6.2.6+incompatible
+	github.com/MissionCriticalCloud/go-cosmic/v6 v6.2.8
 	github.com/go-ini/ini v1.41.0
 	github.com/hashicorp/go-hclog v0.0.0-20190109152822-4783caec6f2e // indirect
 	github.com/hashicorp/go-multierror v1.0.0

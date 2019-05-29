@@ -6,8 +6,8 @@ cloud.google.com/go/internal/optional
 cloud.google.com/go/internal/trace
 cloud.google.com/go/internal/version
 cloud.google.com/go/compute/metadata
-# github.com/MissionCriticalCloud/go-cosmic v6.2.6+incompatible
-github.com/MissionCriticalCloud/go-cosmic/cosmic
+# github.com/MissionCriticalCloud/go-cosmic/v6 v6.2.8
+github.com/MissionCriticalCloud/go-cosmic/v6/cosmic
 # github.com/agext/levenshtein v1.2.2
 github.com/agext/levenshtein
 # github.com/apparentlymart/go-cidr v1.0.0
