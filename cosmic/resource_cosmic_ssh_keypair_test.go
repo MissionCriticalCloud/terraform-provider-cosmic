@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/MissionCriticalCloud/go-cosmic/cosmic"
+	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 )

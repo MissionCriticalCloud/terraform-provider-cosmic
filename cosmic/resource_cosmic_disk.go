@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/MissionCriticalCloud/go-cosmic/cosmic"
+	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
