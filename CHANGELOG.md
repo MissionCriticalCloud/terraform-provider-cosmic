@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.3.0 (2019-06-17)
+
+- Support Terraform 0.12
+- Add `dns` option to `cosmic_network` to allow configuring DNS resolver per tier
+- Add `disk_controller` option to `cosmic_instance`
+- Add `disk_controller` option to `cosmic_disk`
+
 ## 0.2.0 (2019-02-28)
 
 - Add option to configure provider using `COSMIC_CONFIG` and `COSMIC_PROFILE` environment variables
