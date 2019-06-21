@@ -54,6 +54,23 @@ func resourceCosmicDisk() *schema.Resource {
 				Default:  false,
 			},
 
+			"disk_controller": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				ForceNew: true,
+				ValidateFunc: func(val interface{}, key string) (warns []string, errs []error) {
+					v := val.(string)
+					switch v {
+					case "IDE", "SCSI", "VIRTIO":
+					default:
+						errs = append(errs, fmt.Errorf("%q must be either 'IDE', 'SCSI' or 'VIRTIO', got: %q", key, v))
+					}
+
+					return
+				},
+			},
+
 			"virtual_machine_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -98,6 +115,11 @@ func resourceCosmicDiskCreate(d *schema.ResourceData, meta interface{}) error {
 		p.SetSize(int64(d.Get("size").(int)))
 	}
 
+	// Set the disk_controller type if configured
+	if diskcontroller, ok := d.GetOk("disk_controller"); ok {
+		p.SetDiskcontroller(diskcontroller.(string))
+	}
+
 	// If there is a project supplied, we retrieve and set the project id
 	if err := setProjectid(p, cs, d); err != nil {
 		return err
@@ -123,6 +145,7 @@ func resourceCosmicDiskCreate(d *schema.ResourceData, meta interface{}) error {
 	d.SetPartial("device_id")
 	d.SetPartial("disk_offering")
 	d.SetPartial("size")
+	d.SetPartial("disk_controller")
 	d.SetPartial("virtual_machine_id")
 	d.SetPartial("project")
 	d.SetPartial("zone")
@@ -161,6 +184,7 @@ func resourceCosmicDiskRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("name", v.Name)
 	d.Set("attach", v.Attached != "")           // If attached this contains a timestamp when attached
 	d.Set("size", int(v.Size/(1024*1024*1024))) // Needed to get GB's again
+	d.Set("disk_controller", v.Diskcontroller)
 
 	setValueOrID(d, "disk_offering", v.Diskofferingname, v.Diskofferingid)
 	setValueOrID(d, "project", v.Project, v.Projectid)

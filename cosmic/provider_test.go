@@ -80,6 +80,9 @@ var COSMIC_SERVICE_OFFERING_2 = os.Getenv("COSMIC_SERVICE_OFFERING_2")
 // ID of an existing VPC
 var COSMIC_VPC_ID = os.Getenv("COSMIC_VPC_ID")
 
+// ID of an existing VPC network
+var COSMIC_VPC_NETWORK_ID = os.Getenv("COSMIC_VPC_NETWORK_ID")
+
 // An available VPC offering
 var COSMIC_VPC_OFFERING = os.Getenv("COSMIC_VPC_OFFERING")
 
