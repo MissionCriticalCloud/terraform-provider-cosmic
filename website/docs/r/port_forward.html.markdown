@@ -36,9 +36,6 @@ The following arguments are supported:
     this IP address will be managed by this resource. This means it will delete
     all port forwards that are not in your config! (defaults false)
 
-* `project` - (Optional) The name or ID of the project to create this port forward
-    in. Changing this forces a new resource to be created.
-
 * `forward` - (Required) Can be specified multiple times. Each forward block supports
     fields documented below.
 

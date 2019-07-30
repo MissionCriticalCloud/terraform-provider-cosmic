@@ -49,13 +49,6 @@ func resourceCosmicVPC() *schema.Resource {
 				ForceNew: true,
 			},
 
-			"project": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-				ForceNew: true,
-			},
-
 			"source_nat_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
@@ -118,11 +111,6 @@ func resourceCosmicVPCCreate(d *schema.ResourceData, meta interface{}) error {
 		p.SetNetworkdomain(networkDomain.(string))
 	}
 
-	// If there is a project supplied, we retrieve and set the project id
-	if err := setProjectid(p, cs, d); err != nil {
-		return err
-	}
-
 	// If there is a sourcenatlist supplied, make sure to add it to the request
 	if sourceNatList, ok := d.GetOk("source_nat_list"); ok {
 		// Set the Source NAT list
@@ -150,10 +138,7 @@ func resourceCosmicVPCRead(d *schema.ResourceData, meta interface{}) error {
 	cs := meta.(*cosmic.CosmicClient)
 
 	// Get the VPC details
-	v, count, err := cs.VPC.GetVPCByID(
-		d.Id(),
-		cosmic.WithProject(d.Get("project").(string)),
-	)
+	v, count, err := cs.VPC.GetVPCByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf(
@@ -179,18 +164,12 @@ func resourceCosmicVPCRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	setValueOrID(d, "vpc_offering", o.Name, v.Vpcofferingid)
-	setValueOrID(d, "project", v.Project, v.Projectid)
 	setValueOrID(d, "zone", v.Zonename, v.Zoneid)
 
 	// Create a new parameter struct
 	p := cs.PublicIPAddress.NewListPublicIpAddressesParams()
 	p.SetVpcid(d.Id())
 	p.SetIssourcenat(true)
-
-	// If there is a project supplied, we retrieve and set the project id
-	if err := setProjectid(p, cs, d); err != nil {
-		return err
-	}
 
 	// Get the source NAT IP assigned to the VPC
 	l, err := cs.PublicIPAddress.ListPublicIpAddresses(p)

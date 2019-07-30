@@ -38,13 +38,6 @@ func resourceCosmicStaticNAT() *schema.Resource {
 				Computed: true,
 				ForceNew: true,
 			},
-
-			"project": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-				ForceNew: true,
-			},
 		},
 	}
 }
@@ -54,10 +47,7 @@ func resourceCosmicStaticNATCreate(d *schema.ResourceData, meta interface{}) err
 
 	ipaddressid := d.Get("ip_address_id").(string)
 
-	vm, _, err := cs.VirtualMachine.GetVirtualMachineByID(
-		d.Get("virtual_machine_id").(string),
-		cosmic.WithProject(d.Get("project").(string)),
-	)
+	vm, _, err := cs.VirtualMachine.GetVirtualMachineByID(d.Get("virtual_machine_id").(string))
 	if err != nil {
 		return err
 	}
@@ -102,10 +92,7 @@ func resourceCosmicStaticNATExists(d *schema.ResourceData, meta interface{}) (bo
 	cs := meta.(*cosmic.CosmicClient)
 
 	// Get the IP address details
-	ip, count, err := cs.PublicIPAddress.GetPublicIpAddressByID(
-		d.Id(),
-		cosmic.WithProject(d.Get("project").(string)),
-	)
+	ip, count, err := cs.PublicIPAddress.GetPublicIpAddressByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf("[DEBUG] IP address with ID %s no longer exists", d.Id())
@@ -122,10 +109,7 @@ func resourceCosmicStaticNATRead(d *schema.ResourceData, meta interface{}) error
 	cs := meta.(*cosmic.CosmicClient)
 
 	// Get the IP address details
-	ip, count, err := cs.PublicIPAddress.GetPublicIpAddressByID(
-		d.Id(),
-		cosmic.WithProject(d.Get("project").(string)),
-	)
+	ip, count, err := cs.PublicIPAddress.GetPublicIpAddressByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf("[DEBUG] IP address with ID %s no longer exists", d.Id())
@@ -144,8 +128,6 @@ func resourceCosmicStaticNATRead(d *schema.ResourceData, meta interface{}) error
 
 	d.Set("virtual_machine_id", ip.Virtualmachineid)
 	d.Set("vm_guest_ip", ip.Vmipaddress)
-
-	setValueOrID(d, "project", ip.Project, ip.Projectid)
 
 	return nil
 }

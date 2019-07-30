@@ -40,10 +40,7 @@ The following arguments are supported:
 * `network_domain` - (Optional) The default DNS domain for networks created in
     this VPC. Changing this forces a new resource to be created.
 
-* `project` - (Optional) The name or ID of the project to deploy this
-    instance to. Changing this forces a new resource to be created.
-
-* `source_nat_list` - Source Nat CIDR list for used to allow other CIDRs to be 
+* `source_nat_list` - Source Nat CIDR list for used to allow other CIDRs to be
     source NATted by the VPC over the public interface.
 
 * `syslog_server_list` - Comma separated list of IP addresses to configure as syslog
@@ -67,10 +64,4 @@ example:
 
 ```shell
 terraform import cosmic_vpc.default 84b23264-917a-4712-b8bf-cd7604db43b0
-```
-
-When importing into a project you need to prefix the import ID with the project name:
-
-```shell
-terraform import cosmic_vpc.default my-project/84b23264-917a-4712-b8bf-cd7604db43b0
 ```

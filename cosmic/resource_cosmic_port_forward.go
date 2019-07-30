@@ -36,12 +36,6 @@ func resourceCosmicPortForward() *schema.Resource {
 				Default:  false,
 			},
 
-			"project": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-			},
-
 			"forward": &schema.Schema{
 				Type:     schema.TypeSet,
 				Required: true,
@@ -149,10 +143,7 @@ func createPortForward(d *schema.ResourceData, meta interface{}, forward map[str
 		return err
 	}
 
-	vm, _, err := cs.VirtualMachine.GetVirtualMachineByID(
-		forward["virtual_machine_id"].(string),
-		cosmic.WithProject(d.Get("project").(string)),
-	)
+	vm, _, err := cs.VirtualMachine.GetVirtualMachineByID(forward["virtual_machine_id"].(string))
 	if err != nil {
 		return err
 	}
@@ -201,10 +192,7 @@ func resourceCosmicPortForwardRead(d *schema.ResourceData, meta interface{}) err
 	cs := meta.(*cosmic.CosmicClient)
 
 	// First check if the IP address is still associated
-	_, count, err := cs.PublicIPAddress.GetPublicIpAddressByID(
-		d.Id(),
-		cosmic.WithProject(d.Get("project").(string)),
-	)
+	_, count, err := cs.PublicIPAddress.GetPublicIpAddressByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf(
@@ -220,10 +208,6 @@ func resourceCosmicPortForwardRead(d *schema.ResourceData, meta interface{}) err
 	p := cs.Firewall.NewListPortForwardingRulesParams()
 	p.SetIpaddressid(d.Id())
 	p.SetListall(true)
-
-	if err := setProjectid(p, cs, d); err != nil {
-		return err
-	}
 
 	l, err := cs.Firewall.ListPortForwardingRules(p)
 	if err != nil {

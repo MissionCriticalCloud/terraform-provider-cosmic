@@ -79,13 +79,6 @@ func resourceCosmicLoadBalancerRule() *schema.Resource {
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-
-			"project": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-				ForceNew: true,
-			},
 		},
 	}
 }
@@ -168,10 +161,7 @@ func resourceCosmicLoadBalancerRuleRead(d *schema.ResourceData, meta interface{}
 	cs := meta.(*cosmic.CosmicClient)
 
 	// Get the load balancer details
-	lb, count, err := cs.LoadBalancer.GetLoadBalancerRuleByID(
-		d.Id(),
-		cosmic.WithProject(d.Get("project").(string)),
-	)
+	lb, count, err := cs.LoadBalancer.GetLoadBalancerRuleByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf("[DEBUG] Load balancer rule %s does no longer exist", d.Get("name").(string))
@@ -191,8 +181,6 @@ func resourceCosmicLoadBalancerRuleRead(d *schema.ResourceData, meta interface{}
 	if _, ok := d.GetOk("network_id"); ok {
 		d.Set("network_id", lb.Networkid)
 	}
-
-	setValueOrID(d, "project", lb.Project, lb.Projectid)
 
 	return nil
 }

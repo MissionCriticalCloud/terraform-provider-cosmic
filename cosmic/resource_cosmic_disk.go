@@ -76,13 +76,6 @@ func resourceCosmicDisk() *schema.Resource {
 				Optional: true,
 			},
 
-			"project": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-				ForceNew: true,
-			},
-
 			"zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
@@ -120,11 +113,6 @@ func resourceCosmicDiskCreate(d *schema.ResourceData, meta interface{}) error {
 		p.SetDiskcontroller(diskcontroller.(string))
 	}
 
-	// If there is a project supplied, we retrieve and set the project id
-	if err := setProjectid(p, cs, d); err != nil {
-		return err
-	}
-
 	// Retrieve the zone ID
 	zoneid, e := retrieveID(cs, "zone", d.Get("zone").(string))
 	if e != nil {
@@ -147,7 +135,6 @@ func resourceCosmicDiskCreate(d *schema.ResourceData, meta interface{}) error {
 	d.SetPartial("size")
 	d.SetPartial("disk_controller")
 	d.SetPartial("virtual_machine_id")
-	d.SetPartial("project")
 	d.SetPartial("zone")
 
 	if d.Get("attach").(bool) {
@@ -168,10 +155,7 @@ func resourceCosmicDiskRead(d *schema.ResourceData, meta interface{}) error {
 	cs := meta.(*cosmic.CosmicClient)
 
 	// Get the volume details
-	v, count, err := cs.Volume.GetVolumeByID(
-		d.Id(),
-		cosmic.WithProject(d.Get("project").(string)),
-	)
+	v, count, err := cs.Volume.GetVolumeByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			d.SetId("")
@@ -187,7 +171,6 @@ func resourceCosmicDiskRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("disk_controller", v.Diskcontroller)
 
 	setValueOrID(d, "disk_offering", v.Diskofferingname, v.Diskofferingid)
-	setValueOrID(d, "project", v.Project, v.Projectid)
 	setValueOrID(d, "zone", v.Zonename, v.Zoneid)
 
 	if v.Attached != "" {
@@ -370,10 +353,7 @@ func isAttached(d *schema.ResourceData, meta interface{}) (bool, error) {
 	cs := meta.(*cosmic.CosmicClient)
 
 	// Get the volume details
-	v, _, err := cs.Volume.GetVolumeByID(
-		d.Id(),
-		cosmic.WithProject(d.Get("project").(string)),
-	)
+	v, _, err := cs.Volume.GetVolumeByID(d.Id())
 	if err != nil {
 		return false, err
 	}

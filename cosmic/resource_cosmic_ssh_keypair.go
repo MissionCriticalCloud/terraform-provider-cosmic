@@ -31,12 +31,6 @@ func resourceCosmicSSHKeyPair() *schema.Resource {
 				ForceNew: true,
 			},
 
-			"project": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-			},
-
 			"private_key": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
@@ -60,11 +54,6 @@ func resourceCosmicSSHKeyPairCreate(d *schema.ResourceData, meta interface{}) er
 		// Register supplied key
 		p := cs.SSH.NewRegisterSSHKeyPairParams(name, publicKey)
 
-		// If there is a project supplied, we retrieve and set the project id
-		if err := setProjectid(p, cs, d); err != nil {
-			return err
-		}
-
 		_, err := cs.SSH.RegisterSSHKeyPair(p)
 		if err != nil {
 			return err
@@ -72,11 +61,6 @@ func resourceCosmicSSHKeyPairCreate(d *schema.ResourceData, meta interface{}) er
 	} else {
 		// No key supplied, must create one and return the private key
 		p := cs.SSH.NewCreateSSHKeyPairParams(name)
-
-		// If there is a project supplied, we retrieve and set the project id
-		if err := setProjectid(p, cs, d); err != nil {
-			return err
-		}
 
 		r, err := cs.SSH.CreateSSHKeyPair(p)
 		if err != nil {
@@ -98,11 +82,6 @@ func resourceCosmicSSHKeyPairRead(d *schema.ResourceData, meta interface{}) erro
 
 	p := cs.SSH.NewListSSHKeyPairsParams()
 	p.SetName(d.Id())
-
-	// If there is a project supplied, we retrieve and set the project id
-	if err := setProjectid(p, cs, d); err != nil {
-		return err
-	}
 
 	r, err := cs.SSH.ListSSHKeyPairs(p)
 	if err != nil {
@@ -126,11 +105,6 @@ func resourceCosmicSSHKeyPairDelete(d *schema.ResourceData, meta interface{}) er
 
 	// Create a new parameter struct
 	p := cs.SSH.NewDeleteSSHKeyPairParams(d.Id())
-
-	// If there is a project supplied, we retrieve and set the project id
-	if err := setProjectid(p, cs, d); err != nil {
-		return err
-	}
 
 	// Remove the SSH Keypair
 	_, err := cs.SSH.DeleteSSHKeyPair(p)

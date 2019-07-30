@@ -16,7 +16,6 @@ Creates or registers an SSH key pair.
 resource "cosmic_ssh_keypair" "default" {
   name       = "myKey"
   public_key = "${file("~/.ssh/id_rsa.pub")}"
-  project    = "myProject"
 }
 ```
 
@@ -33,9 +32,6 @@ The following arguments are supported:
     be loaded from a file on disk using the [`file()` interpolation
     function](/docs/configuration/interpolation.html#file_path_). Changing
     this forces a new resource to be created.
-
-* `project` - (Optional) The name or ID of the project to register this
-    key to. Changing this forces a new resource to be created.
 
 ## Attributes Reference
 

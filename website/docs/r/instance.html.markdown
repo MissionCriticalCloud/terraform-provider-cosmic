@@ -55,9 +55,6 @@ The following arguments are supported:
 * `affinity_group_names` - (Optional) List of affinity group names to apply to
     this instance.
 
-* `project` - (Optional) The name or ID of the project to deploy this
-    instance to. Changing this forces a new resource to be created.
-
 * `zone` - (Required) The name or ID of the zone where this instance will be
     created. Changing this forces a new resource to be created.
 
@@ -84,10 +81,4 @@ example:
 
 ```shell
 terraform import cosmic_instance.default 5cf69677-7e4b-4bf4-b868-f0b02bb72ee0
-```
-
-When importing into a project you need to prefix the import ID with the project name:
-
-```shell
-terraform import cosmic_instance.default my-project/5cf69677-7e4b-4bf4-b868-f0b02bb72ee0
 ```
