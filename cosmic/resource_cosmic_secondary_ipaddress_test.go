@@ -58,6 +58,26 @@ func TestAccCosmicSecondaryIPAddress_fixedIP(t *testing.T) {
 	})
 }
 
+func TestAccCosmicSecondaryIPAddress_import(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckCosmicSecondaryIPAddressDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCosmicSecondaryIPAddress_fixedIP,
+			},
+
+			{
+				ResourceName:      "cosmic_secondary_ipaddress.foo",
+				ImportState:       true,
+				ImportStateId:     fmt.Sprintf("%s/10.0.8.10", COSMIC_INSTANCE_ID),
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testAccCheckCosmicSecondaryIPAddressExists(
 	n string, ip *cosmic.AddIpToNicResponse) resource.TestCheckFunc {
 	return func(s *terraform.State) error {

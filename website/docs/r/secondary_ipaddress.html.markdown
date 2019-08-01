@@ -43,9 +43,9 @@ The following attributes are exported:
 
 ## Import (EXPERIMENTAL)
 
-Secondary IP addresses can be imported; use `<SECONDARY IP ADDRESS ID>` as the import ID. For
+Secondary IP addresses can be imported; use `<INSTANCE ID>/<SECONDARY IP ADDRESS>` as the import ID. For
 example:
 
 ```shell
-terraform import cosmic_secondary_ipaddress.default e42a24d2-46cb-4b18-9d41-382582fad309
+terraform import cosmic_secondary_ipaddress.default e42a24d2-46cb-4b18-9d41-382582fad309/192.168.10.10
 ```
