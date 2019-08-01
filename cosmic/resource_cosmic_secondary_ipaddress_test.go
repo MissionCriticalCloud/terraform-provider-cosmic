@@ -10,20 +10,8 @@ import (
 )
 
 func TestAccCosmicSecondaryIPAddress_basic(t *testing.T) {
-	if COSMIC_SERVICE_OFFERING_1 == "" {
-		t.Skip("This test requires an existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_1)")
-	}
-
-	if COSMIC_TEMPLATE == "" {
-		t.Skip("This test requires an existing instance template (set it by exporting COSMIC_TEMPLATE)")
-	}
-
-	if COSMIC_VPC_ID == "" {
-		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
-	}
-
-	if COSMIC_VPC_NETWORK_OFFERING == "" {
-		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
+	if COSMIC_INSTANCE_ID == "" {
+		t.Skip("This test requires an existing instance (set it by exporting COSMIC_INSTANCE_ID)")
 	}
 
 	var ip cosmic.AddIpToNicResponse
@@ -45,20 +33,8 @@ func TestAccCosmicSecondaryIPAddress_basic(t *testing.T) {
 }
 
 func TestAccCosmicSecondaryIPAddress_fixedIP(t *testing.T) {
-	if COSMIC_SERVICE_OFFERING_1 == "" {
-		t.Skip("This test requires an existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_1)")
-	}
-
-	if COSMIC_TEMPLATE == "" {
-		t.Skip("This test requires an existing instance template (set it by exporting COSMIC_TEMPLATE)")
-	}
-
-	if COSMIC_VPC_ID == "" {
-		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
-	}
-
-	if COSMIC_VPC_NETWORK_OFFERING == "" {
-		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
+	if COSMIC_INSTANCE_ID == "" {
+		t.Skip("This test requires an existing instance (set it by exporting COSMIC_INSTANCE_ID)")
 	}
 
 	var ip cosmic.AddIpToNicResponse
@@ -75,7 +51,7 @@ func TestAccCosmicSecondaryIPAddress_fixedIP(t *testing.T) {
 						"cosmic_secondary_ipaddress.foo", &ip),
 					testAccCheckCosmicSecondaryIPAddressAttributes(&ip),
 					resource.TestCheckResourceAttr(
-						"cosmic_secondary_ipaddress.foo", "ip_address", "10.0.10.10"),
+						"cosmic_secondary_ipaddress.foo", "ip_address", "10.0.8.10"),
 				),
 			},
 		},
@@ -156,7 +132,7 @@ func testAccCheckCosmicSecondaryIPAddressAttributes(
 	ip *cosmic.AddIpToNicResponse) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
-		if ip.Ipaddress != "10.0.10.10" {
+		if ip.Ipaddress != "10.0.8.10" {
 			return fmt.Errorf("Bad IP address: %s", ip.Ipaddress)
 		}
 		return nil
@@ -232,58 +208,14 @@ func testAccCheckCosmicSecondaryIPAddressDestroy(s *terraform.State) error {
 }
 
 var testAccCosmicSecondaryIPAddress_basic = fmt.Sprintf(`
-resource "cosmic_network" "foo" {
-  name             = "terraform-network"
-  cidr             = "10.0.10.0/24"
-  gateway          = "10.0.10.1"
-  network_offering = "%s"
-  vpc_id           = "%s"
-  zone             = "%s"
-}
-
-resource "cosmic_instance" "foo" {
-  name             = "terraform-test"
-  service_offering = "%s"
-  network_id       = "${cosmic_network.foo.id}"
-  template         = "%s"
-  zone             = "${cosmic_network.foo.zone}"
-  expunge          = true
-}
-
 resource "cosmic_secondary_ipaddress" "foo" {
-  virtual_machine_id = "${cosmic_instance.foo.id}"
+  virtual_machine_id = "%s"
 }`,
-	COSMIC_VPC_NETWORK_OFFERING,
-	COSMIC_VPC_ID,
-	COSMIC_ZONE,
-	COSMIC_SERVICE_OFFERING_1,
-	COSMIC_TEMPLATE)
+	COSMIC_INSTANCE_ID)
 
 var testAccCosmicSecondaryIPAddress_fixedIP = fmt.Sprintf(`
-resource "cosmic_network" "foo" {
-  name             = "terraform-network"
-  cidr             = "10.0.10.0/24"
-  gateway          = "10.0.10.1"
-  network_offering = "%s"
-  vpc_id           = "%s"
-  zone             = "%s"
-}
-
-resource "cosmic_instance" "foo" {
-  name             = "terraform-test"
-  service_offering = "%s"
-  network_id       = "${cosmic_network.foo.id}"
-  template         = "%s"
-  zone             = "${cosmic_network.foo.zone}"
-  expunge          = true
-}
-
 resource "cosmic_secondary_ipaddress" "foo" {
-  ip_address         = "10.0.10.10"
-  virtual_machine_id = "${cosmic_instance.foo.id}"
+  ip_address         = "10.0.8.10"
+  virtual_machine_id = "%s"
 }`,
-	COSMIC_VPC_NETWORK_OFFERING,
-	COSMIC_VPC_ID,
-	COSMIC_ZONE,
-	COSMIC_SERVICE_OFFERING_1,
-	COSMIC_TEMPLATE)
+	COSMIC_INSTANCE_ID)
