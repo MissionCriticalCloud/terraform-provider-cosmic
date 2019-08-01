@@ -60,10 +60,7 @@ The following arguments are supported:
     swap ACL's, but if you want to detach an attached ACL and revert to using
     `none`, this will force a new resource to be created. (defaults `none`)
 
-* `project` - (Optional) The name or ID of the project to deploy this
-    instance to. Changing this forces a new resource to be created.
-
-* `ip_exclusion_list` - (Optional) list of ip addresses and/or ranges of 
+* `ip_exclusion_list` - (Optional) list of ip addresses and/or ranges of
     addresses to be excluded from the network for assignment to instances
     in this network (eg. 10.0.0.2,10.0.0.4-10.0.0.7).
 
@@ -86,10 +83,4 @@ example:
 
 ```shell
 terraform import cosmic_network.default 36619b20-5584-43bf-9a84-e242bacd5582
-```
-
-When importing into a project you need to prefix the import ID with the project name:
-
-```shell
-terraform import cosmic_network.default my-project/36619b20-5584-43bf-9a84-e242bacd5582
 ```

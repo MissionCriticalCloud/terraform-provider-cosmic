@@ -37,12 +37,6 @@ func resourceCosmicAffinityGroup() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
-
-			"project": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-			},
 		},
 	}
 }
@@ -63,11 +57,6 @@ func resourceCosmicAffinityGroupCreate(d *schema.ResourceData, meta interface{})
 		p.SetDescription(name)
 	}
 
-	// If there is a project supplied, we retrieve and set the project id
-	if err := setProjectid(p, cs, d); err != nil {
-		return err
-	}
-
 	log.Printf("[DEBUG] Creating affinity group %s", name)
 	r, err := cs.AffinityGroup.CreateAffinityGroup(p)
 	if err != nil {
@@ -86,10 +75,7 @@ func resourceCosmicAffinityGroupRead(d *schema.ResourceData, meta interface{}) e
 	log.Printf("[DEBUG] Rerieving affinity group %s", d.Get("name").(string))
 
 	// Get the affinity group details
-	ag, count, err := cs.AffinityGroup.GetAffinityGroupByID(
-		d.Id(),
-		cosmic.WithProject(d.Get("project").(string)),
-	)
+	ag, count, err := cs.AffinityGroup.GetAffinityGroupByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf("[DEBUG] Affinity group %s does not longer exist", d.Get("name").(string))
@@ -114,11 +100,6 @@ func resourceCosmicAffinityGroupDelete(d *schema.ResourceData, meta interface{})
 	// Create a new parameter struct
 	p := cs.AffinityGroup.NewDeleteAffinityGroupParams()
 	p.SetId(d.Id())
-
-	// If there is a project supplied, we retrieve and set the project id
-	if err := setProjectid(p, cs, d); err != nil {
-		return err
-	}
 
 	// Delete the affinity group
 	_, err := cs.AffinityGroup.DeleteAffinityGroup(p)

@@ -45,14 +45,11 @@ The following arguments are supported:
 * `shrink_ok` - (Optional) Verifies if the disk volume is allowed to shrink when
     resizing (defaults false).
 
-* `disk_controller` - (Optional) Set the disk controller type for this disk. Allowed 
+* `disk_controller` - (Optional) Set the disk controller type for this disk. Allowed
      options are IDE, SCSI and VIRTIO. Changing this forces a new resource to be created.
 
 * `virtual_machine_id` - (Optional) The ID of the virtual machine to which you want
     to attach the disk volume.
-
-* `project` - (Optional) The name or ID of the project to deploy this
-    instance to. Changing this forces a new resource to be created.
 
 * `zone` - (Required) The name or ID of the zone where this disk volume will be available.
     Changing this forces a new resource to be created.
@@ -71,10 +68,4 @@ example:
 
 ```shell
 terraform import cosmic_disk.default 6f3ee798-d417-4e7a-92bc-95ad41cf1244
-```
-
-When importing into a project you need to prefix the import ID with the project name:
-
-```shell
-terraform import cosmic_disk.default my-project/6f3ee798-d417-4e7a-92bc-95ad41cf1244
 ```

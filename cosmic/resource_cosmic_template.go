@@ -54,13 +54,6 @@ func resourceCosmicTemplate() *schema.Resource {
 				ForceNew: true,
 			},
 
-			"project": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-				ForceNew: true,
-			},
-
 			"zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
@@ -171,11 +164,6 @@ func resourceCosmicTemplateCreate(d *schema.ResourceData, meta interface{}) erro
 		p.SetPasswordenabled(v.(bool))
 	}
 
-	// If there is a project supplied, we retrieve and set the project id
-	if err := setProjectid(p, cs, d); err != nil {
-		return err
-	}
-
 	// Create the new template
 	r, err := cs.Template.RegisterTemplate(p)
 	if err != nil {
@@ -211,11 +199,7 @@ func resourceCosmicTemplateRead(d *schema.ResourceData, meta interface{}) error 
 	cs := meta.(*cosmic.CosmicClient)
 
 	// Get the template details
-	t, count, err := cs.Template.GetTemplateByID(
-		d.Id(),
-		"executable",
-		cosmic.WithProject(d.Get("project").(string)),
-	)
+	t, count, err := cs.Template.GetTemplateByID(d.Id(), "executable")
 	if err != nil {
 		if count == 0 {
 			log.Printf(
@@ -239,7 +223,6 @@ func resourceCosmicTemplateRead(d *schema.ResourceData, meta interface{}) error 
 	d.Set("is_ready", t.Isready)
 
 	setValueOrID(d, "os_type", t.Ostypename, t.Ostypeid)
-	setValueOrID(d, "project", t.Project, t.Projectid)
 	setValueOrID(d, "zone", t.Zonename, t.Zoneid)
 
 	return nil

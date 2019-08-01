@@ -92,12 +92,6 @@ func resourceCosmicNetworkACLRule() *schema.Resource {
 				},
 			},
 
-			"project": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-			},
-
 			"parallelism": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
@@ -279,10 +273,7 @@ func resourceCosmicNetworkACLRuleRead(d *schema.ResourceData, meta interface{}) 
 	cs := meta.(*cosmic.CosmicClient)
 
 	// First check if the ACL itself still exists
-	_, count, err := cs.NetworkACL.GetNetworkACLListByID(
-		d.Id(),
-		cosmic.WithProject(d.Get("project").(string)),
-	)
+	_, count, err := cs.NetworkACL.GetNetworkACLListByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf(

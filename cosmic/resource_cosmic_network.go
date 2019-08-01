@@ -118,13 +118,6 @@ func resourceCosmicNetwork() *schema.Resource {
 				Optional: true,
 			},
 
-			"project": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-				ForceNew: true,
-			},
-
 			"zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
@@ -230,11 +223,6 @@ func resourceCosmicNetworkCreate(d *schema.ResourceData, meta interface{}) error
 		}
 	}
 
-	// If there is a project supplied, we retrieve and set the project id
-	if err := setProjectid(p, cs, d); err != nil {
-		return err
-	}
-
 	// Create the new network
 	r, err := cs.Network.CreateNetwork(p)
 	if err != nil {
@@ -255,10 +243,7 @@ func resourceCosmicNetworkRead(d *schema.ResourceData, meta interface{}) error {
 	cs := meta.(*cosmic.CosmicClient)
 
 	// Get the network details
-	n, count, err := cs.Network.GetNetworkByID(
-		d.Id(),
-		cosmic.WithProject(d.Get("project").(string)),
-	)
+	n, count, err := cs.Network.GetNetworkByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf(
@@ -307,7 +292,6 @@ func resourceCosmicNetworkRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("tags", tags)
 
 	setValueOrID(d, "network_offering", n.Networkofferingname, n.Networkofferingid)
-	setValueOrID(d, "project", n.Project, n.Projectid)
 	setValueOrID(d, "zone", n.Zonename, n.Zoneid)
 
 	return nil

@@ -50,13 +50,6 @@ func resourceCosmicIPAddress() *schema.Resource {
 				ForceNew: true,
 			},
 
-			"project": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-				ForceNew: true,
-			},
-
 			"ip_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
@@ -87,11 +80,6 @@ func resourceCosmicIPAddressCreate(d *schema.ResourceData, meta interface{}) err
 		p.SetVpcid(vpcid.(string))
 	}
 
-	// If there is a project supplied, we retrieve and set the project id
-	if err := setProjectid(p, cs, d); err != nil {
-		return err
-	}
-
 	// Associate a new IP address
 	r, err := cs.PublicIPAddress.AssociateIpAddress(p)
 	if err != nil {
@@ -120,10 +108,7 @@ func resourceCosmicIPAddressRead(d *schema.ResourceData, meta interface{}) error
 	cs := meta.(*cosmic.CosmicClient)
 
 	// Get the IP address details
-	ip, count, err := cs.PublicIPAddress.GetPublicIpAddressByID(
-		d.Id(),
-		cosmic.WithProject(d.Get("project").(string)),
-	)
+	ip, count, err := cs.PublicIPAddress.GetPublicIpAddressByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf(
@@ -150,8 +135,6 @@ func resourceCosmicIPAddressRead(d *schema.ResourceData, meta interface{}) error
 		ip.Aclid = none
 	}
 	d.Set("acl_id", ip.Aclid)
-
-	setValueOrID(d, "project", ip.Project, ip.Projectid)
 
 	return nil
 }
@@ -196,10 +179,7 @@ func resourceCosmicIPAddressDelete(d *schema.ResourceData, meta interface{}) err
 
 func resourceCosmicIPAddressImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	cs := meta.(*cosmic.CosmicClient)
-	ip, _, _ := cs.PublicIPAddress.GetPublicIpAddressByID(
-		d.Id(),
-		cosmic.WithProject(d.Get("project").(string)),
-	)
+	ip, _, _ := cs.PublicIPAddress.GetPublicIpAddressByID(d.Id())
 
 	// Set the vpc_id if the IP is attached to a VPC.
 	if ip.Vpcid != "" {

@@ -224,51 +224,6 @@ func TestAccCosmicInstance_keyPair(t *testing.T) {
 	})
 }
 
-func TestAccCosmicInstance_project(t *testing.T) {
-	if COSMIC_PROJECT_NAME == "" {
-		t.Skip("This test requires an existing project (set it by exporting COSMIC_PROJECT_NAME)")
-	}
-
-	if COSMIC_SERVICE_OFFERING_1 == "" {
-		t.Skip("This test requires an existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_1)")
-	}
-
-	if COSMIC_SERVICE_OFFERING_2 == "" {
-		t.Skip("This test requires a second existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_2)")
-	}
-
-	if COSMIC_TEMPLATE == "" {
-		t.Skip("This test requires an existing instance template (set it by exporting COSMIC_TEMPLATE)")
-	}
-
-	if COSMIC_VPC_ID == "" {
-		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
-	}
-
-	if COSMIC_VPC_NETWORK_OFFERING == "" {
-		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
-	}
-
-	var instance cosmic.VirtualMachine
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckCosmicInstanceDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccCosmicInstance_project,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckCosmicInstanceExists(
-						"cosmic_instance.foo", &instance),
-					resource.TestCheckResourceAttr(
-						"cosmic_instance.foo", "project", COSMIC_PROJECT_NAME),
-				),
-			},
-		},
-	})
-}
-
 func testAccCheckCosmicInstanceExists(
 	n string, instance *cosmic.VirtualMachine) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
@@ -496,43 +451,5 @@ resource "cosmic_instance" "foo" {
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_VPC_ID,
 	COSMIC_ZONE,
-	COSMIC_SERVICE_OFFERING_1,
-	COSMIC_TEMPLATE)
-
-var testAccCosmicInstance_project = fmt.Sprintf(`
-resource "cosmic_vpc" "foo" {
-  name           = "terraform-vpc"
-  display_text   = "terraform-vpc-text"
-  cidr           = "10.0.10.0/22"
-  vpc_offering   = "%s"
-  network_domain = "terraform-domain"
-  project        = "%s"
-  zone           = "%s"
-}
-
-resource "cosmic_network" "foo" {
-  name             = "terraform-network"
-  cidr             = "10.0.10.0/24"
-  gateway          = "10.0.10.1"
-  network_offering = "%s"
-  project          = "${cosmic_vpc.foo.project}"
-  vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
-}
-
-resource "cosmic_instance" "foo" {
-  name             = "terraform-test"
-  display_name     = "terraform-test"
-  service_offering = "%s"
-  network_id       = "${cosmic_network.foo.id}"
-  template         = "%s"
-  project          = "${cosmic_vpc.foo.project}"
-  zone             = "${cosmic_vpc.foo.zone}"
-  expunge          = true
-}`,
-	COSMIC_VPC_OFFERING,
-	COSMIC_PROJECT_NAME,
-	COSMIC_ZONE,
-	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE)

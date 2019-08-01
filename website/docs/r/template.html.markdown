@@ -43,9 +43,6 @@ The following arguments are supported:
 * `url` - (Required) The URL of where the template is hosted. Changing this
     forces a new resource to be created.
 
-* `project` - (Optional) The name or ID of the project to create this template for.
-    Changing this forces a new resource to be created.
-
 * `zone` - (Optional) The name or ID of the zone where this template will be created.
     Changing this forces a new resource to be created.
 

@@ -88,13 +88,6 @@ func resourceCosmicInstance() *schema.Resource {
 				ConflictsWith: []string{"affinity_group_ids"},
 			},
 
-			"project": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-				ForceNew: true,
-			},
-
 			"zone": {
 				Type:     schema.TypeString,
 				Required: true,
@@ -246,11 +239,6 @@ func resourceCosmicInstanceCreate(d *schema.ResourceData, meta interface{}) erro
 		p.SetAffinitygroupnames(groups)
 	}
 
-	// If there is a project supplied, we retrieve and set the project id
-	if err := setProjectid(p, cs, d); err != nil {
-		return err
-	}
-
 	// If a keypair is supplied, add it to the parameter struct
 	if keypair, ok := d.GetOk("keypair"); ok {
 		p.SetKeypair(keypair.(string))
@@ -286,10 +274,7 @@ func resourceCosmicInstanceRead(d *schema.ResourceData, meta interface{}) error 
 	cs := meta.(*cosmic.CosmicClient)
 
 	// Get the virtual machine details
-	vm, count, err := cs.VirtualMachine.GetVirtualMachineByID(
-		d.Id(),
-		cosmic.WithProject(d.Get("project").(string)),
-	)
+	vm, count, err := cs.VirtualMachine.GetVirtualMachineByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf("[DEBUG] Instance %s does no longer exist", d.Get("name").(string))
@@ -331,7 +316,6 @@ func resourceCosmicInstanceRead(d *schema.ResourceData, meta interface{}) error 
 
 	setValueOrID(d, "service_offering", vm.Serviceofferingname, vm.Serviceofferingid)
 	setValueOrID(d, "template", vm.Templatename, vm.Templateid)
-	setValueOrID(d, "project", vm.Project, vm.Projectid)
 	setValueOrID(d, "zone", vm.Zonename, vm.Zoneid)
 
 	return nil

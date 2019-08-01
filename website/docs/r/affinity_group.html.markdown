@@ -31,9 +31,6 @@ The following arguments are supported:
 * `type` - (Required) The affinity group type. Changing this
     forces a new resource to be created.
 
-* `project` - (Optional) The name or ID of the project to register this
-    affinity group to. Changing this forces a new resource to be created.
-
 ## Attributes Reference
 
 The following attributes are exported:
@@ -49,10 +46,3 @@ example:
 ```shell
 terraform import cosmic_affinity_group.default 6226ea4d-9cbe-4cc9-b30c-b9532146da5b
 ```
-
-When importing into a project you need to prefix the import ID with the project name:
-
-```shell
-terraform import cosmic_affinity_group.default my-project/6226ea4d-9cbe-4cc9-b30c-b9532146da5b
-```
-

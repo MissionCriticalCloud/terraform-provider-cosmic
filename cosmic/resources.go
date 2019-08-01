@@ -54,8 +54,6 @@ func retrieveID(cs *cosmic.CosmicClient, name string, value string, opts ...cosm
 		id, _, err = cs.ServiceOffering.GetServiceOfferingID(value)
 	case "network_offering":
 		id, _, err = cs.NetworkOffering.GetNetworkOfferingID(value)
-	case "project":
-		id, _, err = cs.Project.GetProjectID(value)
 	case "vpc_offering":
 		id, _, err = cs.VPC.GetVPCOfferingID(value)
 	case "zone":
@@ -121,19 +119,6 @@ func Retry(n int, f RetryFunc) (interface{}, error) {
 	}
 
 	return nil, lastErr
-}
-
-// If there is a project supplied, we retrieve and set the project id
-func setProjectid(p cosmic.ProjectIDSetter, cs *cosmic.CosmicClient, d *schema.ResourceData) error {
-	if project, ok := d.GetOk("project"); ok {
-		projectid, e := retrieveID(cs, "project", project.(string))
-		if e != nil {
-			return e.Error()
-		}
-		p.SetProjectid(projectid)
-	}
-
-	return nil
 }
 
 func isCosmic(cs *cosmic.CosmicClient) bool {

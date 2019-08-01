@@ -34,9 +34,6 @@ The following arguments are supported:
 * `zone` - (Optional) The name or ID of the zone for which an IP address should be
    acquired and associated. Changing this forces a new resource to be created.
 
-* `project` - (Optional) The name or ID of the project to deploy this
-    instance to. Changing this forces a new resource to be created.
-
 *NOTE: `network_id` and/or `zone` should have a value when `is_portable` is `false`!*
 *NOTE: Either `network_id` or `vpc_id` should have a value when `is_portable` is `true`!*
 

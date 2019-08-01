@@ -33,9 +33,6 @@ The following arguments are supported:
     static NAT traffic to (useful when the virtual machine has secondary
     NICs or IP addresses). Changing this forces a new resource to be created.
 
-* `project` - (Optional) The name or ID of the project the instance belongs 
-    to. Changing this forces a new resource to be created.
-
 ## Attributes Reference
 
 The following attributes are exported:

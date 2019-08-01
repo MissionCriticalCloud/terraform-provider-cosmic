@@ -32,12 +32,6 @@ func resourceCosmicNetworkACL() *schema.Resource {
 				ForceNew: true,
 			},
 
-			"project": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-			},
-
 			"vpc_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
@@ -77,10 +71,7 @@ func resourceCosmicNetworkACLRead(d *schema.ResourceData, meta interface{}) erro
 	cs := meta.(*cosmic.CosmicClient)
 
 	// Get the network ACL list details
-	f, count, err := cs.NetworkACL.GetNetworkACLListByID(
-		d.Id(),
-		cosmic.WithProject(d.Get("project").(string)),
-	)
+	f, count, err := cs.NetworkACL.GetNetworkACLListByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf(
