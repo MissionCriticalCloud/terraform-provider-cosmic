@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ## Unreleased
 
 - Remove project support
+- Fix importing `cosmic_secondary_ipaddress` resources
 
 ## 0.3.0 (2019-06-17)
 
