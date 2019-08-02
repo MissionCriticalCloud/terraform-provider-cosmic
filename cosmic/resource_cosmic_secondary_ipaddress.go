@@ -15,7 +15,7 @@ func resourceCosmicSecondaryIPAddress() *schema.Resource {
 		Read:   resourceCosmicSecondaryIPAddressRead,
 		Delete: resourceCosmicSecondaryIPAddressDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			State: resourceCosmicSecondaryIPAddressImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -53,7 +53,7 @@ func resourceCosmicSecondaryIPAddressCreate(d *schema.ResourceData, meta interfa
 		vm, count, err := cs.VirtualMachine.GetVirtualMachineByID(virtualmachineid)
 		if err != nil {
 			if count == 0 {
-				log.Printf("[DEBUG] Virtual Machine %s does no longer exist", virtualmachineid)
+				log.Printf("[DEBUG] Virtual Machine %s does not exist", virtualmachineid)
 				d.SetId("")
 				return nil
 			}
@@ -90,7 +90,7 @@ func resourceCosmicSecondaryIPAddressRead(d *schema.ResourceData, meta interface
 	vm, count, err := cs.VirtualMachine.GetVirtualMachineByID(virtualmachineid)
 	if err != nil {
 		if count == 0 {
-			log.Printf("[DEBUG] Virtual Machine %s does no longer exist", virtualmachineid)
+			log.Printf("[DEBUG] Virtual Machine %s does not exist", virtualmachineid)
 			d.SetId("")
 			return nil
 		}
@@ -111,7 +111,7 @@ func resourceCosmicSecondaryIPAddressRead(d *schema.ResourceData, meta interface
 	}
 
 	if l.Count == 0 {
-		log.Printf("[DEBUG] NIC %s does no longer exist", d.Get("nic_id").(string))
+		log.Printf("[DEBUG] NIC %s does not exist", d.Get("nic_id").(string))
 		d.SetId("")
 		return nil
 	}
@@ -143,7 +143,7 @@ func resourceCosmicSecondaryIPAddressDelete(d *schema.ResourceData, meta interfa
 
 	log.Printf("[INFO] Removing secondary IP address: %s", d.Get("ip_address").(string))
 	if _, err := cs.Nic.RemoveIpFromNic(p); err != nil {
-		// This is a very poor way to be told the ID does no longer exist :(
+		// This is a very poor way to be told the ID does not exist :(
 		if strings.Contains(err.Error(), fmt.Sprintf(
 			"Invalid parameter id value=%s due to incorrect long value format, "+
 				"or entity does not exist", d.Id())) {
@@ -154,4 +154,40 @@ func resourceCosmicSecondaryIPAddressDelete(d *schema.ResourceData, meta interfa
 	}
 
 	return nil
+}
+
+func resourceCosmicSecondaryIPAddressImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	s := strings.Split(d.Id(), "/")
+	if len(s) != 2 {
+		return nil, fmt.Errorf(
+			"invalid variable import format: %s (expected <INSTANCE ID>/<SECONDARY IP ADDRESS>)",
+			d.Id(),
+		)
+	}
+	vmid, sip := s[0], s[1]
+
+	c := meta.(*cosmic.CosmicClient)
+
+	// Get the virtual machine details
+	vm, count, err := c.VirtualMachine.GetVirtualMachineByID(vmid)
+	if err != nil {
+		if count == 0 {
+			return nil, fmt.Errorf("[DEBUG] Virtual Machine %s does not exist", vmid)
+		}
+		return nil, err
+	}
+
+	for _, n := range vm.Nic {
+		for _, ip := range n.Secondaryip {
+			if ip.Ipaddress == sip {
+				d.SetId(ip.Id)
+				d.Set("ip_address", ip.Ipaddress)
+				d.Set("nic_id", n.Id)
+				d.Set("virtual_machine_id", vm.Id)
+				return []*schema.ResourceData{d}, nil
+			}
+		}
+	}
+
+	return nil, fmt.Errorf("IP address %s does not exist", sip)
 }
