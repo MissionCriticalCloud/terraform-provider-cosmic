@@ -133,6 +133,7 @@ func resourceCosmicInstance() *schema.Resource {
 			"optimise_for": {
 				Type:     schema.TypeString,
 				Optional: true,
+				Computed: true,
 				StateFunc: func(val interface{}) string {
 					return strings.Title(strings.ToLower(val.(string)))
 				},
@@ -290,6 +291,7 @@ func resourceCosmicInstanceRead(d *schema.ResourceData, meta interface{}) error 
 	d.Set("display_name", vm.Displayname)
 	d.Set("group", vm.Group)
 	d.Set("disk_controller", vm.Rootdevicecontroller)
+	d.Set("optimise_for", vm.Optimisefor)
 
 	// In some rare cases (when destroying a machine failes) it can happen that
 	// an instance does not have any attached NIC anymore.

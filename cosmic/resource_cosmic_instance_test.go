@@ -44,6 +44,8 @@ func TestAccCosmicInstance_basic(t *testing.T) {
 						"cosmic_instance.foo", &instance),
 					testAccCheckCosmicInstanceAttributes(&instance),
 					resource.TestCheckResourceAttr(
+						"cosmic_instance.foo", "optimise_for", "Generic"),
+					resource.TestCheckResourceAttr(
 						"cosmic_instance.foo", "user_data", "0cf3dcdc356ec8369494cb3991985ecd5296cdd5"),
 				),
 			},
