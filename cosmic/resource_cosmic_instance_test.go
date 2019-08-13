@@ -226,6 +226,26 @@ func TestAccCosmicInstance_keyPair(t *testing.T) {
 	})
 }
 
+func TestAccCosmicInstance_import(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckCosmicInstanceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCosmicInstance_basic,
+			},
+
+			{
+				ResourceName:            "cosmic_instance.foo",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"expunge", "user_data"},
+			},
+		},
+	})
+}
+
 func testAccCheckCosmicInstanceExists(
 	n string, instance *cosmic.VirtualMachine) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
