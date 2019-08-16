@@ -44,6 +44,8 @@ func TestAccCosmicInstance_basic(t *testing.T) {
 						"cosmic_instance.foo", &instance),
 					testAccCheckCosmicInstanceAttributes(&instance),
 					resource.TestCheckResourceAttr(
+						"cosmic_instance.foo", "optimise_for", "Generic"),
+					resource.TestCheckResourceAttr(
 						"cosmic_instance.foo", "user_data", "0cf3dcdc356ec8369494cb3991985ecd5296cdd5"),
 				),
 			},
@@ -219,6 +221,26 @@ func TestAccCosmicInstance_keyPair(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"cosmic_instance.foo", "keypair", "terraform-test-keypair"),
 				),
+			},
+		},
+	})
+}
+
+func TestAccCosmicInstance_import(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckCosmicInstanceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCosmicInstance_basic,
+			},
+
+			{
+				ResourceName:            "cosmic_instance.foo",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"expunge", "user_data"},
 			},
 		},
 	})

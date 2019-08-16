@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+- Set `optimise_for` value when importing a Cosmic instance
+
 ## 0.3.1 (2019-08-06)
 
 - Remove project support
