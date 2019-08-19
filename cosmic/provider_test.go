@@ -97,6 +97,3 @@ var COSMIC_TEMPLATE = os.Getenv("COSMIC_TEMPLATE")
 
 // Name of a zone that exists already
 var COSMIC_ZONE = os.Getenv("COSMIC_ZONE")
-
-// ID of the "default_acl" built-in ACL
-var COSMIC_DEFAULT_ALLOW_ACL_ID = os.Getenv("COSMIC_DEFAULT_ALLOW_ACL_ID")

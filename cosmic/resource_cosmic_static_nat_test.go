@@ -10,10 +10,6 @@ import (
 )
 
 func TestAccCosmicStaticNAT_basic(t *testing.T) {
-	if COSMIC_DEFAULT_ALLOW_ACL_ID == "" {
-		t.Skip("This test requires a \"default_allow\" ACL ID (set it by exporting COSMIC_DEFAULT_ALLOW_ACL_ID)")
-	}
-
 	if COSMIC_SERVICE_OFFERING_1 == "" {
 		t.Skip("This test requires an existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_1)")
 	}
@@ -116,6 +112,13 @@ func testAccCheckCosmicStaticNATDestroy(s *terraform.State) error {
 }
 
 var testAccCosmicStaticNAT_basic = fmt.Sprintf(`
+data "cosmic_network_acl" "default_allow" {
+  filter {
+    name  = "name"
+    value = "default_allow"
+  }
+}
+
 resource "cosmic_network" "foo" {
   name             = "terraform-network"
   cidr             = "10.0.10.0/24"
@@ -137,7 +140,7 @@ resource "cosmic_instance" "foo" {
 }
 
 resource "cosmic_ipaddress" "foo" {
-  acl_id = "%s"
+  acl_id = "${data.cosmic_network_acl.default_allow.id}"
   vpc_id = "${cosmic_network.foo.vpc_id}"
 }
 
@@ -150,4 +153,4 @@ resource "cosmic_static_nat" "foo" {
 	COSMIC_ZONE,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE,
-	COSMIC_DEFAULT_ALLOW_ACL_ID)
+)

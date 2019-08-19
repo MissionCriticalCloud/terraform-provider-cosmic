@@ -69,7 +69,6 @@ $ make testacc
 
 Optionally the following need to be exported for certain tests:
 
-- `COSMIC_DEFAULT_ALLOW_ACL_ID` - UUID of the "default_allow" ACL
 - `COSMIC_DISK_OFFERING_1` -  An existing disk offering to test storage
 - `COSMIC_DISK_OFFERING_2` -  A second existing disk offering to test provisioning storage
 - `COSMIC_INSTANCE_ID` - An existing instance to test instance-related resources
