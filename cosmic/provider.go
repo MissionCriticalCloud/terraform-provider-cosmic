@@ -60,6 +60,10 @@ func Provider() terraform.ResourceProvider {
 			},
 		},
 
+		DataSourcesMap: map[string]*schema.Resource{
+			"cosmic_network_acl": dataSourceCosmicNetworkACL(),
+		},
+
 		ResourcesMap: map[string]*schema.Resource{
 			"cosmic_affinity_group":       resourceCosmicAffinityGroup(),
 			"cosmic_disk":                 resourceCosmicDisk(),
