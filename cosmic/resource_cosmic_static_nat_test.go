@@ -78,12 +78,10 @@ func testAccCheckCosmicStaticNATExists(
 	}
 }
 
-func testAccCheckCosmicStaticNATAttributes(
-	ipaddr *cosmic.PublicIpAddress) resource.TestCheckFunc {
+func testAccCheckCosmicStaticNATAttributes(ipaddr *cosmic.PublicIpAddress) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-
-		if ipaddr.Associatednetworkname != "terraform-network" {
-			return fmt.Errorf("Bad network name: %s", ipaddr.Associatednetworkname)
+		if ipaddr.Virtualmachinename != "terraform-test" {
+			return fmt.Errorf("Bad network name: %s", ipaddr.Virtualmachinename)
 		}
 
 		return nil
