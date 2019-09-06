@@ -19,10 +19,6 @@ func TestAccCosmicLoadBalancerRule_basic(t *testing.T) {
 		t.Skip("This test requires an existing instance template (set it by exporting COSMIC_TEMPLATE)")
 	}
 
-	if COSMIC_DEFAULT_ALLOW_ACL_ID == "" {
-		t.Skip("This test requires a \"default_allow\" ACL ID (set it by exporting COSMIC_DEFAULT_ALLOW_ACL_ID)")
-	}
-
 	if COSMIC_VPC_ID == "" {
 		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
 	}
@@ -61,10 +57,6 @@ func TestAccCosmicLoadBalancerRule_update(t *testing.T) {
 
 	if COSMIC_TEMPLATE == "" {
 		t.Skip("This test requires an existing instance template (set it by exporting COSMIC_TEMPLATE)")
-	}
-
-	if COSMIC_DEFAULT_ALLOW_ACL_ID == "" {
-		t.Skip("This test requires a \"default_allow\" ACL ID (set it by exporting COSMIC_DEFAULT_ALLOW_ACL_ID)")
 	}
 
 	if COSMIC_VPC_ID == "" {
@@ -177,6 +169,13 @@ func testAccCheckCosmicLoadBalancerRuleDestroy(s *terraform.State) error {
 }
 
 var testAccCosmicLoadBalancerRule_basic = fmt.Sprintf(`
+data "cosmic_network_acl" "default_allow" {
+  filter {
+    name  = "name"
+    value = "default_allow"
+  }
+}
+
 resource "cosmic_network" "foo" {
   name             = "terraform-network"
   cidr             = "10.0.10.0/24"
@@ -187,7 +186,7 @@ resource "cosmic_network" "foo" {
 }
 
 resource "cosmic_ipaddress" "foo" {
-  acl_id = "%s"
+  acl_id = "${data.cosmic_network_acl.default_allow.id}"
   vpc_id = "${cosmic_network.foo.vpc_id}"
 }
 
@@ -213,11 +212,18 @@ resource "cosmic_loadbalancer_rule" "foo" {
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_VPC_ID,
 	COSMIC_ZONE,
-	COSMIC_DEFAULT_ALLOW_ACL_ID,
 	COSMIC_SERVICE_OFFERING_1,
-	COSMIC_TEMPLATE)
+	COSMIC_TEMPLATE,
+)
 
 var testAccCosmicLoadBalancerRule_update = fmt.Sprintf(`
+data "cosmic_network_acl" "default_allow" {
+  filter {
+    name  = "name"
+    value = "default_allow"
+  }
+}
+
 resource "cosmic_network" "foo" {
   name             = "terraform-network"
   cidr             = "10.0.10.0/24"
@@ -228,7 +234,7 @@ resource "cosmic_network" "foo" {
 }
 
 resource "cosmic_ipaddress" "foo" {
-  acl_id = "%s"
+  acl_id = "${data.cosmic_network_acl.default_allow.id}"
   vpc_id = "${cosmic_network.foo.vpc_id}"
 }
 
@@ -264,6 +270,6 @@ resource "cosmic_loadbalancer_rule" "foo" {
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_VPC_ID,
 	COSMIC_ZONE,
-	COSMIC_DEFAULT_ALLOW_ACL_ID,
 	COSMIC_SERVICE_OFFERING_1,
-	COSMIC_TEMPLATE)
+	COSMIC_TEMPLATE,
+)
