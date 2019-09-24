@@ -51,9 +51,19 @@ func resourceCosmicPortForward() *schema.Resource {
 							Required: true,
 						},
 
+						"private_end_port": &schema.Schema{
+							Type:     schema.TypeInt,
+							Optional: true,
+						},
+
 						"public_port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
+						},
+
+						"public_end_port": &schema.Schema{
+							Type:     schema.TypeInt,
+							Optional: true,
 						},
 
 						"virtual_machine_id": &schema.Schema{
@@ -152,6 +162,14 @@ func createPortForward(d *schema.ResourceData, meta interface{}, forward map[str
 	p := cs.Firewall.NewCreatePortForwardingRuleParams(d.Id(), forward["private_port"].(int),
 		forward["protocol"].(string), forward["public_port"].(int), vm.Id)
 
+	if privateEndPort, ok := forward["private_end_port"]; ok && privateEndPort.(int) != 0 {
+		p.SetPrivateendport(privateEndPort.(int))
+	}
+
+	if publicEndPort, ok := forward["public_end_port"]; ok && publicEndPort.(int) != 0 {
+		p.SetPublicendport(publicEndPort.(int))
+	}
+
 	if vmGuestIP, ok := forward["vm_guest_ip"]; ok && vmGuestIP.(string) != "" {
 		p.SetVmguestip(vmGuestIP.(string))
 
@@ -248,7 +266,17 @@ func resourceCosmicPortForwardRead(d *schema.ResourceData, meta interface{}) err
 				return err
 			}
 
+			privEndPort, err := strconv.Atoi(f.Privateendport)
+			if err != nil {
+				return err
+			}
+
 			pubPort, err := strconv.Atoi(f.Publicport)
+			if err != nil {
+				return err
+			}
+
+			pubEndPort, err := strconv.Atoi(f.Publicendport)
 			if err != nil {
 				return err
 			}
@@ -258,6 +286,14 @@ func resourceCosmicPortForwardRead(d *schema.ResourceData, meta interface{}) err
 			forward["private_port"] = privPort
 			forward["public_port"] = pubPort
 			forward["virtual_machine_id"] = f.Virtualmachineid
+			// When specifying a single private or public port the same value is the end port, so
+			// we only save the end port to state when it differs from the start port.
+			if privEndPort != privPort {
+				forward["private_end_port"] = privEndPort
+			}
+			if pubEndPort != pubPort {
+				forward["public_end_port"] = pubEndPort
+			}
 
 			// This one is a bit tricky. We only want to update this optional value
 			// if we've set one ourselves. If not this would become a computed value
@@ -278,7 +314,9 @@ func resourceCosmicPortForwardRead(d *schema.ResourceData, meta interface{}) err
 			forward := map[string]interface{}{
 				"protocol":           uuid,
 				"private_port":       0,
+				"private_end_port":   0,
 				"public_port":        0,
+				"public_end_port":    0,
 				"virtual_machine_id": uuid,
 				"uuid":               uuid,
 			}
