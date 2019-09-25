@@ -70,3 +70,6 @@ example:
 ```shell
 terraform import cosmic_port_forward.default e42a24d2-46cb-4b18-9d41-382582fad309
 ```
+
+Multiple port forwards in the same resource can be imported by specifying a
+comma separated string.
