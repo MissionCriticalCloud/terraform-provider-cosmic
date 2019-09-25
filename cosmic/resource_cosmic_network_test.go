@@ -175,8 +175,8 @@ func testAccCheckCosmicNetworkExists(n string, network *cosmic.Network) resource
 			return fmt.Errorf("No network ID is set")
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		ntwrk, _, err := cs.Network.GetNetworkByID(rs.Primary.ID)
+		client := testAccProvider.Meta().(*CosmicClient)
+		ntwrk, _, err := client.Network.GetNetworkByID(rs.Primary.ID)
 
 		if err != nil {
 			return err
@@ -222,7 +222,7 @@ func testAccCheckNetworkTags(n *cosmic.Network, key string, value string) resour
 }
 
 func testAccCheckCosmicNetworkDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_network" {
@@ -233,7 +233,7 @@ func testAccCheckCosmicNetworkDestroy(s *terraform.State) error {
 			return fmt.Errorf("No network ID is set")
 		}
 
-		_, _, err := cs.Network.GetNetworkByID(rs.Primary.ID)
+		_, _, err := client.Network.GetNetworkByID(rs.Primary.ID)
 		if err == nil {
 			return fmt.Errorf("Network %s still exists", rs.Primary.ID)
 		}

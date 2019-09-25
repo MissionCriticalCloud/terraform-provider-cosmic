@@ -5,7 +5,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -42,13 +41,13 @@ func resourceCosmicAffinityGroup() *schema.Resource {
 }
 
 func resourceCosmicAffinityGroupCreate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	name := d.Get("name").(string)
 	affinityGroupType := d.Get("type").(string)
 
 	// Create a new parameter struct
-	p := cs.AffinityGroup.NewCreateAffinityGroupParams(name, affinityGroupType)
+	p := client.AffinityGroup.NewCreateAffinityGroupParams(name, affinityGroupType)
 
 	// Set the description
 	if description, ok := d.GetOk("description"); ok {
@@ -58,7 +57,7 @@ func resourceCosmicAffinityGroupCreate(d *schema.ResourceData, meta interface{})
 	}
 
 	log.Printf("[DEBUG] Creating affinity group %s", name)
-	r, err := cs.AffinityGroup.CreateAffinityGroup(p)
+	r, err := client.AffinityGroup.CreateAffinityGroup(p)
 	if err != nil {
 		return err
 	}
@@ -70,12 +69,12 @@ func resourceCosmicAffinityGroupCreate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceCosmicAffinityGroupRead(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	log.Printf("[DEBUG] Rerieving affinity group %s", d.Get("name").(string))
 
 	// Get the affinity group details
-	ag, count, err := cs.AffinityGroup.GetAffinityGroupByID(d.Id())
+	ag, count, err := client.AffinityGroup.GetAffinityGroupByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf("[DEBUG] Affinity group %s does not longer exist", d.Get("name").(string))
@@ -95,14 +94,14 @@ func resourceCosmicAffinityGroupRead(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceCosmicAffinityGroupDelete(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.AffinityGroup.NewDeleteAffinityGroupParams()
+	p := client.AffinityGroup.NewDeleteAffinityGroupParams()
 	p.SetId(d.Id())
 
 	// Delete the affinity group
-	_, err := cs.AffinityGroup.DeleteAffinityGroup(p)
+	_, err := client.AffinityGroup.DeleteAffinityGroup(p)
 	if err != nil {
 		// This is a very poor way to be told the ID does no longer exist :(
 		if strings.Contains(err.Error(), fmt.Sprintf(

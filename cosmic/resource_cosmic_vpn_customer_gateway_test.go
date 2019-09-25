@@ -56,8 +56,8 @@ func testAccCheckCosmicVPNCustomerGatewayExists(n string, vpnCustomerGateway *co
 			return fmt.Errorf("No VPN CustomerGateway ID is set")
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		v, _, err := cs.VPN.GetVpnCustomerGatewayByID(rs.Primary.ID)
+		client := testAccProvider.Meta().(*CosmicClient)
+		v, _, err := client.VPN.GetVpnCustomerGatewayByID(rs.Primary.ID)
 
 		if err != nil {
 			return err
@@ -93,7 +93,7 @@ func testAccCheckCosmicVPNCustomerGatewayAttributes(vpnCustomerGateway *cosmic.V
 }
 
 func testAccCheckCosmicVPNCustomerGatewayDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_vpn_customer_gateway" {
@@ -104,7 +104,7 @@ func testAccCheckCosmicVPNCustomerGatewayDestroy(s *terraform.State) error {
 			return fmt.Errorf("No VPN Customer Gateway ID is set")
 		}
 
-		_, _, err := cs.VPN.GetVpnCustomerGatewayByID(rs.Primary.ID)
+		_, _, err := client.VPN.GetVpnCustomerGatewayByID(rs.Primary.ID)
 		if err == nil {
 			return fmt.Errorf("VPN Customer Gateway %s still exists", rs.Primary.ID)
 		}

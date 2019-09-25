@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -133,18 +132,18 @@ func resourceCosmicNetwork() *schema.Resource {
 }
 
 func resourceCosmicNetworkCreate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	name := d.Get("name").(string)
 
 	// Retrieve the network_offering ID
-	networkofferingid, e := retrieveID(cs, "network_offering", d.Get("network_offering").(string))
+	networkofferingid, e := retrieveID(client, "network_offering", d.Get("network_offering").(string))
 	if e != nil {
 		return e.Error()
 	}
 
 	// Retrieve the zone ID
-	zoneid, e := retrieveID(cs, "zone", d.Get("zone").(string))
+	zoneid, e := retrieveID(client, "zone", d.Get("zone").(string))
 	if e != nil {
 		return e.Error()
 	}
@@ -156,10 +155,10 @@ func resourceCosmicNetworkCreate(d *schema.ResourceData, meta interface{}) error
 	}
 
 	// Create a new parameter struct
-	p := cs.Network.NewCreateNetworkParams(displaytext.(string), name, networkofferingid, zoneid)
+	p := client.Network.NewCreateNetworkParams(displaytext.(string), name, networkofferingid, zoneid)
 
 	// Get the network offering to check if it supports specifying IP ranges
-	no, _, err := cs.NetworkOffering.GetNetworkOfferingByID(networkofferingid)
+	no, _, err := client.NetworkOffering.GetNetworkOfferingByID(networkofferingid)
 	if err != nil {
 		return err
 	}
@@ -227,14 +226,14 @@ func resourceCosmicNetworkCreate(d *schema.ResourceData, meta interface{}) error
 	}
 
 	// Create the new network
-	r, err := cs.Network.CreateNetwork(p)
+	r, err := client.Network.CreateNetwork(p)
 	if err != nil {
 		return fmt.Errorf("Error creating network %s: %s", name, err)
 	}
 
 	d.SetId(r.Id)
 
-	err = setTags(cs, d, "network")
+	err = setTags(client, d, "network")
 	if err != nil {
 		return fmt.Errorf("Error setting tags: %s", err)
 	}
@@ -243,10 +242,10 @@ func resourceCosmicNetworkCreate(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceCosmicNetworkRead(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Get the network details
-	n, count, err := cs.Network.GetNetworkByID(d.Id())
+	n, count, err := client.Network.GetNetworkByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf(
@@ -301,11 +300,11 @@ func resourceCosmicNetworkRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceCosmicNetworkUpdate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 	name := d.Get("name").(string)
 
 	// Create a new parameter struct
-	p := cs.Network.NewUpdateNetworkParams(d.Id())
+	p := client.Network.NewUpdateNetworkParams(d.Id())
 
 	// Check if the name or display text is changed
 	if d.HasChange("name") || d.HasChange("display_text") {
@@ -352,7 +351,7 @@ func resourceCosmicNetworkUpdate(d *schema.ResourceData, meta interface{}) error
 	// Check if the network offering is changed
 	if d.HasChange("network_offering") {
 		// Retrieve the network_offering ID
-		networkofferingid, e := retrieveID(cs, "network_offering", d.Get("network_offering").(string))
+		networkofferingid, e := retrieveID(client, "network_offering", d.Get("network_offering").(string))
 		if e != nil {
 			return e.Error()
 		}
@@ -361,7 +360,7 @@ func resourceCosmicNetworkUpdate(d *schema.ResourceData, meta interface{}) error
 	}
 
 	// Update the network
-	_, err := cs.Network.UpdateNetwork(p)
+	_, err := client.Network.UpdateNetwork(p)
 	if err != nil {
 		return fmt.Errorf(
 			"Error updating network %s: %s", name, err)
@@ -369,10 +368,10 @@ func resourceCosmicNetworkUpdate(d *schema.ResourceData, meta interface{}) error
 
 	// Replace the ACL if the ID has changed
 	if d.HasChange("acl_id") {
-		p := cs.NetworkACL.NewReplaceNetworkACLListParams(d.Get("acl_id").(string))
+		p := client.NetworkACL.NewReplaceNetworkACLListParams(d.Get("acl_id").(string))
 		p.SetNetworkid(d.Id())
 
-		_, err := cs.NetworkACL.ReplaceNetworkACLList(p)
+		_, err := client.NetworkACL.ReplaceNetworkACLList(p)
 		if err != nil {
 			return fmt.Errorf("Error replacing ACL: %s", err)
 		}
@@ -380,7 +379,7 @@ func resourceCosmicNetworkUpdate(d *schema.ResourceData, meta interface{}) error
 
 	// Update tags if they have changed
 	if d.HasChange("tags") {
-		err = setTags(cs, d, "network")
+		err = setTags(client, d, "network")
 		if err != nil {
 			return fmt.Errorf("Error updating tags: %s", err)
 		}
@@ -390,13 +389,13 @@ func resourceCosmicNetworkUpdate(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceCosmicNetworkDelete(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.Network.NewDeleteNetworkParams(d.Id())
+	p := client.Network.NewDeleteNetworkParams(d.Id())
 
 	// Delete the network
-	_, err := cs.Network.DeleteNetwork(p)
+	_, err := client.Network.DeleteNetwork(p)
 	if err != nil {
 		// This is a very poor way to be told the ID does no longer exist :(
 		if strings.Contains(err.Error(), fmt.Sprintf(

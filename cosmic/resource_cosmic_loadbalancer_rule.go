@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -98,12 +97,12 @@ func resourceCosmicLoadBalancerRule() *schema.Resource {
 }
 
 func resourceCosmicLoadBalancerRuleCreate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	d.Partial(true)
 
 	// Create a new parameter struct
-	p := cs.LoadBalancer.NewCreateLoadBalancerRuleParams(
+	p := client.LoadBalancer.NewCreateLoadBalancerRuleParams(
 		d.Get("algorithm").(string),
 		d.Get("name").(string),
 		d.Get("private_port").(int),
@@ -151,7 +150,7 @@ func resourceCosmicLoadBalancerRuleCreate(d *schema.ResourceData, meta interface
 	p.SetPublicipid(d.Get("ip_address_id").(string))
 
 	// Create the load balancer rule
-	r, err := cs.LoadBalancer.CreateLoadBalancerRule(p)
+	r, err := client.LoadBalancer.CreateLoadBalancerRule(p)
 	if err != nil {
 		return err
 	}
@@ -168,7 +167,7 @@ func resourceCosmicLoadBalancerRuleCreate(d *schema.ResourceData, meta interface
 	d.SetPartial("protocol")
 
 	// Create a new parameter struct
-	ap := cs.LoadBalancer.NewAssignToLoadBalancerRuleParams(r.Id)
+	ap := client.LoadBalancer.NewAssignToLoadBalancerRuleParams(r.Id)
 
 	var mbs []string
 	for _, id := range d.Get("member_ids").([]interface{}) {
@@ -177,7 +176,7 @@ func resourceCosmicLoadBalancerRuleCreate(d *schema.ResourceData, meta interface
 
 	ap.SetVirtualmachineids(mbs)
 
-	_, err = cs.LoadBalancer.AssignToLoadBalancerRule(ap)
+	_, err = client.LoadBalancer.AssignToLoadBalancerRule(ap)
 	if err != nil {
 		return err
 	}
@@ -189,10 +188,10 @@ func resourceCosmicLoadBalancerRuleCreate(d *schema.ResourceData, meta interface
 }
 
 func resourceCosmicLoadBalancerRuleRead(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Get the load balancer details
-	lb, count, err := cs.LoadBalancer.GetLoadBalancerRuleByID(d.Id())
+	lb, count, err := client.LoadBalancer.GetLoadBalancerRuleByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf("[DEBUG] Load balancer rule %s does no longer exist", d.Get("name").(string))
@@ -226,13 +225,13 @@ func resourceCosmicLoadBalancerRuleRead(d *schema.ResourceData, meta interface{}
 }
 
 func resourceCosmicLoadBalancerRuleUpdate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	if d.HasChange("name") || d.HasChange("description") || d.HasChange("algorithm") || d.HasChange("client_timeout") || d.HasChange("server_timeout") {
 		name := d.Get("name").(string)
 
 		// Create new parameter struct
-		p := cs.LoadBalancer.NewUpdateLoadBalancerRuleParams(d.Id())
+		p := client.LoadBalancer.NewUpdateLoadBalancerRuleParams(d.Id())
 
 		if d.HasChange("name") {
 			log.Printf("[DEBUG] Name has changed for load balancer rule %s, starting update", name)
@@ -280,7 +279,7 @@ func resourceCosmicLoadBalancerRuleUpdate(d *schema.ResourceData, meta interface
 			p.SetServertimeout(t)
 		}
 
-		_, err := cs.LoadBalancer.UpdateLoadBalancerRule(p)
+		_, err := client.LoadBalancer.UpdateLoadBalancerRule(p)
 		if err != nil {
 			return fmt.Errorf(
 				"Error updating load balancer rule %s", name)
@@ -291,13 +290,13 @@ func resourceCosmicLoadBalancerRuleUpdate(d *schema.ResourceData, meta interface
 }
 
 func resourceCosmicLoadBalancerRuleDelete(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.LoadBalancer.NewDeleteLoadBalancerRuleParams(d.Id())
+	p := client.LoadBalancer.NewDeleteLoadBalancerRuleParams(d.Id())
 
 	log.Printf("[INFO] Deleting load balancer rule: %s", d.Get("name").(string))
-	if _, err := cs.LoadBalancer.DeleteLoadBalancerRule(p); err != nil {
+	if _, err := client.LoadBalancer.DeleteLoadBalancerRule(p); err != nil {
 		// This is a very poor way to be told the ID does no longer exist :(
 		if !strings.Contains(err.Error(), fmt.Sprintf(
 			"Invalid parameter id value=%s due to incorrect long value format, "+

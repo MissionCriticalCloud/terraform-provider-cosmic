@@ -45,8 +45,8 @@ func testAccCheckCosmicStaticRouteExists(n string, route *cosmic.StaticRoute) re
 			return fmt.Errorf("No Static Route ID is set")
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		r, _, err := cs.VPC.GetStaticRouteByID(rs.Primary.ID)
+		client := testAccProvider.Meta().(*CosmicClient)
+		r, _, err := client.VPC.GetStaticRouteByID(rs.Primary.ID)
 
 		if err != nil {
 			return err
@@ -74,7 +74,7 @@ func testAccCheckCosmicStaticRouteAttributes(route *cosmic.StaticRoute) resource
 }
 
 func testAccCheckCosmicStaticRouteDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_static_route" {
@@ -85,7 +85,7 @@ func testAccCheckCosmicStaticRouteDestroy(s *terraform.State) error {
 			return fmt.Errorf("No static route ID is set")
 		}
 
-		route, _, err := cs.VPC.GetStaticRouteByID(rs.Primary.ID)
+		route, _, err := client.VPC.GetStaticRouteByID(rs.Primary.ID)
 		if err == nil && route.Id != "" {
 			return fmt.Errorf("Static route %s still exists", rs.Primary.ID)
 		}

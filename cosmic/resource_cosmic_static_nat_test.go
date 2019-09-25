@@ -57,8 +57,8 @@ func testAccCheckCosmicStaticNATExists(n string, ipaddr *cosmic.PublicIpAddress)
 			return fmt.Errorf("No static NAT ID is set")
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		ip, _, err := cs.PublicIPAddress.GetPublicIpAddressByID(rs.Primary.ID)
+		client := testAccProvider.Meta().(*CosmicClient)
+		ip, _, err := client.PublicIPAddress.GetPublicIpAddressByID(rs.Primary.ID)
 
 		if err != nil {
 			return err
@@ -89,7 +89,7 @@ func testAccCheckCosmicStaticNATAttributes(ipaddr *cosmic.PublicIpAddress) resou
 }
 
 func testAccCheckCosmicStaticNATDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_static_nat" {
@@ -100,7 +100,7 @@ func testAccCheckCosmicStaticNATDestroy(s *terraform.State) error {
 			return fmt.Errorf("No static NAT ID is set")
 		}
 
-		ip, _, err := cs.PublicIPAddress.GetPublicIpAddressByID(rs.Primary.ID)
+		ip, _, err := client.PublicIPAddress.GetPublicIpAddressByID(rs.Primary.ID)
 		if err == nil && ip.Isstaticnat {
 			return fmt.Errorf("Static NAT %s still enabled", rs.Primary.ID)
 		}

@@ -8,7 +8,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -152,34 +151,34 @@ func resourceCosmicInstance() *schema.Resource {
 }
 
 func resourceCosmicInstanceCreate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Retrieve the service_offering ID
-	serviceofferingid, e := retrieveID(cs, "service_offering", d.Get("service_offering").(string))
+	serviceofferingid, e := retrieveID(client, "service_offering", d.Get("service_offering").(string))
 	if e != nil {
 		return e.Error()
 	}
 
 	// Retrieve the zone ID
-	zoneid, e := retrieveID(cs, "zone", d.Get("zone").(string))
+	zoneid, e := retrieveID(client, "zone", d.Get("zone").(string))
 	if e != nil {
 		return e.Error()
 	}
 
 	// Retrieve the zone object
-	zone, _, err := cs.Zone.GetZoneByID(zoneid)
+	zone, _, err := client.Zone.GetZoneByID(zoneid)
 	if err != nil {
 		return err
 	}
 
 	// Retrieve the template ID
-	templateid, e := retrieveTemplateID(cs, zone.Id, d.Get("template").(string))
+	templateid, e := retrieveTemplateID(client, zone.Id, d.Get("template").(string))
 	if e != nil {
 		return e.Error()
 	}
 
 	// Create a new parameter struct
-	p := cs.VirtualMachine.NewDeployVirtualMachineParams(serviceofferingid, templateid, zone.Id)
+	p := client.VirtualMachine.NewDeployVirtualMachineParams(serviceofferingid, templateid, zone.Id)
 
 	// Set the name
 	name, hasName := d.GetOk("name")
@@ -249,7 +248,7 @@ func resourceCosmicInstanceCreate(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	if userData, ok := d.GetOk("user_data"); ok {
-		ud, err := getUserData(userData.(string), cs.HTTPGETOnly)
+		ud, err := getUserData(userData.(string), client.HTTPGETOnly)
 		if err != nil {
 			return err
 		}
@@ -258,7 +257,7 @@ func resourceCosmicInstanceCreate(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	// Create the new instance
-	r, err := cs.VirtualMachine.DeployVirtualMachine(p)
+	r, err := client.VirtualMachine.DeployVirtualMachine(p)
 	if err != nil {
 		return fmt.Errorf("Error creating the new instance %s: %s", name, err)
 	}
@@ -275,10 +274,10 @@ func resourceCosmicInstanceCreate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceCosmicInstanceRead(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Get the virtual machine details
-	vm, count, err := cs.VirtualMachine.GetVirtualMachineByID(d.Id())
+	vm, count, err := client.VirtualMachine.GetVirtualMachineByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf("[DEBUG] Instance %s does no longer exist", d.Get("name").(string))
@@ -327,7 +326,7 @@ func resourceCosmicInstanceRead(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 	d.Partial(true)
 
 	name := d.Get("name").(string)
@@ -337,13 +336,13 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 		log.Printf("[DEBUG] Display name changed for %s, starting update", name)
 
 		// Create a new parameter struct
-		p := cs.VirtualMachine.NewUpdateVirtualMachineParams(d.Id())
+		p := client.VirtualMachine.NewUpdateVirtualMachineParams(d.Id())
 
 		// Set the new display name
 		p.SetDisplayname(d.Get("display_name").(string))
 
 		// Update the display name
-		_, err := cs.VirtualMachine.UpdateVirtualMachine(p)
+		_, err := client.VirtualMachine.UpdateVirtualMachine(p)
 		if err != nil {
 			return fmt.Errorf(
 				"Error updating the display name for instance %s: %s", name, err)
@@ -357,13 +356,13 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 		log.Printf("[DEBUG] Group changed for %s, starting update", name)
 
 		// Create a new parameter struct
-		p := cs.VirtualMachine.NewUpdateVirtualMachineParams(d.Id())
+		p := client.VirtualMachine.NewUpdateVirtualMachineParams(d.Id())
 
 		// Set the new group
 		p.SetGroup(d.Get("group").(string))
 
 		// Update the display name
-		_, err := cs.VirtualMachine.UpdateVirtualMachine(p)
+		_, err := client.VirtualMachine.UpdateVirtualMachine(p)
 		if err != nil {
 			return fmt.Errorf(
 				"Error updating the group for instance %s: %s", name, err)
@@ -377,8 +376,8 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 		d.HasChange("affinity_group_names") || d.HasChange("keypair") || d.HasChange("user_data") ||
 		d.HasChange("optimise_for") {
 		// Before we can actually make these changes, the virtual machine must be stopped
-		_, err := cs.VirtualMachine.StopVirtualMachine(
-			cs.VirtualMachine.NewStopVirtualMachineParams(d.Id()))
+		_, err := client.VirtualMachine.StopVirtualMachine(
+			client.VirtualMachine.NewStopVirtualMachineParams(d.Id()))
 		if err != nil {
 			return fmt.Errorf(
 				"Error stopping instance %s before making changes: %s", name, err)
@@ -389,13 +388,13 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 			log.Printf("[DEBUG] Name for %s changed to %s, starting update", d.Id(), name)
 
 			// Create a new parameter struct
-			p := cs.VirtualMachine.NewUpdateVirtualMachineParams(d.Id())
+			p := client.VirtualMachine.NewUpdateVirtualMachineParams(d.Id())
 
 			// Set the new name
 			p.SetName(name)
 
 			// Update the display name
-			_, err := cs.VirtualMachine.UpdateVirtualMachine(p)
+			_, err := client.VirtualMachine.UpdateVirtualMachine(p)
 			if err != nil {
 				return fmt.Errorf(
 					"Error updating the name for instance %s: %s", name, err)
@@ -409,16 +408,16 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 			log.Printf("[DEBUG] Service offering changed for %s, starting update", name)
 
 			// Retrieve the service_offering ID
-			serviceofferingid, e := retrieveID(cs, "service_offering", d.Get("service_offering").(string))
+			serviceofferingid, e := retrieveID(client, "service_offering", d.Get("service_offering").(string))
 			if e != nil {
 				return e.Error()
 			}
 
 			// Create a new parameter struct
-			p := cs.VirtualMachine.NewChangeServiceForVirtualMachineParams(d.Id(), serviceofferingid)
+			p := client.VirtualMachine.NewChangeServiceForVirtualMachineParams(d.Id(), serviceofferingid)
 
 			// Change the service offering
-			_, err = cs.VirtualMachine.ChangeServiceForVirtualMachine(p)
+			_, err = client.VirtualMachine.ChangeServiceForVirtualMachine(p)
 			if err != nil {
 				return fmt.Errorf(
 					"Error changing the service offering for instance %s: %s", name, err)
@@ -428,7 +427,7 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 
 		// Check if the affinity group IDs have changed and if so, update the IDs
 		if d.HasChange("affinity_group_ids") {
-			p := cs.AffinityGroup.NewUpdateVMAffinityGroupParams(d.Id())
+			p := client.AffinityGroup.NewUpdateVMAffinityGroupParams(d.Id())
 			var groups []string
 
 			if agIDs := d.Get("affinity_group_ids").(*schema.Set); agIDs.Len() > 0 {
@@ -441,7 +440,7 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 			p.SetAffinitygroupids(groups)
 
 			// Update the affinity groups
-			_, err = cs.AffinityGroup.UpdateVMAffinityGroup(p)
+			_, err = client.AffinityGroup.UpdateVMAffinityGroup(p)
 			if err != nil {
 				return fmt.Errorf(
 					"Error updating the affinity groups for instance %s: %s", name, err)
@@ -451,7 +450,7 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 
 		// Check if the affinity group names have changed and if so, update the names
 		if d.HasChange("affinity_group_names") {
-			p := cs.AffinityGroup.NewUpdateVMAffinityGroupParams(d.Id())
+			p := client.AffinityGroup.NewUpdateVMAffinityGroupParams(d.Id())
 			var groups []string
 
 			if agNames := d.Get("affinity_group_names").(*schema.Set); agNames.Len() > 0 {
@@ -464,7 +463,7 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 			p.SetAffinitygroupnames(groups)
 
 			// Update the affinity groups
-			_, err = cs.AffinityGroup.UpdateVMAffinityGroup(p)
+			_, err = client.AffinityGroup.UpdateVMAffinityGroup(p)
 			if err != nil {
 				return fmt.Errorf(
 					"Error updating the affinity groups for instance %s: %s", name, err)
@@ -476,10 +475,10 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 		if d.HasChange("keypair") {
 			log.Printf("[DEBUG] SSH keypair changed for %s, starting update", name)
 
-			p := cs.SSH.NewResetSSHKeyForVirtualMachineParams(d.Id(), d.Get("keypair").(string))
+			p := client.SSH.NewResetSSHKeyForVirtualMachineParams(d.Id(), d.Get("keypair").(string))
 
 			// Change the ssh keypair
-			_, err = cs.SSH.ResetSSHKeyForVirtualMachine(p)
+			_, err = client.SSH.ResetSSHKeyForVirtualMachine(p)
 			if err != nil {
 				return fmt.Errorf(
 					"Error changing the SSH keypair for instance %s: %s", name, err)
@@ -491,14 +490,14 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 		if d.HasChange("user_data") {
 			log.Printf("[DEBUG] user_data changed for %s, starting update", name)
 
-			ud, err := getUserData(d.Get("user_data").(string), cs.HTTPGETOnly)
+			ud, err := getUserData(d.Get("user_data").(string), client.HTTPGETOnly)
 			if err != nil {
 				return err
 			}
 
-			p := cs.VirtualMachine.NewUpdateVirtualMachineParams(d.Id())
+			p := client.VirtualMachine.NewUpdateVirtualMachineParams(d.Id())
 			p.SetUserdata(ud)
-			_, err = cs.VirtualMachine.UpdateVirtualMachine(p)
+			_, err = client.VirtualMachine.UpdateVirtualMachine(p)
 			if err != nil {
 				return fmt.Errorf(
 					"Error updating user_data for instance %s: %s", name, err)
@@ -510,14 +509,14 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 		if d.HasChange("optimise_for") {
 			log.Printf("[DEBUG] optimise_for changed for %s, starting update", name)
 
-			ud, err := getUserData(d.Get("optimise_for").(string), cs.HTTPGETOnly)
+			ud, err := getUserData(d.Get("optimise_for").(string), client.HTTPGETOnly)
 			if err != nil {
 				return err
 			}
 
-			p := cs.VirtualMachine.NewUpdateVirtualMachineParams(d.Id())
+			p := client.VirtualMachine.NewUpdateVirtualMachineParams(d.Id())
 			p.SetOptimisefor(ud)
-			_, err = cs.VirtualMachine.UpdateVirtualMachine(p)
+			_, err = client.VirtualMachine.UpdateVirtualMachine(p)
 			if err != nil {
 				return fmt.Errorf(
 					"Error updating optimise_for for instance %s: %s", name, err)
@@ -526,8 +525,8 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 		}
 
 		// Start the virtual machine again
-		_, err = cs.VirtualMachine.StartVirtualMachine(
-			cs.VirtualMachine.NewStartVirtualMachineParams(d.Id()))
+		_, err = client.VirtualMachine.StartVirtualMachine(
+			client.VirtualMachine.NewStartVirtualMachineParams(d.Id()))
 		if err != nil {
 			return fmt.Errorf(
 				"Error starting instance %s after making changes", name)
@@ -540,17 +539,17 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceCosmicInstanceDelete(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.VirtualMachine.NewDestroyVirtualMachineParams(d.Id())
+	p := client.VirtualMachine.NewDestroyVirtualMachineParams(d.Id())
 
 	if d.Get("expunge").(bool) {
 		p.SetExpunge(true)
 	}
 
 	log.Printf("[INFO] Destroying instance: %s", d.Get("name").(string))
-	if _, err := cs.VirtualMachine.DestroyVirtualMachine(p); err != nil {
+	if _, err := client.VirtualMachine.DestroyVirtualMachine(p); err != nil {
 		// This is a very poor way to be told the ID does no longer exist :(
 		if strings.Contains(err.Error(), fmt.Sprintf(
 			"Invalid parameter id value=%s due to incorrect long value format, "+

@@ -270,8 +270,8 @@ func testAccCheckCosmicInstanceExists(n string, instance *cosmic.VirtualMachine)
 			return fmt.Errorf("No instance ID is set")
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		vm, _, err := cs.VirtualMachine.GetVirtualMachineByID(rs.Primary.ID)
+		client := testAccProvider.Meta().(*CosmicClient)
+		vm, _, err := client.VirtualMachine.GetVirtualMachineByID(rs.Primary.ID)
 
 		if err != nil {
 			return err
@@ -340,7 +340,7 @@ func testAccCheckCosmicInstanceRenamedAndResized(instance *cosmic.VirtualMachine
 }
 
 func testAccCheckCosmicInstanceDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_instance" {
@@ -351,7 +351,7 @@ func testAccCheckCosmicInstanceDestroy(s *terraform.State) error {
 			return fmt.Errorf("No instance ID is set")
 		}
 
-		_, _, err := cs.VirtualMachine.GetVirtualMachineByID(rs.Primary.ID)
+		_, _, err := client.VirtualMachine.GetVirtualMachineByID(rs.Primary.ID)
 		if err == nil {
 			return fmt.Errorf("Virtual Machine %s still exists", rs.Primary.ID)
 		}

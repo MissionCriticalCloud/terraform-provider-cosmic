@@ -44,8 +44,8 @@ func testAccCheckCosmicPrivateGatewayExists(n string, gateway *cosmic.PrivateGat
 			return fmt.Errorf("No Private Gateway ID is set")
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		pgw, _, err := cs.VPC.GetPrivateGatewayByID(rs.Primary.ID)
+		client := testAccProvider.Meta().(*CosmicClient)
+		pgw, _, err := client.VPC.GetPrivateGatewayByID(rs.Primary.ID)
 
 		if err != nil {
 			return err
@@ -73,7 +73,7 @@ func testAccCheckCosmicPrivateGatewayAttributes(gateway *cosmic.PrivateGateway) 
 }
 
 func testAccCheckCosmicPrivateGatewayDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_private_gateway" {
@@ -84,7 +84,7 @@ func testAccCheckCosmicPrivateGatewayDestroy(s *terraform.State) error {
 			return fmt.Errorf("No private gateway ID is set")
 		}
 
-		gateway, _, err := cs.VPC.GetPrivateGatewayByID(rs.Primary.ID)
+		gateway, _, err := client.VPC.GetPrivateGatewayByID(rs.Primary.ID)
 		if err == nil && gateway.Id != "" {
 			return fmt.Errorf("Private gateway %s still exists", rs.Primary.ID)
 		}

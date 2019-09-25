@@ -5,7 +5,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -41,17 +40,17 @@ func resourceCosmicStaticRoute() *schema.Resource {
 }
 
 func resourceCosmicStaticRouteCreate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.VPC.NewCreateStaticRouteParams(
+	p := client.VPC.NewCreateStaticRouteParams(
 		d.Get("cidr").(string),
 		d.Get("nexthop").(string),
 		d.Get("vpc_id").(string),
 	)
 
 	// Create the new private gateway
-	r, err := cs.VPC.CreateStaticRoute(p)
+	r, err := client.VPC.CreateStaticRoute(p)
 	if err != nil {
 		return fmt.Errorf("Error creating static route for %s: %s", d.Get("cidr").(string), err)
 	}
@@ -62,10 +61,10 @@ func resourceCosmicStaticRouteCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceCosmicStaticRouteRead(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Get the virtual machine details
-	route, count, err := cs.VPC.GetStaticRouteByID(d.Id())
+	route, count, err := client.VPC.GetStaticRouteByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf("[DEBUG] Static route %s does no longer exist", d.Id())
@@ -84,13 +83,13 @@ func resourceCosmicStaticRouteRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceCosmicStaticRouteDelete(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.VPC.NewDeleteStaticRouteParams(d.Id())
+	p := client.VPC.NewDeleteStaticRouteParams(d.Id())
 
 	// Delete the private gateway
-	_, err := cs.VPC.DeleteStaticRoute(p)
+	_, err := client.VPC.DeleteStaticRoute(p)
 	if err != nil {
 		// This is a very poor way to be told the ID does no longer exist :(
 		if strings.Contains(err.Error(), fmt.Sprintf(

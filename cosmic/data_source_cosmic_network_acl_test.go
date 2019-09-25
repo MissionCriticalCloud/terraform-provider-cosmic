@@ -38,9 +38,9 @@ func testAccCheckCosmicNetworkACLDataSourceExists(n string, aclList *cosmic.Netw
 			return fmt.Errorf("Network ACL List data source ID not set")
 		}
 
-		conn := testAccProvider.Meta().(*cosmic.CosmicClient)
-		list, _, err := conn.NetworkACL.GetNetworkACLListByID(rs.Primary.ID)
+		client := testAccProvider.Meta().(*CosmicClient)
 
+		list, _, err := client.NetworkACL.GetNetworkACLListByID(rs.Primary.ID)
 		if err != nil {
 			return err
 		}

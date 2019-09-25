@@ -37,7 +37,7 @@ func setValueOrID(d *schema.ResourceData, key string, value string, id string) {
 	}
 }
 
-func retrieveID(cs *cosmic.CosmicClient, name string, value string, opts ...cosmic.OptionFunc) (id string, e *retrieveError) {
+func retrieveID(client *CosmicClient, name string, value string, opts ...cosmic.OptionFunc) (id string, e *retrieveError) {
 	// If the supplied value isn't a ID, try to retrieve the ID ourselves
 	if cosmic.IsID(value) {
 		return value, nil
@@ -49,19 +49,19 @@ func retrieveID(cs *cosmic.CosmicClient, name string, value string, opts ...cosm
 	var err error
 	switch name {
 	case "disk_offering":
-		id, _, err = cs.DiskOffering.GetDiskOfferingID(value)
+		id, _, err = client.DiskOffering.GetDiskOfferingID(value)
 	case "service_offering":
-		id, _, err = cs.ServiceOffering.GetServiceOfferingID(value)
+		id, _, err = client.ServiceOffering.GetServiceOfferingID(value)
 	case "network_offering":
-		id, _, err = cs.NetworkOffering.GetNetworkOfferingID(value)
+		id, _, err = client.NetworkOffering.GetNetworkOfferingID(value)
 	case "vpc_offering":
-		id, _, err = cs.VPC.GetVPCOfferingID(value)
+		id, _, err = client.VPC.GetVPCOfferingID(value)
 	case "zone":
-		id, _, err = cs.Zone.GetZoneID(value)
+		id, _, err = client.Zone.GetZoneID(value)
 	case "os_type":
-		p := cs.GuestOS.NewListOsTypesParams()
+		p := client.GuestOS.NewListOsTypesParams()
 		p.SetDescription(value)
-		l, e := cs.GuestOS.ListOsTypes(p)
+		l, e := client.GuestOS.ListOsTypes(p)
 		if e != nil {
 			err = e
 			break
@@ -83,7 +83,7 @@ func retrieveID(cs *cosmic.CosmicClient, name string, value string, opts ...cosm
 	return id, nil
 }
 
-func retrieveTemplateID(cs *cosmic.CosmicClient, zoneid, value string) (id string, e *retrieveError) {
+func retrieveTemplateID(client *CosmicClient, zoneid, value string) (id string, e *retrieveError) {
 	// If the supplied value isn't a ID, try to retrieve the ID ourselves
 	if cosmic.IsID(value) {
 		return value, nil
@@ -92,7 +92,7 @@ func retrieveTemplateID(cs *cosmic.CosmicClient, zoneid, value string) (id strin
 	log.Printf("[DEBUG] Retrieving ID of template: %s", value)
 
 	// Ignore count, since an error is returned if there is no exact match
-	id, _, err := cs.Template.GetTemplateID(value, "executable", zoneid)
+	id, _, err := client.Template.GetTemplateID(value, "executable", zoneid)
 	if err != nil {
 		return id, &retrieveError{name: "template", value: value, err: err}
 	}
@@ -121,9 +121,9 @@ func Retry(n int, f RetryFunc) (interface{}, error) {
 	return nil, lastErr
 }
 
-func isCosmic(cs *cosmic.CosmicClient) bool {
-	l := cs.Configuration.NewListCapabilitiesParams()
-	c, err := cs.Configuration.ListCapabilities(l)
+func isCosmic(client *CosmicClient) bool {
+	l := client.Configuration.NewListCapabilitiesParams()
+	c, err := client.Configuration.ListCapabilities(l)
 	if err != nil {
 		fmt.Errorf("Unable to retrieve capabilities: %s", err)
 		return false

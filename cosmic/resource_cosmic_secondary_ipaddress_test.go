@@ -62,7 +62,7 @@ func testAccCheckCosmicSecondaryIPAddressExists(n string, ip *cosmic.AddIpToNicR
 			return fmt.Errorf("No IP address ID is set")
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+		client := testAccProvider.Meta().(*CosmicClient)
 
 		virtualmachine, ok := rs.Primary.Attributes["virtual_machine_id"]
 		if !ok {
@@ -70,13 +70,13 @@ func testAccCheckCosmicSecondaryIPAddressExists(n string, ip *cosmic.AddIpToNicR
 		}
 
 		// Retrieve the virtual_machine ID
-		virtualmachineid, e := retrieveID(cs, "virtual_machine", virtualmachine)
+		virtualmachineid, e := retrieveID(client, "virtual_machine", virtualmachine)
 		if e != nil {
 			return e.Error()
 		}
 
 		// Get the virtual machine details
-		vm, count, err := cs.VirtualMachine.GetVirtualMachineByID(virtualmachineid)
+		vm, count, err := client.VirtualMachine.GetVirtualMachineByID(virtualmachineid)
 		if err != nil {
 			if count == 0 {
 				return fmt.Errorf("Instance not found")
@@ -92,10 +92,10 @@ func testAccCheckCosmicSecondaryIPAddressExists(n string, ip *cosmic.AddIpToNicR
 			nicid = vm.Nic[0].Id
 		}
 
-		p := cs.Nic.NewListNicsParams(virtualmachineid)
+		p := client.Nic.NewListNicsParams(virtualmachineid)
 		p.SetNicid(nicid)
 
-		l, err := cs.Nic.ListNics(p)
+		l, err := client.Nic.ListNics(p)
 		if err != nil {
 			return err
 		}
@@ -131,7 +131,7 @@ func testAccCheckCosmicSecondaryIPAddressAttributes(ip *cosmic.AddIpToNicRespons
 }
 
 func testAccCheckCosmicSecondaryIPAddressDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_secondary_ipaddress" {
@@ -148,13 +148,13 @@ func testAccCheckCosmicSecondaryIPAddressDestroy(s *terraform.State) error {
 		}
 
 		// Retrieve the virtual_machine ID
-		virtualmachineid, e := retrieveID(cs, "virtual_machine", virtualmachine)
+		virtualmachineid, e := retrieveID(client, "virtual_machine", virtualmachine)
 		if e != nil {
 			return e.Error()
 		}
 
 		// Get the virtual machine details
-		vm, count, err := cs.VirtualMachine.GetVirtualMachineByID(virtualmachineid)
+		vm, count, err := client.VirtualMachine.GetVirtualMachineByID(virtualmachineid)
 		if err != nil {
 			if count == 0 {
 				return nil
@@ -170,10 +170,10 @@ func testAccCheckCosmicSecondaryIPAddressDestroy(s *terraform.State) error {
 			nicid = vm.Nic[0].Id
 		}
 
-		p := cs.Nic.NewListNicsParams(virtualmachineid)
+		p := client.Nic.NewListNicsParams(virtualmachineid)
 		p.SetNicid(nicid)
 
-		l, err := cs.Nic.ListNics(p)
+		l, err := client.Nic.ListNics(p)
 		if err != nil {
 			return err
 		}

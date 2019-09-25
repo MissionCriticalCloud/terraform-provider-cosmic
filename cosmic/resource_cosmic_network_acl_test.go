@@ -79,8 +79,8 @@ func testAccCheckCosmicNetworkACLExists(n string, id *string, acl *cosmic.Networ
 			*id = rs.Primary.ID
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		acllist, count, err := cs.NetworkACL.GetNetworkACLListByID(rs.Primary.ID)
+		client := testAccProvider.Meta().(*cosmic.CosmicClient)
+		acllist, count, err := client.NetworkACL.GetNetworkACLListByID(rs.Primary.ID)
 		if err != nil {
 			return err
 		}
@@ -116,7 +116,7 @@ func testAccCheckCosmicNetworkACLBasicAttributes(acl *cosmic.NetworkACLList, wan
 }
 
 func testAccCheckCosmicNetworkACLDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*cosmic.CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_network_acl" {
@@ -127,7 +127,7 @@ func testAccCheckCosmicNetworkACLDestroy(s *terraform.State) error {
 			return fmt.Errorf("No network ACL ID is set")
 		}
 
-		_, _, err := cs.NetworkACL.GetNetworkACLListByID(rs.Primary.ID)
+		_, _, err := client.NetworkACL.GetNetworkACLListByID(rs.Primary.ID)
 		if err == nil {
 			return fmt.Errorf("Network ACl list %s still exists", rs.Primary.ID)
 		}

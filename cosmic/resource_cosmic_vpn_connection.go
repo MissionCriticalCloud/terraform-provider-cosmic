@@ -5,7 +5,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -35,16 +34,16 @@ func resourceCosmicVPNConnection() *schema.Resource {
 }
 
 func resourceCosmicVPNConnectionCreate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.VPN.NewCreateVpnConnectionParams(
+	p := client.VPN.NewCreateVpnConnectionParams(
 		d.Get("customer_gateway_id").(string),
 		d.Get("vpn_gateway_id").(string),
 	)
 
 	// Create the new VPN Connection
-	v, err := cs.VPN.CreateVpnConnection(p)
+	v, err := client.VPN.CreateVpnConnection(p)
 	if err != nil {
 		return fmt.Errorf("Error creating VPN Connection: %s", err)
 	}
@@ -55,10 +54,10 @@ func resourceCosmicVPNConnectionCreate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceCosmicVPNConnectionRead(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Get the VPN Connection details
-	v, count, err := cs.VPN.GetVpnConnectionByID(d.Id())
+	v, count, err := client.VPN.GetVpnConnectionByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf("[DEBUG] VPN Connection does no longer exist")
@@ -76,13 +75,13 @@ func resourceCosmicVPNConnectionRead(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceCosmicVPNConnectionDelete(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.VPN.NewDeleteVpnConnectionParams(d.Id())
+	p := client.VPN.NewDeleteVpnConnectionParams(d.Id())
 
 	// Delete the VPN Connection
-	_, err := cs.VPN.DeleteVpnConnection(p)
+	_, err := client.VPN.DeleteVpnConnection(p)
 	if err != nil {
 		// This is a very poor way to be told the ID does no longer exist :(
 		if strings.Contains(err.Error(), fmt.Sprintf(

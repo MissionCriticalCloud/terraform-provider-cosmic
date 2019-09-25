@@ -39,12 +39,12 @@ func dataSourceCosmicNetworkACL() *schema.Resource {
 }
 
 func dataSourceCosmicNetworkACLRead(d *schema.ResourceData, meta interface{}) error {
-	conn := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
-	p := conn.NetworkACL.NewListNetworkACLListsParams()
+	p := client.NetworkACL.NewListNetworkACLListsParams()
 	p.SetListall(true)
 
-	cosmicACLLists, err := conn.NetworkACL.ListNetworkACLLists(p)
+	cosmicACLLists, err := client.NetworkACL.ListNetworkACLLists(p)
 	if err != nil {
 		return fmt.Errorf("Failed to list ACL Lists: %s", err)
 	}

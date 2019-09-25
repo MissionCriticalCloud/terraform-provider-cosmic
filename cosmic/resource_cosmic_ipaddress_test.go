@@ -45,8 +45,8 @@ func testAccCheckCosmicIPAddressExists(n string, ipaddr *cosmic.PublicIpAddress)
 			return fmt.Errorf("No IP address ID is set")
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		pip, _, err := cs.PublicIPAddress.GetPublicIpAddressByID(rs.Primary.ID)
+		client := testAccProvider.Meta().(*CosmicClient)
+		pip, _, err := client.PublicIPAddress.GetPublicIpAddressByID(rs.Primary.ID)
 
 		if err != nil {
 			return err
@@ -80,7 +80,7 @@ func testAccCheckCosmicIPAddressAttributes(ipaddr *cosmic.PublicIpAddress) resou
 }
 
 func testAccCheckCosmicIPAddressDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_ipaddress" {
@@ -91,7 +91,7 @@ func testAccCheckCosmicIPAddressDestroy(s *terraform.State) error {
 			return fmt.Errorf("No IP address ID is set")
 		}
 
-		ip, _, err := cs.PublicIPAddress.GetPublicIpAddressByID(rs.Primary.ID)
+		ip, _, err := client.PublicIPAddress.GetPublicIpAddressByID(rs.Primary.ID)
 		if err == nil && ip.Associatednetworkid != "" {
 			return fmt.Errorf("Public IP %s still associated", rs.Primary.ID)
 		}

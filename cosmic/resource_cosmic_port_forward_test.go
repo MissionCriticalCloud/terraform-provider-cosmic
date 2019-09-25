@@ -5,7 +5,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
@@ -133,8 +132,8 @@ func testAccCheckCosmicPortForwardsExist(n string) resource.TestCheckFunc {
 				continue
 			}
 
-			cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-			_, count, err := cs.Firewall.GetPortForwardingRuleByID(id)
+			client := testAccProvider.Meta().(*CosmicClient)
+			_, count, err := client.Firewall.GetPortForwardingRuleByID(id)
 
 			if err != nil {
 				return err
@@ -150,7 +149,7 @@ func testAccCheckCosmicPortForwardsExist(n string) resource.TestCheckFunc {
 }
 
 func testAccCheckCosmicPortForwardDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_port_forward" {
@@ -166,7 +165,7 @@ func testAccCheckCosmicPortForwardDestroy(s *terraform.State) error {
 				continue
 			}
 
-			_, _, err := cs.Firewall.GetPortForwardingRuleByID(id)
+			_, _, err := client.Firewall.GetPortForwardingRuleByID(id)
 			if err == nil {
 				return fmt.Errorf("Port forward %s still exists", rs.Primary.ID)
 			}

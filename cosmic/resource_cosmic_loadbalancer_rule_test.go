@@ -392,8 +392,8 @@ func testAccCheckCosmicLoadBalancerRuleExist(n string, id *string, rule *cosmic.
 			*id = rs.Primary.ID
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		lbrule, count, err := cs.LoadBalancer.GetLoadBalancerRuleByID(rs.Primary.ID)
+		client := testAccProvider.Meta().(*cosmic.CosmicClient)
+		lbrule, count, err := client.LoadBalancer.GetLoadBalancerRuleByID(rs.Primary.ID)
 		if err != nil {
 			return err
 		}
@@ -462,7 +462,7 @@ func testAccCheckCosmicLoadBalancerRuleAttributes(rule *cosmic.LoadBalancerRule,
 }
 
 func testAccCheckCosmicLoadBalancerRuleDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*cosmic.CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_loadbalancer_rule" {
@@ -478,7 +478,7 @@ func testAccCheckCosmicLoadBalancerRuleDestroy(s *terraform.State) error {
 				continue
 			}
 
-			_, _, err := cs.LoadBalancer.GetLoadBalancerRuleByID(id)
+			_, _, err := client.LoadBalancer.GetLoadBalancerRuleByID(id)
 			if err == nil {
 				return fmt.Errorf("Loadbalancer rule %s still exists", rs.Primary.ID)
 			}

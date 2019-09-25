@@ -68,11 +68,11 @@ func testAccCheckCosmicSSHKeyPairExists(n string, sshkey *cosmic.SSHKeyPair) res
 			return fmt.Errorf("No key pair ID is set")
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		p := cs.SSH.NewListSSHKeyPairsParams()
+		client := testAccProvider.Meta().(*CosmicClient)
+		p := client.SSH.NewListSSHKeyPairsParams()
 		p.SetName(rs.Primary.ID)
 
-		list, err := cs.SSH.ListSSHKeyPairs(p)
+		list, err := client.SSH.ListSSHKeyPairs(p)
 		if err != nil {
 			return err
 		}
@@ -131,7 +131,7 @@ func testAccCheckCosmicSSHKeyPairCreateAttributes(name string) resource.TestChec
 }
 
 func testAccCheckCosmicSSHKeyPairDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_ssh_keypair" {
@@ -142,10 +142,10 @@ func testAccCheckCosmicSSHKeyPairDestroy(s *terraform.State) error {
 			return fmt.Errorf("No key pair ID is set")
 		}
 
-		p := cs.SSH.NewListSSHKeyPairsParams()
+		p := client.SSH.NewListSSHKeyPairsParams()
 		p.SetName(rs.Primary.ID)
 
-		list, err := cs.SSH.ListSSHKeyPairs(p)
+		list, err := client.SSH.ListSSHKeyPairs(p)
 		if err != nil {
 			return err
 		}

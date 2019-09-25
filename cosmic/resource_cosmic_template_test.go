@@ -72,8 +72,8 @@ func testAccCheckCosmicTemplateExists(n string, template *cosmic.Template) resou
 			return fmt.Errorf("No template ID is set")
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		tmpl, _, err := cs.Template.GetTemplateByID(rs.Primary.ID, "executable")
+		client := testAccProvider.Meta().(*CosmicClient)
+		tmpl, _, err := client.Template.GetTemplateByID(rs.Primary.ID, "executable")
 
 		if err != nil {
 			return err
@@ -136,7 +136,7 @@ func testAccCheckCosmicTemplateUpdatedAttributes(template *cosmic.Template) reso
 }
 
 func testAccCheckCosmicTemplateDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_template" {
@@ -147,7 +147,7 @@ func testAccCheckCosmicTemplateDestroy(s *terraform.State) error {
 			return fmt.Errorf("No template ID is set")
 		}
 
-		_, _, err := cs.Template.GetTemplateByID(rs.Primary.ID, "executable")
+		_, _, err := client.Template.GetTemplateByID(rs.Primary.ID, "executable")
 		if err == nil {
 			return fmt.Errorf("Template %s still exists", rs.Primary.ID)
 		}

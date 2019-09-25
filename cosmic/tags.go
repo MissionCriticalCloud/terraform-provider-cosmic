@@ -3,7 +3,6 @@ package cosmic
 import (
 	"log"
 
-	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -18,7 +17,7 @@ func tagsSchema() *schema.Schema {
 
 // setTags is a helper to set the tags for a resource. It expects the
 // tags field to be named "tags"
-func setTags(cs *cosmic.CosmicClient, d *schema.ResourceData, resourcetype string) error {
+func setTags(client *CosmicClient, d *schema.ResourceData, resourcetype string) error {
 	oraw, nraw := d.GetChange("tags")
 	o := oraw.(map[string]interface{})
 	n := nraw.(map[string]interface{})
@@ -30,9 +29,9 @@ func setTags(cs *cosmic.CosmicClient, d *schema.ResourceData, resourcetype strin
 	// First remove any obsolete tags
 	if len(remove) > 0 {
 		log.Printf("[DEBUG] Removing tags: %v from %s", remove, d.Id())
-		p := cs.Resourcetags.NewDeleteTagsParams([]string{d.Id()}, resourcetype)
+		p := client.Resourcetags.NewDeleteTagsParams([]string{d.Id()}, resourcetype)
 		p.SetTags(remove)
-		_, err := cs.Resourcetags.DeleteTags(p)
+		_, err := client.Resourcetags.DeleteTags(p)
 		if err != nil {
 			return err
 		}
@@ -41,8 +40,8 @@ func setTags(cs *cosmic.CosmicClient, d *schema.ResourceData, resourcetype strin
 	// Then add any new tags
 	if len(create) > 0 {
 		log.Printf("[DEBUG] Creating tags: %v for %s", create, d.Id())
-		p := cs.Resourcetags.NewCreateTagsParams([]string{d.Id()}, resourcetype, create)
-		_, err := cs.Resourcetags.CreateTags(p)
+		p := client.Resourcetags.NewCreateTagsParams([]string{d.Id()}, resourcetype, create)
+		_, err := client.Resourcetags.CreateTags(p)
 		if err != nil {
 			return err
 		}

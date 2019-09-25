@@ -165,7 +165,7 @@ func createNetworkACLRules(d *schema.ResourceData, meta interface{}, rules *sche
 }
 
 func createNetworkACLRule(d *schema.ResourceData, meta interface{}, rule map[string]interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 	uuids := rule["uuids"].(map[string]interface{})
 
 	// Make sure all required parameters are there
@@ -174,7 +174,7 @@ func createNetworkACLRule(d *schema.ResourceData, meta interface{}, rule map[str
 	}
 
 	// Create a new parameter struct
-	p := cs.NetworkACL.NewCreateNetworkACLParams(rule["protocol"].(string))
+	p := client.NetworkACL.NewCreateNetworkACLParams(rule["protocol"].(string))
 
 	// Set the acl ID
 	p.SetAclid(d.Id())
@@ -194,7 +194,7 @@ func createNetworkACLRule(d *schema.ResourceData, meta interface{}, rule map[str
 		p.SetIcmptype(rule["icmp_type"].(int))
 		p.SetIcmpcode(rule["icmp_code"].(int))
 
-		r, err := Retry(4, retryableACLCreationFunc(cs, p))
+		r, err := Retry(4, retryableACLCreationFunc(client, p))
 		if err != nil {
 			return err
 		}
@@ -203,7 +203,7 @@ func createNetworkACLRule(d *schema.ResourceData, meta interface{}, rule map[str
 
 	// If the protocol is ALL set the needed parameters
 	case rule["protocol"].(string) == "all":
-		r, err := Retry(4, retryableACLCreationFunc(cs, p))
+		r, err := Retry(4, retryableACLCreationFunc(client, p))
 		if err != nil {
 			return err
 		}
@@ -242,7 +242,7 @@ func createNetworkACLRule(d *schema.ResourceData, meta interface{}, rule map[str
 				p.SetStartport(startPort)
 				p.SetEndport(endPort)
 
-				r, err := Retry(4, retryableACLCreationFunc(cs, p))
+				r, err := Retry(4, retryableACLCreationFunc(client, p))
 				if err != nil {
 					return err
 				}
@@ -257,7 +257,7 @@ func createNetworkACLRule(d *schema.ResourceData, meta interface{}, rule map[str
 	// If the rule doesn't have protocol set to "all" or "icmp", or doesn't have ports
 	// defined, just create it as is
 	default:
-		r, err := Retry(4, retryableACLCreationFunc(cs, p))
+		r, err := Retry(4, retryableACLCreationFunc(client, p))
 		if err != nil {
 			return err
 		}
@@ -270,10 +270,10 @@ func createNetworkACLRule(d *schema.ResourceData, meta interface{}, rule map[str
 }
 
 func resourceCosmicNetworkACLRuleRead(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// First check if the ACL itself still exists
-	_, count, err := cs.NetworkACL.GetNetworkACLListByID(d.Id())
+	_, count, err := client.NetworkACL.GetNetworkACLListByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf(
@@ -286,11 +286,11 @@ func resourceCosmicNetworkACLRuleRead(d *schema.ResourceData, meta interface{}) 
 	}
 
 	// Get all the rules from the running environment
-	p := cs.NetworkACL.NewListNetworkACLsParams()
+	p := client.NetworkACL.NewListNetworkACLsParams()
 	p.SetAclid(d.Id())
 	p.SetListall(true)
 
-	l, err := cs.NetworkACL.ListNetworkACLs(p)
+	l, err := client.NetworkACL.ListNetworkACLs(p)
 	if err != nil {
 		return err
 	}
@@ -584,7 +584,7 @@ func deleteNetworkACLRules(d *schema.ResourceData, meta interface{}, rules *sche
 }
 
 func deleteNetworkACLRule(d *schema.ResourceData, meta interface{}, rule map[string]interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 	uuids := rule["uuids"].(map[string]interface{})
 
 	for k, id := range uuids {
@@ -594,10 +594,10 @@ func deleteNetworkACLRule(d *schema.ResourceData, meta interface{}, rule map[str
 		}
 
 		// Create the parameter struct
-		p := cs.NetworkACL.NewDeleteNetworkACLParams(id.(string))
+		p := client.NetworkACL.NewDeleteNetworkACLParams(id.(string))
 
 		// Delete the rule
-		if _, err := cs.NetworkACL.DeleteNetworkACL(p); err != nil {
+		if _, err := client.NetworkACL.DeleteNetworkACL(p); err != nil {
 
 			// This is a very poor way to be told the ID does no longer exist :(
 			if strings.Contains(err.Error(), fmt.Sprintf(
@@ -681,10 +681,10 @@ func verifyNetworkACLRuleParams(d *schema.ResourceData, rule map[string]interfac
 	return nil
 }
 
-func retryableACLCreationFunc(cs *cosmic.CosmicClient, p *cosmic.CreateNetworkACLParams) func() (interface{}, error) {
+func retryableACLCreationFunc(client *CosmicClient, p *cosmic.CreateNetworkACLParams) func() (interface{}, error) {
 	return func() (interface{}, error) {
 
-		r, err := cs.NetworkACL.CreateNetworkACL(p)
+		r, err := client.NetworkACL.CreateNetworkACL(p)
 		if err != nil {
 			return nil, err
 		}

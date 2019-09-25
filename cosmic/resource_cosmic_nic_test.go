@@ -118,8 +118,8 @@ func testAccCheckCosmicNICExists(v, n string, nic *cosmic.Nic) resource.TestChec
 			return fmt.Errorf("No NIC ID is set")
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		vm, _, err := cs.VirtualMachine.GetVirtualMachineByID(rsv.Primary.ID)
+		client := testAccProvider.Meta().(*CosmicClient)
+		vm, _, err := client.VirtualMachine.GetVirtualMachineByID(rsv.Primary.ID)
 
 		if err != nil {
 			return err
@@ -163,7 +163,7 @@ func testAccCheckCosmicNICIPAddress(nic *cosmic.Nic) resource.TestCheckFunc {
 }
 
 func testAccCheckCosmicNICDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	// Deleting the instance automatically deletes any additional NICs
 	for _, rs := range s.RootModule().Resources {
@@ -175,7 +175,7 @@ func testAccCheckCosmicNICDestroy(s *terraform.State) error {
 			return fmt.Errorf("No instance ID is set")
 		}
 
-		_, _, err := cs.VirtualMachine.GetVirtualMachineByID(rs.Primary.ID)
+		_, _, err := client.VirtualMachine.GetVirtualMachineByID(rs.Primary.ID)
 		if err == nil {
 			return fmt.Errorf("Virtual Machine %s still exists", rs.Primary.ID)
 		}

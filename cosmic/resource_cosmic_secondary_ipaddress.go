@@ -5,7 +5,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -43,14 +42,14 @@ func resourceCosmicSecondaryIPAddress() *schema.Resource {
 }
 
 func resourceCosmicSecondaryIPAddressCreate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	nicid, ok := d.GetOk("nic_id")
 	if !ok {
 		virtualmachineid := d.Get("virtual_machine_id").(string)
 
 		// Get the virtual machine details
-		vm, count, err := cs.VirtualMachine.GetVirtualMachineByID(virtualmachineid)
+		vm, count, err := client.VirtualMachine.GetVirtualMachineByID(virtualmachineid)
 		if err != nil {
 			if count == 0 {
 				log.Printf("[DEBUG] Virtual Machine %s does not exist", virtualmachineid)
@@ -64,14 +63,14 @@ func resourceCosmicSecondaryIPAddressCreate(d *schema.ResourceData, meta interfa
 	}
 
 	// Create a new parameter struct
-	p := cs.Nic.NewAddIpToNicParams(nicid.(string))
+	p := client.Nic.NewAddIpToNicParams(nicid.(string))
 
 	// If there is a ipaddres supplied, add it to the parameter struct
 	if ipaddress, ok := d.GetOk("ip_address"); ok {
 		p.SetIpaddress(ipaddress.(string))
 	}
 
-	ip, err := cs.Nic.AddIpToNic(p)
+	ip, err := client.Nic.AddIpToNic(p)
 	if err != nil {
 		return err
 	}
@@ -82,12 +81,12 @@ func resourceCosmicSecondaryIPAddressCreate(d *schema.ResourceData, meta interfa
 }
 
 func resourceCosmicSecondaryIPAddressRead(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	virtualmachineid := d.Get("virtual_machine_id").(string)
 
 	// Get the virtual machine details
-	vm, count, err := cs.VirtualMachine.GetVirtualMachineByID(virtualmachineid)
+	vm, count, err := client.VirtualMachine.GetVirtualMachineByID(virtualmachineid)
 	if err != nil {
 		if count == 0 {
 			log.Printf("[DEBUG] Virtual Machine %s does not exist", virtualmachineid)
@@ -102,10 +101,10 @@ func resourceCosmicSecondaryIPAddressRead(d *schema.ResourceData, meta interface
 		nicid = vm.Nic[0].Id
 	}
 
-	p := cs.Nic.NewListNicsParams(virtualmachineid)
+	p := client.Nic.NewListNicsParams(virtualmachineid)
 	p.SetNicid(nicid.(string))
 
-	l, err := cs.Nic.ListNics(p)
+	l, err := client.Nic.ListNics(p)
 	if err != nil {
 		return err
 	}
@@ -136,13 +135,13 @@ func resourceCosmicSecondaryIPAddressRead(d *schema.ResourceData, meta interface
 }
 
 func resourceCosmicSecondaryIPAddressDelete(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.Nic.NewRemoveIpFromNicParams(d.Id())
+	p := client.Nic.NewRemoveIpFromNicParams(d.Id())
 
 	log.Printf("[INFO] Removing secondary IP address: %s", d.Get("ip_address").(string))
-	if _, err := cs.Nic.RemoveIpFromNic(p); err != nil {
+	if _, err := client.Nic.RemoveIpFromNic(p); err != nil {
 		// This is a very poor way to be told the ID does not exist :(
 		if strings.Contains(err.Error(), fmt.Sprintf(
 			"Invalid parameter id value=%s due to incorrect long value format, "+
@@ -166,10 +165,10 @@ func resourceCosmicSecondaryIPAddressImporter(d *schema.ResourceData, meta inter
 	}
 	vmid, sip := s[0], s[1]
 
-	c := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Get the virtual machine details
-	vm, count, err := c.VirtualMachine.GetVirtualMachineByID(vmid)
+	vm, count, err := client.VirtualMachine.GetVirtualMachineByID(vmid)
 	if err != nil {
 		if count == 0 {
 			return nil, fmt.Errorf("[DEBUG] Virtual Machine %s does not exist", vmid)

@@ -5,7 +5,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
@@ -277,8 +276,8 @@ func testAccCheckCosmicNetworkACLRulesExist(n string) resource.TestCheckFunc {
 				continue
 			}
 
-			cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-			_, count, err := cs.NetworkACL.GetNetworkACLByID(id)
+			client := testAccProvider.Meta().(*CosmicClient)
+			_, count, err := client.NetworkACL.GetNetworkACLByID(id)
 
 			if err != nil {
 				return err
@@ -294,7 +293,7 @@ func testAccCheckCosmicNetworkACLRulesExist(n string) resource.TestCheckFunc {
 }
 
 func testAccCheckCosmicNetworkACLRuleDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_network_acl_rule" {
@@ -310,7 +309,7 @@ func testAccCheckCosmicNetworkACLRuleDestroy(s *terraform.State) error {
 				continue
 			}
 
-			_, _, err := cs.NetworkACL.GetNetworkACLByID(id)
+			_, _, err := client.NetworkACL.GetNetworkACLByID(id)
 			if err == nil {
 				return fmt.Errorf("Network ACL rule %s still exists", rs.Primary.ID)
 			}

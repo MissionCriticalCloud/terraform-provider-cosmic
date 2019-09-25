@@ -284,8 +284,8 @@ func testAccCheckCosmicDiskExists(n string, disk *cosmic.Volume) resource.TestCh
 			return fmt.Errorf("No disk ID is set")
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		volume, _, err := cs.Volume.GetVolumeByID(rs.Primary.ID)
+		client := testAccProvider.Meta().(*CosmicClient)
+		volume, _, err := client.Volume.GetVolumeByID(rs.Primary.ID)
 
 		if err != nil {
 			return err
@@ -317,7 +317,7 @@ func testAccCheckCosmicDiskAttributes(disk *cosmic.Volume) resource.TestCheckFun
 }
 
 func testAccCheckCosmicDiskDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_disk" {
@@ -328,7 +328,7 @@ func testAccCheckCosmicDiskDestroy(s *terraform.State) error {
 			return fmt.Errorf("No disk ID is set")
 		}
 
-		_, _, err := cs.Volume.GetVolumeByID(rs.Primary.ID)
+		_, _, err := client.Volume.GetVolumeByID(rs.Primary.ID)
 		if err == nil {
 			return fmt.Errorf("Disk %s still exists", rs.Primary.ID)
 		}
