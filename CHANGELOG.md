@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Add `cosmic_network_acl` data source to look up Network ACL Lists
 - Add `private_end_port` and `public_end_port` fields to `cosmic_port_forward`
+- Add `cosmic_port_forward` importer
 - Set `optimise_for` value when importing a Cosmic instance
 
 ## 0.3.1 (2019-08-06)

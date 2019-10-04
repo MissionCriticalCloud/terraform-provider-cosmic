@@ -20,7 +20,7 @@ func resourceCosmicPortForward() *schema.Resource {
 		Update: resourceCosmicPortForwardUpdate,
 		Delete: resourceCosmicPortForwardDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			State: resourceCosmicPortForwardImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -461,4 +461,99 @@ func verifyPortForwardParams(d *schema.ResourceData, forward map[string]interfac
 			"%s is not a valid protocol. Valid options are 'tcp' and 'udp'", protocol)
 	}
 	return nil
+}
+
+func resourceCosmicPortForwardImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	client := meta.(*cosmic.CosmicClient)
+
+	forwards := d.Get("forward").(*schema.Set)
+	ipid := ""
+
+	// As we can specify multiple forward {} blocks we should allow importing multiple
+	// port forwards by iterating over a comma separated string
+	for _, id := range strings.Split(d.Id(), ",") {
+		l, count, err := client.Firewall.GetPortForwardingRuleByID(id)
+		if err != nil {
+			return nil, err
+		}
+		if count == 0 {
+			return nil, fmt.Errorf("Port forwarding rule %s does not exist", id)
+		}
+
+		// Check each port forward rule we're importing is mapped to the same IP address
+		if ipid != "" && l.Ipaddressid != ipid {
+			return nil, fmt.Errorf("Port forwarding rule %s is not attached to expected IP address. Expected: %s, got: %s", id, ipid, l.Ipaddressid)
+		}
+		ipid = l.Ipaddressid
+
+		privPort, err := strconv.Atoi(l.Privateport)
+		if err != nil {
+			return nil, err
+		}
+
+		privEndPort, err := strconv.Atoi(l.Privateendport)
+		if err != nil {
+			return nil, err
+		}
+
+		pubPort, err := strconv.Atoi(l.Publicport)
+		if err != nil {
+			return nil, err
+		}
+
+		pubEndPort, err := strconv.Atoi(l.Publicendport)
+		if err != nil {
+			return nil, err
+		}
+
+		forward := map[string]interface{}{
+			"protocol":           l.Protocol,
+			"private_port":       privPort,
+			"public_port":        pubPort,
+			"virtual_machine_id": l.Virtualmachineid,
+			"uuid":               l.Id,
+		}
+		// Set end port value if it differs from start port.
+		if privEndPort != privPort {
+			forward["private_end_port"] = privEndPort
+		}
+		if pubEndPort != pubPort {
+			forward["public_end_port"] = pubEndPort
+		}
+
+		// This is a tricky one: we're going to assume that vm_guest_ip isn't
+		// set when using the instance's default IP, so we'll only set it during
+		// import if the IP isn't the IP attached to the default NIC. If we're
+		// wrong we'll end up needing to create all port fowards in the resource.
+		vm, _, err := client.VirtualMachine.GetVirtualMachineByID(l.Virtualmachineid)
+		if err != nil {
+			return nil, err
+		}
+		// Loop through NICs and any configured secondary IPs
+	NICs:
+		for _, n := range vm.Nic {
+			for _, sip := range n.Secondaryip {
+				if sip.Ipaddress == l.Vmguestip {
+					forward["vm_guest_ip"] = l.Vmguestip
+					break NICs
+				}
+			}
+
+			if n.Ipaddress == l.Vmguestip {
+				if n.Isdefault != true {
+					forward["vm_guest_ip"] = l.Vmguestip
+					break NICs
+				}
+			}
+		}
+
+		log.Printf("[DEBUG] Importing forward: %v", forward)
+		forwards.Add(forward)
+	}
+
+	d.SetId(ipid)
+	d.Set("ip_address_id", ipid)
+	d.Set("forward", forwards)
+	d.Set("managed", false)
+	return []*schema.ResourceData{d}, nil
 }
