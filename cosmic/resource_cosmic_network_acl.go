@@ -13,6 +13,7 @@ func resourceCosmicNetworkACL() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceCosmicNetworkACLCreate,
 		Read:   resourceCosmicNetworkACLRead,
+		Update: resourceCosmicNetworkACLUpdate,
 		Delete: resourceCosmicNetworkACLDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
@@ -22,14 +23,12 @@ func resourceCosmicNetworkACL() *schema.Resource {
 			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 
 			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
-				ForceNew: true,
 			},
 
 			"vpc_id": &schema.Schema{
@@ -88,6 +87,35 @@ func resourceCosmicNetworkACLRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("vpc_id", f.Vpcid)
 
 	return nil
+}
+
+func resourceCosmicNetworkACLUpdate(d *schema.ResourceData, meta interface{}) error {
+	cs := meta.(*cosmic.CosmicClient)
+	name := d.Get("name").(string)
+
+	// Create a new parameter struct
+	p := cs.NetworkACL.NewUpdateNetworkACLListParams(d.Id())
+
+	// Check if the name or description is changed
+	if d.HasChange("name") || d.HasChange("description") {
+		p.SetName(name)
+
+		// Compute/set the display text
+		description := d.Get("description").(string)
+		if description == "" {
+			description = name
+		}
+		p.SetDescription(description)
+	}
+
+	// Update the network ACL
+	_, err := cs.NetworkACL.UpdateNetworkACLList(p)
+	if err != nil {
+		return fmt.Errorf(
+			"Error updating network ACL %s: %s", name, err)
+	}
+
+	return resourceCosmicNetworkACLRead(d, meta)
 }
 
 func resourceCosmicNetworkACLDelete(d *schema.ResourceData, meta interface{}) error {
