@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## 0.4.0 (2019-11-08)
 
 - Add `cosmic_network_acl` data source to look up Network ACL Lists
 - Add `private_end_port` and `public_end_port` fields to `cosmic_port_forward`
