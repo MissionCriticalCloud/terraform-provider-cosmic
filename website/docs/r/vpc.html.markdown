@@ -56,6 +56,7 @@ The following attributes are exported:
 * `id` - The ID of the VPC.
 * `display_text` - The display text of the VPC.
 * `source_nat_ip` - The source NAT IP assigned to the VPC.
+* `source_nat_ip_id` - The ID of the source NAT IP assigned to the VPC.
 
 ## Import (EXPERIMENTAL)
 

@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+- Add `source_nat_ip_id` field to `cosmic_vpc` resource
+
 ## 0.4.0 (2019-11-08)
 
 - Add `cosmic_network_acl` data source to look up Network ACL Lists
