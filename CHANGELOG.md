@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## 0.4.1 (2019-11-19)
 
 - Add `source_nat_ip_id` field to `cosmic_vpc` resource
 
