@@ -54,6 +54,11 @@ func resourceCosmicVPC() *schema.Resource {
 				Computed: true,
 			},
 
+			"source_nat_ip_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+
 			"source_nat_list": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -179,6 +184,7 @@ func resourceCosmicVPCRead(d *schema.ResourceData, meta interface{}) error {
 
 	if l.Count == 1 {
 		d.Set("source_nat_ip", l.PublicIpAddresses[0].Ipaddress)
+		d.Set("source_nat_ip_id", l.PublicIpAddresses[0].Id)
 	}
 
 	return nil
