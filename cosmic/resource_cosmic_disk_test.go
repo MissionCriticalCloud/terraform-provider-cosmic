@@ -343,10 +343,8 @@ resource "cosmic_disk" "foo" {
   attach        = false
   size          = "10"
   disk_offering = "%s"
-  zone          = "%s"
 }`,
 	strings.ToLower(COSMIC_DISK_OFFERING),
-	COSMIC_ZONE,
 )
 
 var testAccCosmicDisk_update = fmt.Sprintf(`
@@ -355,10 +353,8 @@ resource "cosmic_disk" "foo" {
   attach        = false
   size          = "20"
   disk_offering = "%s"
-  zone          = "%s"
 }`,
 	COSMIC_DISK_OFFERING,
-	COSMIC_ZONE,
 )
 
 var testAccCosmicDisk_diskController = fmt.Sprintf(`
@@ -368,10 +364,8 @@ resource "cosmic_disk" "foo" {
   size            = "10"
   disk_offering   = "%s"
   disk_controller = "SCSI"
-  zone            = "%s"
 }`,
 	COSMIC_DISK_OFFERING,
-	COSMIC_ZONE,
 )
 
 var testAccCosmicDisk_attachBasic = fmt.Sprintf(`
@@ -381,7 +375,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -390,7 +383,6 @@ resource "cosmic_network" "foo" {
   gateway          = "10.0.10.1"
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 }
 
 resource "cosmic_instance" "foo" {
@@ -399,7 +391,6 @@ resource "cosmic_instance" "foo" {
   service_offering = "%s"
   network_id       = "${cosmic_network.foo.id}"
   template         = "%s"
-  zone             = "${cosmic_vpc.foo.zone}"
   expunge          = true
 }
 
@@ -409,10 +400,8 @@ resource "cosmic_disk" "foo" {
   size               = "10"
   disk_offering      = "%s"
   virtual_machine_id = "${cosmic_instance.foo.id}"
-  zone               = "${cosmic_instance.foo.zone}"
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE,
@@ -426,7 +415,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -435,7 +423,6 @@ resource "cosmic_network" "foo" {
   gateway          = "10.0.10.1"
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 }
 
 resource "cosmic_instance" "foo" {
@@ -444,7 +431,6 @@ resource "cosmic_instance" "foo" {
   service_offering = "%s"
   network_id       = "${cosmic_network.foo.id}"
   template         = "%s"
-  zone             = "${cosmic_vpc.foo.zone}"
   expunge          = true
 }
 
@@ -455,10 +441,8 @@ resource "cosmic_disk" "foo" {
   disk_offering      = "%s"
   disk_controller    = "SCSI"
   virtual_machine_id = "${cosmic_instance.foo.id}"
-  zone               = "${cosmic_instance.foo.zone}"
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE,
@@ -472,7 +456,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -481,7 +464,6 @@ resource "cosmic_network" "foo" {
   gateway          = "10.0.10.1"
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 }
 
 resource "cosmic_instance" "foo" {
@@ -490,7 +472,6 @@ resource "cosmic_instance" "foo" {
   service_offering = "%s"
   network_id       = "${cosmic_network.foo.id}"
   template         = "%s"
-  zone             = "${cosmic_vpc.foo.zone}"
   expunge          = true
 }
 
@@ -501,10 +482,8 @@ resource "cosmic_disk" "foo" {
   size               = "10"
   disk_offering      = "%s"
   virtual_machine_id = "${cosmic_instance.foo.id}"
-  zone               = "${cosmic_instance.foo.zone}"
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE,
@@ -518,7 +497,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -527,7 +505,6 @@ resource "cosmic_network" "foo" {
   gateway          = "10.0.10.1"
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 }
 
 resource "cosmic_instance" "foo" {
@@ -536,7 +513,6 @@ resource "cosmic_instance" "foo" {
   service_offering = "%s"
   network_id       = "${cosmic_network.foo.id}"
   template         = "%s"
-  zone             = "${cosmic_vpc.foo.zone}"
   expunge          = true
 }
 
@@ -546,10 +522,8 @@ resource "cosmic_disk" "foo" {
   size               = "20"
   disk_offering      = "%s"
   virtual_machine_id = "${cosmic_instance.foo.id}"
-  zone               = "${cosmic_instance.foo.zone}"
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE,

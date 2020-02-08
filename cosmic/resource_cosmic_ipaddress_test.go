@@ -107,7 +107,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   vpc_offering   = "%s"
   network_domain = "terraform-domain"
-  zone           = "%s"
 }
 
 data "cosmic_network_acl" "default_allow" {
@@ -122,5 +121,4 @@ resource "cosmic_ipaddress" "foo" {
   vpc_id = "${cosmic_vpc.foo.id}"
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 )

@@ -49,14 +49,21 @@ func Provider() terraform.ResourceProvider {
 				Type:          schema.TypeString,
 				Optional:      true,
 				DefaultFunc:   schema.EnvDefaultFunc("COSMIC_CONFIG", nil),
-				ConflictsWith: []string{"api_url", "api_key", "secret_key"},
+				ConflictsWith: []string{"api_url", "api_key", "secret_key", "zone"},
 			},
 
 			"profile": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				DefaultFunc:   schema.EnvDefaultFunc("COSMIC_PROFILE", nil),
-				ConflictsWith: []string{"api_url", "api_key", "secret_key"},
+				ConflictsWith: []string{"api_url", "api_key", "secret_key", "zone"},
+			},
+
+			"zone": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				DefaultFunc:   schema.EnvDefaultFunc("COSMIC_ZONE", nil),
+				ConflictsWith: []string{"config", "profile"},
 			},
 		},
 
@@ -95,13 +102,14 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	apiURL, apiURLOK := d.GetOk("api_url")
 	apiKey, apiKeyOK := d.GetOk("api_key")
 	secretKey, secretKeyOK := d.GetOk("secret_key")
+	zone, zoneOK := d.GetOk("zone")
 	config, configOK := d.GetOk("config")
 	profile, profileOK := d.GetOk("profile")
 
 	switch {
-	case apiURLOK, apiKeyOK, secretKeyOK:
-		if !(apiURLOK && apiKeyOK && secretKeyOK) {
-			return nil, errors.New("'api_url', 'api_key' and 'secret_key' should all have values")
+	case apiURLOK, apiKeyOK, secretKeyOK, zoneOK:
+		if !(apiURLOK && apiKeyOK && secretKeyOK && zoneOK) {
+			return nil, errors.New("'api_url', 'api_key', 'secret_key' and 'zone' should all have values")
 		}
 	case configOK, profileOK:
 		if !(configOK && profileOK) {
@@ -109,7 +117,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		}
 	default:
 		return nil, errors.New(
-			"either 'api_url', 'api_key' and 'secret_key' or 'config' and 'profile' should have values")
+			"either 'api_url', 'api_key', 'secret_key' and 'zone' or 'config' and 'profile' should have values")
 	}
 
 	if configOK && profileOK {
@@ -124,17 +132,39 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		}
 
 		apiURL = section.Key("url").String()
+		if apiURL == "" {
+			return nil, errors.New("value for 'url' is empty or missing from config profile")
+		}
+
 		apiKey = section.Key("apikey").String()
+		if apiKey == "" {
+			return nil, errors.New("value for 'apikey' is empty or missing from config profile")
+		}
+
 		secretKey = section.Key("secretkey").String()
+		if secretKey == "" {
+			return nil, errors.New("value for 'secretkey' is empty or missing from config profile")
+		}
+
+		zone = section.Key("zone").String()
+		if zone == "" {
+			return nil, errors.New("value for 'zone' is empty or missing from config profile")
+		}
 	}
 
 	cfg := Config{
 		APIURL:      apiURL.(string),
 		APIKey:      apiKey.(string),
 		SecretKey:   secretKey.(string),
+		ZoneName:    zone.(string),
 		HTTPGETOnly: d.Get("http_get_only").(bool),
 		Timeout:     int64(d.Get("timeout").(int)),
 	}
 
 	return cfg.NewClient()
+}
+
+func deprecatedZoneMsg() string {
+	return "Setting the zone via resource is deprecated and will be removed in a future version," +
+		"please configure the \"zone\" attribute in the provider config."
 }

@@ -108,10 +108,6 @@ func testAccCheckCosmicTemplateBasicAttributes(template *cosmic.Template) resour
 			return fmt.Errorf("Bad os type: %s", template.Ostypename)
 		}
 
-		if template.Zonename != COSMIC_ZONE {
-			return fmt.Errorf("Bad zone: %s", template.Zonename)
-		}
-
 		return nil
 	}
 }
@@ -163,10 +159,7 @@ resource "cosmic_template" "foo" {
   hypervisor = "KVM"
   os_type    = "Other PV (64-bit)"
   url        = "http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2"
-  zone       = "%s"
-}`,
-	COSMIC_ZONE,
-)
+}`)
 
 var testAccCosmicTemplate_update = fmt.Sprintf(`
 resource "cosmic_template" "foo" {
@@ -176,9 +169,6 @@ resource "cosmic_template" "foo" {
   hypervisor              = "KVM"
   os_type                 = "Other PV (64-bit)"
   url                     = "http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2"
-  zone                    = "%s"
   is_dynamically_scalable = true
   password_enabled        = true
-}`,
-	COSMIC_ZONE,
-)
+}`)

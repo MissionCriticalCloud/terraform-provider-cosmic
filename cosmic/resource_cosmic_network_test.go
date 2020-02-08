@@ -249,7 +249,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -258,14 +257,12 @@ resource "cosmic_network" "foo" {
   gateway          = "10.0.10.1"
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 
   tags = {
     terraform-tag = "true"
   }
 }`,
 	strings.ToLower(COSMIC_VPC_OFFERING),
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 )
 
@@ -276,7 +273,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -286,14 +282,12 @@ resource "cosmic_network" "foo" {
   dns              = ["10.10.10.10"]
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 
   tags = {
     terraform-tag = "true"
   }
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 )
 
@@ -304,7 +298,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -314,14 +307,12 @@ resource "cosmic_network" "foo" {
   dns              = ["10.10.10.10"]
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 
   tags = {
     terraform-tag = "true"
   }
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 )
 
@@ -332,7 +323,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network_acl" "foo" {
@@ -347,10 +337,8 @@ resource "cosmic_network" "foo" {
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
   acl_id           = "${cosmic_network_acl.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 )
 
@@ -361,7 +349,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network_acl" "bar" {
@@ -376,9 +363,7 @@ resource "cosmic_network" "foo" {
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
   acl_id           = "${cosmic_network_acl.bar.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 )

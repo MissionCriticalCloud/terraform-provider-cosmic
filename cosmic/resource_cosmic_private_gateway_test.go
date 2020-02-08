@@ -100,14 +100,12 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   vpc_offering   = "%s"
   network_domain = "terraform-domain"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
   name             = "terraform-network"
   cidr             = "10.0.252.0/24"
   network_offering = "DefaultPrivateGatewayNetworkOffering"
-  zone             = "${cosmic_vpc.foo.zone}"
 }
 
 resource "cosmic_network_acl" "foo" {
@@ -122,5 +120,4 @@ resource "cosmic_private_gateway" "foo" {
   vpc_id     = "${cosmic_network_acl.foo.vpc_id}"
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 )

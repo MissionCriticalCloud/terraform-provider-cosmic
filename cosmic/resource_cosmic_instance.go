@@ -90,12 +90,6 @@ func resourceCosmicInstance() *schema.Resource {
 				ConflictsWith: []string{"affinity_group_ids"},
 			},
 
-			"zone": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-
 			"keypair": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -146,6 +140,14 @@ func resourceCosmicInstance() *schema.Resource {
 				Optional: true,
 				Default:  false,
 			},
+
+			"zone": {
+				Type:       schema.TypeString,
+				Optional:   true,
+				Computed:   true,
+				ForceNew:   true,
+				Deprecated: deprecatedZoneMsg(),
+			},
 		},
 	}
 }
@@ -160,7 +162,7 @@ func resourceCosmicInstanceCreate(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	// Retrieve the zone ID
-	zoneid, e := retrieveID(client, "zone", d.Get("zone").(string))
+	zoneid, e := retrieveID(client, "zone", client.ZoneName)
 	if e != nil {
 		return e.Error()
 	}

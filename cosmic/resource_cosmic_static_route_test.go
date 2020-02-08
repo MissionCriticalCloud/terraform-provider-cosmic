@@ -101,7 +101,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_static_route" "foo" {
@@ -110,5 +109,4 @@ resource "cosmic_static_route" "foo" {
   vpc_id  = "${cosmic_vpc.foo.id}"
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 )

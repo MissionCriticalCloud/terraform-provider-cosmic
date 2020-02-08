@@ -53,12 +53,6 @@ func resourceCosmicTemplate() *schema.Resource {
 				ForceNew: true,
 			},
 
-			"zone": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-
 			"is_dynamically_scalable": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -101,6 +95,14 @@ func resourceCosmicTemplate() *schema.Resource {
 				Optional: true,
 				Default:  300,
 			},
+
+			"zone": &schema.Schema{
+				Type:       schema.TypeString,
+				Optional:   true,
+				Computed:   true,
+				ForceNew:   true,
+				Deprecated: deprecatedZoneMsg(),
+			},
 		},
 	}
 }
@@ -127,7 +129,7 @@ func resourceCosmicTemplateCreate(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	// Retrieve the zone ID
-	zoneid, e := retrieveID(client, "zone", d.Get("zone").(string))
+	zoneid, e := retrieveID(client, "zone", client.ZoneName)
 	if e != nil {
 		return e.Error()
 	}

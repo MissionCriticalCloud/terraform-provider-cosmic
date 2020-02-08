@@ -8,6 +8,7 @@ type Config struct {
 	APIURL      string
 	APIKey      string
 	SecretKey   string
+	ZoneName    string
 	HTTPGETOnly bool
 	Timeout     int64
 }
@@ -17,5 +18,5 @@ func (c *Config) NewClient() (*CosmicClient, error) {
 	client := cosmic.NewAsyncClient(c.APIURL, c.APIKey, c.SecretKey, nil, 120)
 	client.HTTPGETOnly = c.HTTPGETOnly
 	client.AsyncTimeout(c.Timeout)
-	return &CosmicClient{CosmicClient: client}, nil
+	return &CosmicClient{CosmicClient: client, ZoneName: c.ZoneName}, nil
 }

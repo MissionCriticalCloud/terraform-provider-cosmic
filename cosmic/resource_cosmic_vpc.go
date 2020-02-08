@@ -72,9 +72,11 @@ func resourceCosmicVPC() *schema.Resource {
 			},
 
 			"zone": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:       schema.TypeString,
+				Optional:   true,
+				Computed:   true,
+				ForceNew:   true,
+				Deprecated: deprecatedZoneMsg(),
 			},
 		},
 	}
@@ -92,7 +94,7 @@ func resourceCosmicVPCCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	// Retrieve the zone ID
-	zoneid, e := retrieveID(client, "zone", d.Get("zone").(string))
+	zoneid, e := retrieveID(client, "zone", client.ZoneName)
 	if e != nil {
 		return e.Error()
 	}

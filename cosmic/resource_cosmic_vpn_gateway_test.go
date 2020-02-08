@@ -89,12 +89,10 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   vpc_offering   = "%s"
   network_domain = "terraform-domain"
-  zone           = "%s"
 }
 
 resource "cosmic_vpn_gateway" "foo" {
   vpc_id = "${cosmic_vpc.foo.id}"
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 )

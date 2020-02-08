@@ -91,14 +91,12 @@ resource "cosmic_vpc" "foo" {
   name         = "terraform-vpc-foo"
   cidr         = "10.0.10.0/22"
   vpc_offering = "%s"
-  zone         = "%s"
 }
 
 resource "cosmic_vpc" "bar" {
   name         = "terraform-vpc-bar"
   cidr         = "10.0.20.0/22"
   vpc_offering = "%s"
-  zone         = "%s"
 }
 
 resource "cosmic_vpn_gateway" "foo" {
@@ -138,9 +136,7 @@ resource "cosmic_vpn_connection" "bar-foo" {
 }
 `,
 		COSMIC_VPC_OFFERING,
-		COSMIC_ZONE,
 		COSMIC_VPC_OFFERING,
-		COSMIC_ZONE,
 		rand,
 		rand,
 	)

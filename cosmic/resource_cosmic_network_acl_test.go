@@ -79,7 +79,7 @@ func testAccCheckCosmicNetworkACLExists(n string, id *string, acl *cosmic.Networ
 			*id = rs.Primary.ID
 		}
 
-		client := testAccProvider.Meta().(*cosmic.CosmicClient)
+		client := testAccProvider.Meta().(*CosmicClient)
 		acllist, count, err := client.NetworkACL.GetNetworkACLListByID(rs.Primary.ID)
 		if err != nil {
 			return err
@@ -116,7 +116,7 @@ func testAccCheckCosmicNetworkACLBasicAttributes(acl *cosmic.NetworkACLList, wan
 }
 
 func testAccCheckCosmicNetworkACLDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_network_acl" {
@@ -144,7 +144,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   vpc_offering   = "%s"
   network_domain = "terraform-domain"
-  zone           = "%s"
 }
 
 resource "cosmic_network_acl" "foo" {
@@ -153,7 +152,6 @@ resource "cosmic_network_acl" "foo" {
   vpc_id      = "${cosmic_vpc.foo.id}"
 }`,
 		COSMIC_VPC_OFFERING,
-		COSMIC_ZONE,
 		attr.Name,
 		attr.Description,
 	)
