@@ -113,4 +113,5 @@ resource "cosmic_private_gateway" "foo" {
   vpc_id     = "${cosmic_network_acl.foo.vpc_id}"
 }`,
 	COSMIC_ZONE,
-	COSMIC_VPC_ID)
+	COSMIC_VPC_ID,
+)

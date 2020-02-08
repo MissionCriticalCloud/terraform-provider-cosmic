@@ -33,9 +33,9 @@ func TestAccCosmicIPAddress_basic(t *testing.T) {
 	})
 }
 
-func testAccCheckCosmicIPAddressExists(
-	n string, ipaddr *cosmic.PublicIpAddress) resource.TestCheckFunc {
+func testAccCheckCosmicIPAddressExists(n string, ipaddr *cosmic.PublicIpAddress) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
+
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
@@ -62,8 +62,7 @@ func testAccCheckCosmicIPAddressExists(
 	}
 }
 
-func testAccCheckCosmicIPAddressAttributes(
-	ipaddr *cosmic.PublicIpAddress) resource.TestCheckFunc {
+func testAccCheckCosmicIPAddressAttributes(ipaddr *cosmic.PublicIpAddress) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		for _, rs := range s.RootModule().Resources {

@@ -15,6 +15,7 @@ func TestAccCosmicNetworkACL_basic(t *testing.T) {
 	}
 
 	var acl cosmic.NetworkACLList
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -32,9 +33,9 @@ func TestAccCosmicNetworkACL_basic(t *testing.T) {
 	})
 }
 
-func testAccCheckCosmicNetworkACLExists(
-	n string, acl *cosmic.NetworkACLList) resource.TestCheckFunc {
+func testAccCheckCosmicNetworkACLExists(n string, acl *cosmic.NetworkACLList) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
+
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
@@ -60,8 +61,7 @@ func testAccCheckCosmicNetworkACLExists(
 	}
 }
 
-func testAccCheckCosmicNetworkACLBasicAttributes(
-	acl *cosmic.NetworkACLList) resource.TestCheckFunc {
+func testAccCheckCosmicNetworkACLBasicAttributes(acl *cosmic.NetworkACLList) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		if acl.Name != "terraform-acl" {
@@ -102,4 +102,6 @@ resource "cosmic_network_acl" "foo" {
   name        = "terraform-acl"
   description = "terraform-acl-text"
   vpc_id      = "%s"
-}`, COSMIC_VPC_ID)
+}`,
+	COSMIC_VPC_ID,
+)

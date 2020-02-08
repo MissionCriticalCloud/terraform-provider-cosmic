@@ -34,9 +34,9 @@ func TestAccCosmicVPNConnection_basic(t *testing.T) {
 	})
 }
 
-func testAccCheckCosmicVPNConnectionExists(
-	n string, vpnConnection *cosmic.VpnConnection) resource.TestCheckFunc {
+func testAccCheckCosmicVPNConnectionExists(n string, vpnConnection *cosmic.VpnConnection) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
+
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
@@ -137,4 +137,5 @@ resource "cosmic_vpn_connection" "bar-foo" {
 	COSMIC_VPC_OFFERING,
 	COSMIC_ZONE,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE)
+	COSMIC_ZONE,
+)

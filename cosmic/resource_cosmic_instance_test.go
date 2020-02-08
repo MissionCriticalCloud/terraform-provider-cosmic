@@ -246,9 +246,9 @@ func TestAccCosmicInstance_import(t *testing.T) {
 	})
 }
 
-func testAccCheckCosmicInstanceExists(
-	n string, instance *cosmic.VirtualMachine) resource.TestCheckFunc {
+func testAccCheckCosmicInstanceExists(n string, instance *cosmic.VirtualMachine) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
+
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
@@ -275,8 +275,7 @@ func testAccCheckCosmicInstanceExists(
 	}
 }
 
-func testAccCheckCosmicInstanceAttributes(
-	instance *cosmic.VirtualMachine) resource.TestCheckFunc {
+func testAccCheckCosmicInstanceAttributes(instance *cosmic.VirtualMachine) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		if instance.Name != "terraform-test" {
@@ -309,8 +308,7 @@ func testAccCheckCosmicInstanceAttributes(
 	}
 }
 
-func testAccCheckCosmicInstanceRenamedAndResized(
-	instance *cosmic.VirtualMachine) resource.TestCheckFunc {
+func testAccCheckCosmicInstanceRenamedAndResized(instance *cosmic.VirtualMachine) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		if instance.Name != "terraform-updated" {
@@ -374,7 +372,8 @@ resource "cosmic_instance" "foo" {
 	COSMIC_VPC_ID,
 	COSMIC_ZONE,
 	COSMIC_SERVICE_OFFERING_1,
-	COSMIC_TEMPLATE)
+	COSMIC_TEMPLATE,
+)
 
 var testAccCosmicInstance_renameAndResize = fmt.Sprintf(`
 resource "cosmic_network" "foo" {
@@ -400,7 +399,8 @@ resource "cosmic_instance" "foo" {
 	COSMIC_VPC_ID,
 	COSMIC_ZONE,
 	COSMIC_SERVICE_OFFERING_2,
-	COSMIC_TEMPLATE)
+	COSMIC_TEMPLATE,
+)
 
 var testAccCosmicInstance_diskController = fmt.Sprintf(`
 resource "cosmic_instance" "foo" {
@@ -443,7 +443,8 @@ resource "cosmic_instance" "foo" {
 	COSMIC_VPC_ID,
 	COSMIC_ZONE,
 	COSMIC_SERVICE_OFFERING_1,
-	COSMIC_TEMPLATE)
+	COSMIC_TEMPLATE,
+)
 
 var testAccCosmicInstance_keyPair = fmt.Sprintf(`
 resource "cosmic_ssh_keypair" "foo" {
@@ -474,4 +475,5 @@ resource "cosmic_instance" "foo" {
 	COSMIC_VPC_ID,
 	COSMIC_ZONE,
 	COSMIC_SERVICE_OFFERING_1,
-	COSMIC_TEMPLATE)
+	COSMIC_TEMPLATE,
+)

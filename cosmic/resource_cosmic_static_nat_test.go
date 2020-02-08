@@ -45,9 +45,9 @@ func TestAccCosmicStaticNAT_basic(t *testing.T) {
 	})
 }
 
-func testAccCheckCosmicStaticNATExists(
-	n string, ipaddr *cosmic.PublicIpAddress) resource.TestCheckFunc {
+func testAccCheckCosmicStaticNATExists(n string, ipaddr *cosmic.PublicIpAddress) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
+
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)

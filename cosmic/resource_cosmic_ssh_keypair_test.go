@@ -81,8 +81,7 @@ func testAccCheckCosmicSSHKeyPairExists(n string, sshkey *cosmic.SSHKeyPair) res
 	}
 }
 
-func testAccCheckCosmicSSHKeyPairAttributes(
-	keypair *cosmic.SSHKeyPair) resource.TestCheckFunc {
+func testAccCheckCosmicSSHKeyPairAttributes(keypair *cosmic.SSHKeyPair) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		fpLen := len(keypair.Fingerprint)
@@ -164,7 +163,9 @@ var testAccCosmicSSHKeyPair_register = fmt.Sprintf(`
 resource "cosmic_ssh_keypair" "foo" {
   name       = "terraform-test-keypair"
   public_key = "%s"
-}`, publicKey)
+}`,
+	publicKey,
+)
 
 const publicKey = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPcjvm/QSl+dtYa1RFWqJfDZcr5GMxegiPjefHz" +
 	"57zvTn/FXN4V5V5pS2nmmEfztm3TLEVSCA6kRWJHFf5A9cSAqc/NqGX5qb8J8wbuLzdKA+LvMfru3HoUeWrBPgzMu2rb" +

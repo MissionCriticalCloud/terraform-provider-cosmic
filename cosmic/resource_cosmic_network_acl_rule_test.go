@@ -359,7 +359,9 @@ resource "cosmic_network_acl_rule" "foo" {
     ports        = ["80", "443"]
     traffic_type = "ingress"
   }
-}`, COSMIC_VPC_ID)
+}`,
+	COSMIC_VPC_ID,
+)
 
 var testAccCosmicNetworkACLRule_update = fmt.Sprintf(`
 resource "cosmic_network_acl" "foo" {
@@ -409,4 +411,6 @@ resource "cosmic_network_acl_rule" "foo" {
     ports        = ["80", "1000-2000"]
     traffic_type = "egress"
   }
-}`, COSMIC_VPC_ID)
+}`,
+	COSMIC_VPC_ID,
+)

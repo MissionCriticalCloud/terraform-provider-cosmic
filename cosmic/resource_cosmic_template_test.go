@@ -60,9 +60,9 @@ func TestAccCosmicTemplate_update(t *testing.T) {
 	})
 }
 
-func testAccCheckCosmicTemplateExists(
-	n string, template *cosmic.Template) resource.TestCheckFunc {
+func testAccCheckCosmicTemplateExists(n string, template *cosmic.Template) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
+
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
@@ -89,8 +89,7 @@ func testAccCheckCosmicTemplateExists(
 	}
 }
 
-func testAccCheckCosmicTemplateBasicAttributes(
-	template *cosmic.Template) resource.TestCheckFunc {
+func testAccCheckCosmicTemplateBasicAttributes(template *cosmic.Template) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		if template.Name != "terraform-test" {
@@ -117,8 +116,7 @@ func testAccCheckCosmicTemplateBasicAttributes(
 	}
 }
 
-func testAccCheckCosmicTemplateUpdatedAttributes(
-	template *cosmic.Template) resource.TestCheckFunc {
+func testAccCheckCosmicTemplateUpdatedAttributes(template *cosmic.Template) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		if template.Displaytext != "terraform-updated" {
@@ -166,7 +164,9 @@ resource "cosmic_template" "foo" {
   os_type    = "Other PV (64-bit)"
   url        = "http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2"
   zone       = "%s"
-}`, COSMIC_ZONE)
+}`,
+	COSMIC_ZONE,
+)
 
 var testAccCosmicTemplate_update = fmt.Sprintf(`
 resource "cosmic_template" "foo" {
@@ -179,4 +179,6 @@ resource "cosmic_template" "foo" {
   zone                    = "%s"
   is_dynamically_scalable = true
   password_enabled        = true
-}`, COSMIC_ZONE)
+}`,
+	COSMIC_ZONE,
+)

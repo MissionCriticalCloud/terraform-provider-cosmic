@@ -361,10 +361,9 @@ func isAttached(d *schema.ResourceData, meta interface{}) (bool, error) {
 	return v.Attached != "", nil
 }
 
-func retryableAttachVolumeFunc(
-	cs *cosmic.CosmicClient,
-	p *cosmic.AttachVolumeParams) func() (interface{}, error) {
+func retryableAttachVolumeFunc(cs *cosmic.CosmicClient, p *cosmic.AttachVolumeParams) func() (interface{}, error) {
 	return func() (interface{}, error) {
+
 		r, err := cs.Volume.AttachVolume(p)
 		if err != nil {
 			return nil, err

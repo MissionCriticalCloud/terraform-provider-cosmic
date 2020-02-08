@@ -35,9 +35,9 @@ func TestAccCosmicVPC_basic(t *testing.T) {
 	})
 }
 
-func testAccCheckCosmicVPCExists(
-	n string, vpc *cosmic.VPC) resource.TestCheckFunc {
+func testAccCheckCosmicVPCExists(n string, vpc *cosmic.VPC) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
+
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
@@ -64,8 +64,7 @@ func testAccCheckCosmicVPCExists(
 	}
 }
 
-func testAccCheckCosmicVPCAttributes(
-	vpc *cosmic.VPC) resource.TestCheckFunc {
+func testAccCheckCosmicVPCAttributes(vpc *cosmic.VPC) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		if vpc.Name != "terraform-vpc" {
@@ -119,4 +118,5 @@ resource "cosmic_vpc" "foo" {
   zone           = "%s"
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE)
+	COSMIC_ZONE,
+)

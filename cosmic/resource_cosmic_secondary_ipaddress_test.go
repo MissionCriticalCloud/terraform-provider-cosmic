@@ -78,9 +78,9 @@ func TestAccCosmicSecondaryIPAddress_import(t *testing.T) {
 	})
 }
 
-func testAccCheckCosmicSecondaryIPAddressExists(
-	n string, ip *cosmic.AddIpToNicResponse) resource.TestCheckFunc {
+func testAccCheckCosmicSecondaryIPAddressExists(n string, ip *cosmic.AddIpToNicResponse) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
+
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
@@ -148,8 +148,7 @@ func testAccCheckCosmicSecondaryIPAddressExists(
 	}
 }
 
-func testAccCheckCosmicSecondaryIPAddressAttributes(
-	ip *cosmic.AddIpToNicResponse) resource.TestCheckFunc {
+func testAccCheckCosmicSecondaryIPAddressAttributes(ip *cosmic.AddIpToNicResponse) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		if ip.Ipaddress != "10.0.8.10" {
@@ -231,11 +230,13 @@ var testAccCosmicSecondaryIPAddress_basic = fmt.Sprintf(`
 resource "cosmic_secondary_ipaddress" "foo" {
   virtual_machine_id = "%s"
 }`,
-	COSMIC_INSTANCE_ID)
+	COSMIC_INSTANCE_ID,
+)
 
 var testAccCosmicSecondaryIPAddress_fixedIP = fmt.Sprintf(`
 resource "cosmic_secondary_ipaddress" "foo" {
   ip_address         = "10.0.8.10"
   virtual_machine_id = "%s"
 }`,
-	COSMIC_INSTANCE_ID)
+	COSMIC_INSTANCE_ID,
+)

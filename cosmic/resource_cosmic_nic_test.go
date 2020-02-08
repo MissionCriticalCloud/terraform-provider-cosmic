@@ -93,9 +93,9 @@ func TestAccCosmicNIC_update(t *testing.T) {
 	})
 }
 
-func testAccCheckCosmicNICExists(
-	v, n string, nic *cosmic.Nic) resource.TestCheckFunc {
+func testAccCheckCosmicNICExists(v, n string, nic *cosmic.Nic) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
+
 		rsv, ok := s.RootModule().Resources[v]
 		if !ok {
 			return fmt.Errorf("Not found: %s", v)
@@ -132,8 +132,7 @@ func testAccCheckCosmicNICExists(
 	}
 }
 
-func testAccCheckCosmicNICAttributes(
-	nic *cosmic.Nic) resource.TestCheckFunc {
+func testAccCheckCosmicNICAttributes(nic *cosmic.Nic) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		if nic.Networkname != "terraform-network-bar" {
@@ -144,8 +143,7 @@ func testAccCheckCosmicNICAttributes(
 	}
 }
 
-func testAccCheckCosmicNICIPAddress(
-	nic *cosmic.Nic) resource.TestCheckFunc {
+func testAccCheckCosmicNICIPAddress(nic *cosmic.Nic) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		if nic.Networkname != "terraform-network-bar" {
@@ -219,7 +217,8 @@ resource "cosmic_nic" "bar" {
 	COSMIC_VPC_ID,
 	COSMIC_ZONE,
 	COSMIC_SERVICE_OFFERING_1,
-	COSMIC_TEMPLATE)
+	COSMIC_TEMPLATE,
+)
 
 var testAccCosmicNIC_ipaddress = fmt.Sprintf(`
 resource "cosmic_network" "foo" {
@@ -259,4 +258,5 @@ resource "cosmic_nic" "bar" {
 	COSMIC_VPC_ID,
 	COSMIC_ZONE,
 	COSMIC_SERVICE_OFFERING_1,
-	COSMIC_TEMPLATE)
+	COSMIC_TEMPLATE,
+)

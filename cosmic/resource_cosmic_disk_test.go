@@ -239,9 +239,9 @@ func TestAccCosmicDisk_attachDiskController(t *testing.T) {
 	})
 }
 
-func testAccCheckCosmicDiskExists(
-	n string, disk *cosmic.Volume) resource.TestCheckFunc {
+func testAccCheckCosmicDiskExists(n string, disk *cosmic.Volume) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
+
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
@@ -268,8 +268,7 @@ func testAccCheckCosmicDiskExists(
 	}
 }
 
-func testAccCheckCosmicDiskAttributes(
-	disk *cosmic.Volume) resource.TestCheckFunc {
+func testAccCheckCosmicDiskAttributes(disk *cosmic.Volume) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		if disk.Name != "terraform-disk" {
@@ -314,7 +313,8 @@ resource "cosmic_disk" "foo" {
   zone          = "%s"
 }`,
 	COSMIC_DISK_OFFERING_1,
-	COSMIC_ZONE)
+	COSMIC_ZONE,
+)
 
 var testAccCosmicDisk_update = fmt.Sprintf(`
 resource "cosmic_disk" "foo" {
@@ -325,7 +325,8 @@ resource "cosmic_disk" "foo" {
   zone          = "%s"
 }`,
 	COSMIC_DISK_OFFERING_1,
-	COSMIC_ZONE)
+	COSMIC_ZONE,
+)
 
 var testAccCosmicDisk_diskController = fmt.Sprintf(`
 resource "cosmic_disk" "foo" {
@@ -337,7 +338,8 @@ resource "cosmic_disk" "foo" {
   zone            = "%s"
 }`,
 	COSMIC_DISK_OFFERING_1,
-	COSMIC_ZONE)
+	COSMIC_ZONE,
+)
 
 var testAccCosmicDisk_attachBasic = fmt.Sprintf(`
 resource "cosmic_instance" "foo" {
@@ -362,7 +364,8 @@ resource "cosmic_disk" "foo" {
 	COSMIC_VPC_NETWORK_ID,
 	COSMIC_TEMPLATE,
 	COSMIC_ZONE,
-	COSMIC_DISK_OFFERING_1)
+	COSMIC_DISK_OFFERING_1,
+)
 
 var testAccCosmicDisk_attachDiskController = fmt.Sprintf(`
 resource "cosmic_instance" "foo" {
@@ -388,7 +391,8 @@ resource "cosmic_disk" "foo" {
 	COSMIC_VPC_NETWORK_ID,
 	COSMIC_TEMPLATE,
 	COSMIC_ZONE,
-	COSMIC_DISK_OFFERING_1)
+	COSMIC_DISK_OFFERING_1,
+)
 
 var testAccCosmicDisk_attachDeviceID = fmt.Sprintf(`
 resource "cosmic_instance" "foo" {
@@ -414,7 +418,8 @@ resource "cosmic_disk" "foo" {
 	COSMIC_VPC_NETWORK_ID,
 	COSMIC_TEMPLATE,
 	COSMIC_ZONE,
-	COSMIC_DISK_OFFERING_1)
+	COSMIC_DISK_OFFERING_1,
+)
 
 var testAccCosmicDisk_attachUpdate = fmt.Sprintf(`
 resource "cosmic_instance" "foo" {
@@ -439,4 +444,5 @@ resource "cosmic_disk" "foo" {
 	COSMIC_VPC_NETWORK_ID,
 	COSMIC_TEMPLATE,
 	COSMIC_ZONE,
-	COSMIC_DISK_OFFERING_1)
+	COSMIC_DISK_OFFERING_1,
+)

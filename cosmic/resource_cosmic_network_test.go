@@ -162,9 +162,9 @@ func TestAccCosmicNetwork_updateACL(t *testing.T) {
 	})
 }
 
-func testAccCheckCosmicNetworkExists(
-	n string, network *cosmic.Network) resource.TestCheckFunc {
+func testAccCheckCosmicNetworkExists(n string, network *cosmic.Network) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
+
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
@@ -256,7 +256,8 @@ resource "cosmic_network" "foo" {
 }`,
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_VPC_ID,
-	COSMIC_ZONE)
+	COSMIC_ZONE,
+)
 
 var testAccCosmicNetwork_update = fmt.Sprintf(`
 resource "cosmic_network" "foo" {
@@ -274,7 +275,8 @@ resource "cosmic_network" "foo" {
 }`,
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_VPC_ID,
-	COSMIC_ZONE)
+	COSMIC_ZONE,
+)
 
 var testAccCosmicNetwork_dns = fmt.Sprintf(`
 resource "cosmic_network" "foo" {
@@ -292,7 +294,8 @@ resource "cosmic_network" "foo" {
 }`,
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_VPC_ID,
-	COSMIC_ZONE)
+	COSMIC_ZONE,
+)
 
 var testAccCosmicNetwork_acl = fmt.Sprintf(`
 resource "cosmic_network_acl" "foo" {
@@ -311,7 +314,8 @@ resource "cosmic_network" "foo" {
 }`,
 	COSMIC_VPC_ID,
 	COSMIC_VPC_NETWORK_OFFERING,
-	COSMIC_ZONE)
+	COSMIC_ZONE,
+)
 
 var testAccCosmicNetwork_updateACL = fmt.Sprintf(`
 resource "cosmic_network_acl" "bar" {
@@ -330,4 +334,5 @@ resource "cosmic_network" "foo" {
 }`,
 	COSMIC_VPC_ID,
 	COSMIC_VPC_NETWORK_OFFERING,
-	COSMIC_ZONE)
+	COSMIC_ZONE,
+)

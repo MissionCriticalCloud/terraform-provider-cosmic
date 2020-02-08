@@ -32,9 +32,9 @@ func TestAccCosmicVPNGateway_basic(t *testing.T) {
 	})
 }
 
-func testAccCheckCosmicVPNGatewayExists(
-	n string, vpnGateway *cosmic.VpnGateway) resource.TestCheckFunc {
+func testAccCheckCosmicVPNGatewayExists(n string, vpnGateway *cosmic.VpnGateway) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
+
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
@@ -85,4 +85,6 @@ func testAccCheckCosmicVPNGatewayDestroy(s *terraform.State) error {
 var testAccCosmicVPNGateway_basic = fmt.Sprintf(`
 resource "cosmic_vpn_gateway" "foo" {
   vpc_id = "%s"
-}`, COSMIC_VPC_ID)
+}`,
+	COSMIC_VPC_ID,
+)

@@ -33,9 +33,9 @@ func TestAccCosmicStaticRoute_basic(t *testing.T) {
 	})
 }
 
-func testAccCheckCosmicStaticRouteExists(
-	n string, route *cosmic.StaticRoute) resource.TestCheckFunc {
+func testAccCheckCosmicStaticRouteExists(n string, route *cosmic.StaticRoute) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
+
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
@@ -62,8 +62,7 @@ func testAccCheckCosmicStaticRouteExists(
 	}
 }
 
-func testAccCheckCosmicStaticRouteAttributes(
-	route *cosmic.StaticRoute) resource.TestCheckFunc {
+func testAccCheckCosmicStaticRouteAttributes(route *cosmic.StaticRoute) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		if route.Cidr != "172.16.0.0/16" {
@@ -100,4 +99,6 @@ resource "cosmic_static_route" "foo" {
   cidr    = "172.16.0.0/16"
   nexthop = "10.0.252.1"
   vpc_id  = "%s"
-}`, COSMIC_VPC_ID)
+}`,
+	COSMIC_VPC_ID,
+)

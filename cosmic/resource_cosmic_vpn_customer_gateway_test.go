@@ -41,9 +41,9 @@ func TestAccCosmicVPNCustomerGateway_basic(t *testing.T) {
 	})
 }
 
-func testAccCheckCosmicVPNCustomerGatewayExists(
-	n string, vpnCustomerGateway *cosmic.VpnCustomerGateway) resource.TestCheckFunc {
+func testAccCheckCosmicVPNCustomerGatewayExists(n string, vpnCustomerGateway *cosmic.VpnCustomerGateway) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
+
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
@@ -70,8 +70,7 @@ func testAccCheckCosmicVPNCustomerGatewayExists(
 	}
 }
 
-func testAccCheckCosmicVPNCustomerGatewayAttributes(
-	vpnCustomerGateway *cosmic.VpnCustomerGateway) resource.TestCheckFunc {
+func testAccCheckCosmicVPNCustomerGatewayAttributes(vpnCustomerGateway *cosmic.VpnCustomerGateway) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		if vpnCustomerGateway.Esppolicy != "aes256-sha1" {
@@ -154,4 +153,5 @@ resource "cosmic_vpn_customer_gateway" "bar" {
 	COSMIC_VPC_OFFERING,
 	COSMIC_ZONE,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE)
+	COSMIC_ZONE,
+)
