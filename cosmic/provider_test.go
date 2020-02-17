@@ -66,10 +66,7 @@ func testAccPreCheck(t *testing.T) {
 }
 
 // Name of a valid disk offering
-var COSMIC_DISK_OFFERING_1 = os.Getenv("COSMIC_DISK_OFFERING_1")
-
-// Name of a disk offering that COSMIC_DISK_OFFERING_1 can resize to
-var COSMIC_DISK_OFFERING_2 = os.Getenv("COSMIC_DISK_OFFERING_2")
+var COSMIC_DISK_OFFERING = os.Getenv("COSMIC_DISK_OFFERING")
 
 // Name of a valid service offering
 var COSMIC_SERVICE_OFFERING_1 = os.Getenv("COSMIC_SERVICE_OFFERING_1")

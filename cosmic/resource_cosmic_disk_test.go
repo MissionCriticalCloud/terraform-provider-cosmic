@@ -10,8 +10,8 @@ import (
 )
 
 func TestAccCosmicDisk_basic(t *testing.T) {
-	if COSMIC_DISK_OFFERING_1 == "" {
-		t.Skip("This test requires an existing disk offering (set it by exporting COSMIC_DISK_OFFERING_1)")
+	if COSMIC_DISK_OFFERING == "" {
+		t.Skip("This test requires an existing disk offering (set it by exporting COSMIC_DISK_OFFERING)")
 	}
 
 	var disk cosmic.Volume
@@ -34,8 +34,8 @@ func TestAccCosmicDisk_basic(t *testing.T) {
 }
 
 func TestAccCosmicDisk_update(t *testing.T) {
-	if COSMIC_DISK_OFFERING_1 == "" {
-		t.Skip("This test requires an existing disk offering (set it by exporting COSMIC_DISK_OFFERING_1)")
+	if COSMIC_DISK_OFFERING == "" {
+		t.Skip("This test requires an existing disk offering (set it by exporting COSMIC_DISK_OFFERING)")
 	}
 
 	var disk cosmic.Volume
@@ -70,8 +70,8 @@ func TestAccCosmicDisk_update(t *testing.T) {
 }
 
 func TestAccCosmicDisk_attachBasic(t *testing.T) {
-	if COSMIC_DISK_OFFERING_1 == "" {
-		t.Skip("This test requires an existing disk offering (set it by exporting COSMIC_DISK_OFFERING_1)")
+	if COSMIC_DISK_OFFERING == "" {
+		t.Skip("This test requires an existing disk offering (set it by exporting COSMIC_DISK_OFFERING)")
 	}
 
 	if COSMIC_SERVICE_OFFERING_1 == "" {
@@ -110,8 +110,8 @@ func TestAccCosmicDisk_attachBasic(t *testing.T) {
 }
 
 func TestAccCosmicDisk_attachUpdate(t *testing.T) {
-	if COSMIC_DISK_OFFERING_1 == "" {
-		t.Skip("This test requires an existing disk offering (set it by exporting COSMIC_DISK_OFFERING_1)")
+	if COSMIC_DISK_OFFERING == "" {
+		t.Skip("This test requires an existing disk offering (set it by exporting COSMIC_DISK_OFFERING)")
 	}
 
 	if COSMIC_SERVICE_OFFERING_1 == "" {
@@ -162,8 +162,8 @@ func TestAccCosmicDisk_attachUpdate(t *testing.T) {
 }
 
 func TestAccCosmicDisk_attachDeviceID(t *testing.T) {
-	if COSMIC_DISK_OFFERING_1 == "" {
-		t.Skip("This test requires an existing disk offering (set it by exporting COSMIC_DISK_OFFERING_1)")
+	if COSMIC_DISK_OFFERING == "" {
+		t.Skip("This test requires an existing disk offering (set it by exporting COSMIC_DISK_OFFERING)")
 	}
 
 	if COSMIC_SERVICE_OFFERING_1 == "" {
@@ -204,8 +204,8 @@ func TestAccCosmicDisk_attachDeviceID(t *testing.T) {
 }
 
 func TestAccCosmicDisk_diskController(t *testing.T) {
-	if COSMIC_DISK_OFFERING_1 == "" {
-		t.Skip("This test requires an existing disk offering (set it by exporting COSMIC_DISK_OFFERING_1)")
+	if COSMIC_DISK_OFFERING == "" {
+		t.Skip("This test requires an existing disk offering (set it by exporting COSMIC_DISK_OFFERING)")
 	}
 
 	var disk cosmic.Volume
@@ -230,8 +230,8 @@ func TestAccCosmicDisk_diskController(t *testing.T) {
 }
 
 func TestAccCosmicDisk_attachDiskController(t *testing.T) {
-	if COSMIC_DISK_OFFERING_1 == "" {
-		t.Skip("This test requires an existing disk offering (set it by exporting COSMIC_DISK_OFFERING_1)")
+	if COSMIC_DISK_OFFERING == "" {
+		t.Skip("This test requires an existing disk offering (set it by exporting COSMIC_DISK_OFFERING)")
 	}
 
 	if COSMIC_SERVICE_OFFERING_1 == "" {
@@ -307,7 +307,7 @@ func testAccCheckCosmicDiskAttributes(disk *cosmic.Volume) resource.TestCheckFun
 			return fmt.Errorf("Bad name: %s", disk.Name)
 		}
 
-		if disk.Diskofferingname != COSMIC_DISK_OFFERING_1 {
+		if disk.Diskofferingname != COSMIC_DISK_OFFERING {
 			return fmt.Errorf("Bad disk offering: %s", disk.Diskofferingname)
 		}
 
@@ -344,7 +344,7 @@ resource "cosmic_disk" "foo" {
   disk_offering = "%s"
   zone          = "%s"
 }`,
-	COSMIC_DISK_OFFERING_1,
+	COSMIC_DISK_OFFERING,
 	COSMIC_ZONE,
 )
 
@@ -356,7 +356,7 @@ resource "cosmic_disk" "foo" {
   disk_offering = "%s"
   zone          = "%s"
 }`,
-	COSMIC_DISK_OFFERING_1,
+	COSMIC_DISK_OFFERING,
 	COSMIC_ZONE,
 )
 
@@ -369,7 +369,7 @@ resource "cosmic_disk" "foo" {
   disk_controller = "SCSI"
   zone            = "%s"
 }`,
-	COSMIC_DISK_OFFERING_1,
+	COSMIC_DISK_OFFERING,
 	COSMIC_ZONE,
 )
 
@@ -415,7 +415,7 @@ resource "cosmic_disk" "foo" {
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE,
-	COSMIC_DISK_OFFERING_1,
+	COSMIC_DISK_OFFERING,
 )
 
 var testAccCosmicDisk_attachDiskController = fmt.Sprintf(`
@@ -461,7 +461,7 @@ resource "cosmic_disk" "foo" {
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE,
-	COSMIC_DISK_OFFERING_1,
+	COSMIC_DISK_OFFERING,
 )
 
 var testAccCosmicDisk_attachDeviceID = fmt.Sprintf(`
@@ -507,7 +507,7 @@ resource "cosmic_disk" "foo" {
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE,
-	COSMIC_DISK_OFFERING_1,
+	COSMIC_DISK_OFFERING,
 )
 
 var testAccCosmicDisk_attachUpdate = fmt.Sprintf(`
@@ -552,5 +552,5 @@ resource "cosmic_disk" "foo" {
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE,
-	COSMIC_DISK_OFFERING_1,
+	COSMIC_DISK_OFFERING,
 )
