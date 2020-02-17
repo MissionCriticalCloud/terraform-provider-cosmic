@@ -12,7 +12,7 @@ import (
 func TestAccCosmicTemplate_basic(t *testing.T) {
 	var template cosmic.Template
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicTemplateDestroy,
@@ -33,7 +33,7 @@ func TestAccCosmicTemplate_basic(t *testing.T) {
 func TestAccCosmicTemplate_update(t *testing.T) {
 	var template cosmic.Template
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicTemplateDestroy,

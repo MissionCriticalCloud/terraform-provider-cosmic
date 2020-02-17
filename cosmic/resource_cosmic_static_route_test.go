@@ -10,13 +10,13 @@ import (
 )
 
 func TestAccCosmicStaticRoute_basic(t *testing.T) {
-	if COSMIC_VPC_ID == "" {
-		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	if COSMIC_VPC_OFFERING == "" {
+		t.Skip("This test requires an existing VPC offering (set it by exporting COSMIC_VPC_OFFERING)")
 	}
 
 	var route cosmic.StaticRoute
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicStaticRouteDestroy,
@@ -95,10 +95,20 @@ func testAccCheckCosmicStaticRouteDestroy(s *terraform.State) error {
 }
 
 var testAccCosmicStaticRoute_basic = fmt.Sprintf(`
+resource "cosmic_vpc" "foo" {
+  name           = "terraform-vpc"
+  display_text   = "terraform-vpc"
+  cidr           = "10.0.10.0/22"
+  network_domain = "terraform-domain"
+  vpc_offering   = "%s"
+  zone           = "%s"
+}
+
 resource "cosmic_static_route" "foo" {
   cidr    = "172.16.0.0/16"
   nexthop = "10.0.252.1"
-  vpc_id  = "%s"
+  vpc_id  = "${cosmic_vpc.foo.id}"
 }`,
-	COSMIC_VPC_ID,
+	COSMIC_VPC_OFFERING,
+	COSMIC_ZONE,
 )

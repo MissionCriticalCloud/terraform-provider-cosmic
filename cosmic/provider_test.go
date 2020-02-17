@@ -71,20 +71,11 @@ var COSMIC_DISK_OFFERING_1 = os.Getenv("COSMIC_DISK_OFFERING_1")
 // Name of a disk offering that COSMIC_DISK_OFFERING_1 can resize to
 var COSMIC_DISK_OFFERING_2 = os.Getenv("COSMIC_DISK_OFFERING_2")
 
-// ID of an existing instance
-var COSMIC_INSTANCE_ID = os.Getenv("COSMIC_INSTANCE_ID")
-
 // Name of a valid service offering
 var COSMIC_SERVICE_OFFERING_1 = os.Getenv("COSMIC_SERVICE_OFFERING_1")
 
 // Name of a service offering that COSMIC_SERVICE_OFFERING_1 can resize to
 var COSMIC_SERVICE_OFFERING_2 = os.Getenv("COSMIC_SERVICE_OFFERING_2")
-
-// ID of an existing VPC
-var COSMIC_VPC_ID = os.Getenv("COSMIC_VPC_ID")
-
-// ID of an existing VPC network
-var COSMIC_VPC_NETWORK_ID = os.Getenv("COSMIC_VPC_NETWORK_ID")
 
 // An available VPC offering
 var COSMIC_VPC_OFFERING = os.Getenv("COSMIC_VPC_OFFERING")

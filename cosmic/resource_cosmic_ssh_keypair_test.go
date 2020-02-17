@@ -13,7 +13,7 @@ import (
 func TestAccCosmicSSHKeyPair_basic(t *testing.T) {
 	var sshkey cosmic.SSHKeyPair
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicSSHKeyPairDestroy,
@@ -33,7 +33,7 @@ func TestAccCosmicSSHKeyPair_basic(t *testing.T) {
 func TestAccCosmicSSHKeyPair_register(t *testing.T) {
 	var sshkey cosmic.SSHKeyPair
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicSSHKeyPairDestroy,
@@ -161,7 +161,7 @@ resource "cosmic_ssh_keypair" "foo" {
 
 var testAccCosmicSSHKeyPair_register = fmt.Sprintf(`
 resource "cosmic_ssh_keypair" "foo" {
-  name       = "terraform-test-keypair"
+  name       = "terraform-test-registered-keypair"
   public_key = "%s"
 }`,
 	publicKey,

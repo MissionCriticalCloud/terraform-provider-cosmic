@@ -14,25 +14,21 @@ func TestAccCosmicInstance_basic(t *testing.T) {
 		t.Skip("This test requires an existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_1)")
 	}
 
-	if COSMIC_SERVICE_OFFERING_2 == "" {
-		t.Skip("This test requires a second existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_2)")
-	}
-
 	if COSMIC_TEMPLATE == "" {
 		t.Skip("This test requires an existing instance template (set it by exporting COSMIC_TEMPLATE)")
-	}
-
-	if COSMIC_VPC_ID == "" {
-		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
 	}
 
 	if COSMIC_VPC_NETWORK_OFFERING == "" {
 		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
 	}
 
+	if COSMIC_VPC_OFFERING == "" {
+		t.Skip("This test requires an existing VPC offering (set it by exporting COSMIC_VPC_OFFERING)")
+	}
+
 	var instance cosmic.VirtualMachine
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicInstanceDestroy,
@@ -59,24 +55,24 @@ func TestAccCosmicInstance_update(t *testing.T) {
 	}
 
 	if COSMIC_SERVICE_OFFERING_2 == "" {
-		t.Skip("This test requires a second existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_2)")
+		t.Skip("This test requires an existing second service offering (set it by exporting COSMIC_SERVICE_OFFERING_2)")
 	}
 
 	if COSMIC_TEMPLATE == "" {
 		t.Skip("This test requires an existing instance template (set it by exporting COSMIC_TEMPLATE)")
 	}
 
-	if COSMIC_VPC_ID == "" {
-		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
-	}
-
 	if COSMIC_VPC_NETWORK_OFFERING == "" {
 		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
 	}
 
+	if COSMIC_VPC_OFFERING == "" {
+		t.Skip("This test requires an existing VPC offering (set it by exporting COSMIC_VPC_OFFERING)")
+	}
+
 	var instance cosmic.VirtualMachine
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicInstanceDestroy,
@@ -119,13 +115,17 @@ func TestAccCosmicInstance_diskController(t *testing.T) {
 		t.Skip("This test requires an existing instance template (set it by exporting COSMIC_TEMPLATE)")
 	}
 
-	if COSMIC_VPC_NETWORK_ID == "" {
-		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	if COSMIC_VPC_NETWORK_OFFERING == "" {
+		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
+	}
+
+	if COSMIC_VPC_OFFERING == "" {
+		t.Skip("This test requires an existing VPC offering (set it by exporting COSMIC_VPC_OFFERING)")
 	}
 
 	var instance cosmic.VirtualMachine
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicInstanceDestroy,
@@ -149,25 +149,21 @@ func TestAccCosmicInstance_fixedIP(t *testing.T) {
 		t.Skip("This test requires an existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_1)")
 	}
 
-	if COSMIC_SERVICE_OFFERING_2 == "" {
-		t.Skip("This test requires a second existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_2)")
-	}
-
 	if COSMIC_TEMPLATE == "" {
 		t.Skip("This test requires an existing instance template (set it by exporting COSMIC_TEMPLATE)")
-	}
-
-	if COSMIC_VPC_ID == "" {
-		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
 	}
 
 	if COSMIC_VPC_NETWORK_OFFERING == "" {
 		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
 	}
 
+	if COSMIC_VPC_OFFERING == "" {
+		t.Skip("This test requires an existing VPC offering (set it by exporting COSMIC_VPC_OFFERING)")
+	}
+
 	var instance cosmic.VirtualMachine
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicInstanceDestroy,
@@ -190,25 +186,21 @@ func TestAccCosmicInstance_keyPair(t *testing.T) {
 		t.Skip("This test requires an existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_1)")
 	}
 
-	if COSMIC_SERVICE_OFFERING_2 == "" {
-		t.Skip("This test requires a second existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_2)")
-	}
-
 	if COSMIC_TEMPLATE == "" {
 		t.Skip("This test requires an existing instance template (set it by exporting COSMIC_TEMPLATE)")
-	}
-
-	if COSMIC_VPC_ID == "" {
-		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
 	}
 
 	if COSMIC_VPC_NETWORK_OFFERING == "" {
 		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
 	}
 
+	if COSMIC_VPC_OFFERING == "" {
+		t.Skip("This test requires an existing VPC offering (set it by exporting COSMIC_VPC_OFFERING)")
+	}
+
 	var instance cosmic.VirtualMachine
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicInstanceDestroy,
@@ -227,7 +219,23 @@ func TestAccCosmicInstance_keyPair(t *testing.T) {
 }
 
 func TestAccCosmicInstance_import(t *testing.T) {
-	resource.Test(t, resource.TestCase{
+	if COSMIC_SERVICE_OFFERING_1 == "" {
+		t.Skip("This test requires an existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_1)")
+	}
+
+	if COSMIC_TEMPLATE == "" {
+		t.Skip("This test requires an existing instance template (set it by exporting COSMIC_TEMPLATE)")
+	}
+
+	if COSMIC_VPC_NETWORK_OFFERING == "" {
+		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
+	}
+
+	if COSMIC_VPC_OFFERING == "" {
+		t.Skip("This test requires an existing VPC offering (set it by exporting COSMIC_VPC_OFFERING)")
+	}
+
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicInstanceDestroy,
@@ -349,13 +357,22 @@ func testAccCheckCosmicInstanceDestroy(s *terraform.State) error {
 }
 
 var testAccCosmicInstance_basic = fmt.Sprintf(`
+resource "cosmic_vpc" "foo" {
+  name           = "terraform-vpc"
+  display_text   = "terraform-vpc"
+  cidr           = "10.0.10.0/22"
+  network_domain = "terraform-domain"
+  vpc_offering   = "%s"
+  zone           = "%s"
+}
+
 resource "cosmic_network" "foo" {
   name             = "terraform-network"
   cidr             = "10.0.10.0/24"
   gateway          = "10.0.10.1"
   network_offering = "%s"
-  vpc_id           = "%s"
-  zone             = "%s"
+  vpc_id           = "${cosmic_vpc.foo.id}"
+  zone             = "${cosmic_vpc.foo.zone}"
 }
 
 resource "cosmic_instance" "foo" {
@@ -364,25 +381,34 @@ resource "cosmic_instance" "foo" {
   service_offering = "%s"
   network_id       = "${cosmic_network.foo.id}"
   template         = "%s"
-  zone             = "${cosmic_network.foo.zone}"
+  zone             = "${cosmic_vpc.foo.zone}"
   user_data        = "foobar\nfoo\nbar"
   expunge          = true
 }`,
-	COSMIC_VPC_NETWORK_OFFERING,
-	COSMIC_VPC_ID,
+	COSMIC_VPC_OFFERING,
 	COSMIC_ZONE,
+	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE,
 )
 
 var testAccCosmicInstance_renameAndResize = fmt.Sprintf(`
+resource "cosmic_vpc" "foo" {
+  name           = "terraform-vpc"
+  display_text   = "terraform-vpc"
+  cidr           = "10.0.10.0/22"
+  network_domain = "terraform-domain"
+  vpc_offering   = "%s"
+  zone           = "%s"
+}
+
 resource "cosmic_network" "foo" {
   name             = "terraform-network"
   cidr             = "10.0.10.0/24"
   gateway          = "10.0.10.1"
   network_offering = "%s"
-  vpc_id           = "%s"
-  zone             = "%s"
+  vpc_id           = "${cosmic_vpc.foo.id}"
+  zone             = "${cosmic_vpc.foo.zone}"
 }
 
 resource "cosmic_instance" "foo" {
@@ -391,42 +417,71 @@ resource "cosmic_instance" "foo" {
   service_offering = "%s"
   network_id       = "${cosmic_network.foo.id}"
   template         = "%s"
-  zone             = "${cosmic_network.foo.zone}"
+  zone             = "${cosmic_vpc.foo.zone}"
   user_data        = "foobar\nfoo\nbar"
   expunge          = true
 }`,
-	COSMIC_VPC_NETWORK_OFFERING,
-	COSMIC_VPC_ID,
+	COSMIC_VPC_OFFERING,
 	COSMIC_ZONE,
+	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_2,
 	COSMIC_TEMPLATE,
 )
 
 var testAccCosmicInstance_diskController = fmt.Sprintf(`
-resource "cosmic_instance" "foo" {
-  name             = "terraform-test"
-  display_name     = "terraform-test"
-  service_offering = "%s"
-  network_id       = "%s"
-  template         = "%s"
-  zone             = "%s"
-  disk_controller  = "SCSI"
-  user_data        = "foobar\nfoo\nbar"
-  expunge          = true
-}`,
-	COSMIC_SERVICE_OFFERING_1,
-	COSMIC_VPC_NETWORK_ID,
-	COSMIC_TEMPLATE,
-	COSMIC_ZONE)
+resource "cosmic_vpc" "foo" {
+  name           = "terraform-vpc"
+  display_text   = "terraform-vpc"
+  cidr           = "10.0.10.0/22"
+  network_domain = "terraform-domain"
+  vpc_offering   = "%s"
+  zone           = "%s"
+}
 
-var testAccCosmicInstance_fixedIP = fmt.Sprintf(`
 resource "cosmic_network" "foo" {
   name             = "terraform-network"
   cidr             = "10.0.10.0/24"
   gateway          = "10.0.10.1"
   network_offering = "%s"
-  vpc_id           = "%s"
-  zone             = "%s"
+  vpc_id           = "${cosmic_vpc.foo.id}"
+  zone             = "${cosmic_vpc.foo.zone}"
+}
+
+resource "cosmic_instance" "foo" {
+  name             = "terraform-test"
+  display_name     = "terraform-test"
+  service_offering = "%s"
+  network_id       = "${cosmic_network.foo.id}"
+  template         = "%s"
+  zone             = "${cosmic_vpc.foo.zone}"
+  disk_controller  = "SCSI"
+  user_data        = "foobar\nfoo\nbar"
+  expunge          = true
+}`,
+	COSMIC_VPC_OFFERING,
+	COSMIC_ZONE,
+	COSMIC_VPC_NETWORK_OFFERING,
+	COSMIC_SERVICE_OFFERING_1,
+	COSMIC_TEMPLATE,
+)
+
+var testAccCosmicInstance_fixedIP = fmt.Sprintf(`
+resource "cosmic_vpc" "foo" {
+  name           = "terraform-vpc"
+  display_text   = "terraform-vpc"
+  cidr           = "10.0.10.0/22"
+  network_domain = "terraform-domain"
+  vpc_offering   = "%s"
+  zone           = "%s"
+}
+
+resource "cosmic_network" "foo" {
+  name             = "terraform-network"
+  cidr             = "10.0.10.0/24"
+  gateway          = "10.0.10.1"
+  network_offering = "%s"
+  vpc_id           = "${cosmic_vpc.foo.id}"
+  zone             = "${cosmic_vpc.foo.zone}"
 }
 
 resource "cosmic_instance" "foo" {
@@ -436,19 +491,24 @@ resource "cosmic_instance" "foo" {
   network_id       = "${cosmic_network.foo.id}"
   ip_address       = "10.0.10.10"
   template         = "%s"
-  zone             = "${cosmic_network.foo.zone}"
+  zone             = "${cosmic_vpc.foo.zone}"
   expunge          = true
 }`,
-	COSMIC_VPC_NETWORK_OFFERING,
-	COSMIC_VPC_ID,
+	COSMIC_VPC_OFFERING,
 	COSMIC_ZONE,
+	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE,
 )
 
 var testAccCosmicInstance_keyPair = fmt.Sprintf(`
-resource "cosmic_ssh_keypair" "foo" {
-  name = "terraform-test-keypair"
+resource "cosmic_vpc" "foo" {
+  name           = "terraform-vpc"
+  display_text   = "terraform-vpc"
+  cidr           = "10.0.10.0/22"
+  network_domain = "terraform-domain"
+  vpc_offering   = "%s"
+  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -456,8 +516,12 @@ resource "cosmic_network" "foo" {
   cidr             = "10.0.10.0/24"
   gateway          = "10.0.10.1"
   network_offering = "%s"
-  vpc_id           = "%s"
-  zone             = "%s"
+  vpc_id           = "${cosmic_vpc.foo.id}"
+  zone             = "${cosmic_vpc.foo.zone}"
+}
+
+resource "cosmic_ssh_keypair" "foo" {
+  name = "terraform-test-keypair"
 }
 
 resource "cosmic_instance" "foo" {
@@ -467,13 +531,13 @@ resource "cosmic_instance" "foo" {
   network_id       = "${cosmic_network.foo.id}"
   ip_address       = "10.0.10.10"
   template         = "%s"
-  zone             = "${cosmic_network.foo.zone}"
+  zone             = "${cosmic_vpc.foo.zone}"
   keypair          = "${cosmic_ssh_keypair.foo.name}"
   expunge          = true
 }`,
-	COSMIC_VPC_NETWORK_OFFERING,
-	COSMIC_VPC_ID,
+	COSMIC_VPC_OFFERING,
 	COSMIC_ZONE,
+	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE,
 )

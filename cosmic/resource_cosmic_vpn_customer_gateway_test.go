@@ -10,13 +10,13 @@ import (
 )
 
 func TestAccCosmicVPNCustomerGateway_basic(t *testing.T) {
-	if COSMIC_VPC_ID == "" {
-		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	if COSMIC_VPC_OFFERING == "" {
+		t.Skip("This test requires an existing VPC offering (set it by exporting COSMIC_VPC_OFFERING)")
 	}
 
 	var vpnCustomerGateway cosmic.VpnCustomerGateway
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicVPNCustomerGatewayDestroy,

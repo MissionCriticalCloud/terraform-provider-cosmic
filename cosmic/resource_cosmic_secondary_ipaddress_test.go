@@ -10,13 +10,9 @@ import (
 )
 
 func TestAccCosmicSecondaryIPAddress_basic(t *testing.T) {
-	if COSMIC_INSTANCE_ID == "" {
-		t.Skip("This test requires an existing instance (set it by exporting COSMIC_INSTANCE_ID)")
-	}
-
 	var ip cosmic.AddIpToNicResponse
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicSecondaryIPAddressDestroy,
@@ -33,13 +29,9 @@ func TestAccCosmicSecondaryIPAddress_basic(t *testing.T) {
 }
 
 func TestAccCosmicSecondaryIPAddress_fixedIP(t *testing.T) {
-	if COSMIC_INSTANCE_ID == "" {
-		t.Skip("This test requires an existing instance (set it by exporting COSMIC_INSTANCE_ID)")
-	}
-
 	var ip cosmic.AddIpToNicResponse
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicSecondaryIPAddressDestroy,
@@ -51,7 +43,7 @@ func TestAccCosmicSecondaryIPAddress_fixedIP(t *testing.T) {
 						"cosmic_secondary_ipaddress.foo", &ip),
 					testAccCheckCosmicSecondaryIPAddressAttributes(&ip),
 					resource.TestCheckResourceAttr(
-						"cosmic_secondary_ipaddress.foo", "ip_address", "10.0.8.10"),
+						"cosmic_secondary_ipaddress.foo", "ip_address", "10.0.10.10"),
 				),
 			},
 		},
@@ -151,7 +143,7 @@ func testAccCheckCosmicSecondaryIPAddressExists(n string, ip *cosmic.AddIpToNicR
 func testAccCheckCosmicSecondaryIPAddressAttributes(ip *cosmic.AddIpToNicResponse) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
-		if ip.Ipaddress != "10.0.8.10" {
+		if ip.Ipaddress != "10.0.10.10" {
 			return fmt.Errorf("Bad IP address: %s", ip.Ipaddress)
 		}
 		return nil
@@ -227,16 +219,82 @@ func testAccCheckCosmicSecondaryIPAddressDestroy(s *terraform.State) error {
 }
 
 var testAccCosmicSecondaryIPAddress_basic = fmt.Sprintf(`
+resource "cosmic_vpc" "foo" {
+  name           = "terraform-vpc"
+  display_text   = "terraform-vpc"
+  cidr           = "10.0.10.0/22"
+  network_domain = "terraform-domain"
+  vpc_offering   = "%s"
+  zone           = "%s"
+}
+
+resource "cosmic_network" "foo" {
+  name             = "terraform-network"
+  cidr             = "10.0.10.0/24"
+  gateway          = "10.0.10.1"
+  network_offering = "%s"
+  vpc_id           = "${cosmic_vpc.foo.id}"
+  zone             = "${cosmic_vpc.foo.zone}"
+}
+
+resource "cosmic_instance" "foo" {
+  name             = "terraform-test"
+  display_name     = "terraform-test"
+  service_offering = "%s"
+  network_id       = "${cosmic_network.foo.id}"
+  template         = "%s"
+  zone             = "${cosmic_vpc.foo.zone}"
+  user_data        = "foobar\nfoo\nbar"
+  expunge          = true
+}
+
 resource "cosmic_secondary_ipaddress" "foo" {
-  virtual_machine_id = "%s"
+  virtual_machine_id = "${cosmic_instance.foo.id}"
 }`,
-	COSMIC_INSTANCE_ID,
+	COSMIC_VPC_OFFERING,
+	COSMIC_ZONE,
+	COSMIC_VPC_NETWORK_OFFERING,
+	COSMIC_SERVICE_OFFERING_1,
+	COSMIC_TEMPLATE,
 )
 
 var testAccCosmicSecondaryIPAddress_fixedIP = fmt.Sprintf(`
+resource "cosmic_vpc" "foo" {
+  name           = "terraform-vpc"
+  display_text   = "terraform-vpc"
+  cidr           = "10.0.10.0/22"
+  network_domain = "terraform-domain"
+  vpc_offering   = "%s"
+  zone           = "%s"
+}
+
+resource "cosmic_network" "foo" {
+  name             = "terraform-network"
+  cidr             = "10.0.10.0/24"
+  gateway          = "10.0.10.1"
+  network_offering = "%s"
+  vpc_id           = "${cosmic_vpc.foo.id}"
+  zone             = "${cosmic_vpc.foo.zone}"
+}
+
+resource "cosmic_instance" "foo" {
+  name             = "terraform-test"
+  display_name     = "terraform-test"
+  service_offering = "%s"
+  network_id       = "${cosmic_network.foo.id}"
+  template         = "%s"
+  zone             = "${cosmic_vpc.foo.zone}"
+  user_data        = "foobar\nfoo\nbar"
+  expunge          = true
+}
+
 resource "cosmic_secondary_ipaddress" "foo" {
-  ip_address         = "10.0.8.10"
-  virtual_machine_id = "%s"
+  ip_address         = "10.0.10.10"
+  virtual_machine_id = "${cosmic_instance.foo.id}"
 }`,
-	COSMIC_INSTANCE_ID,
+	COSMIC_VPC_OFFERING,
+	COSMIC_ZONE,
+	COSMIC_VPC_NETWORK_OFFERING,
+	COSMIC_SERVICE_OFFERING_1,
+	COSMIC_TEMPLATE,
 )

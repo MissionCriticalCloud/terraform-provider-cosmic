@@ -12,7 +12,7 @@ import (
 func TestAccCosmicAffinityGroup_basic(t *testing.T) {
 	var affinityGroup cosmic.AffinityGroup
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicAffinityGroupDestroy,
