@@ -1,0 +1,54 @@
+---
+name: CI
+
+on:
+  pull_request:
+
+jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@master
+      - name: Setup Go env
+        uses: actions/setup-go@v1
+        with:
+          go-version: '1.13.6'
+      - name: Run fmtcheck
+        run: make fmtcheck
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@master
+      - name: Setup Go env
+        uses: actions/setup-go@v1
+        with:
+          go-version: '1.13.6'
+      - name: Run tests
+        run: make test
+
+  testacc:
+    runs-on: [self-hosted, linux]
+    steps:
+      - name: Check out code
+        uses: actions/checkout@master
+      - name: Setup Go env
+        uses: actions/setup-go@v1
+        with:
+          go-version: '1.13.6'
+      - name: Run acceptance tests
+        run: make testacc
+    env:
+      COSMIC_API_KEY: ${{ secrets.COSMIC_API_KEY }}
+      COSMIC_API_URL: ${{ secrets.COSMIC_API_URL }}
+      COSMIC_SECRET_KEY: ${{ secrets.COSMIC_SECRET_KEY }}
+      COSMIC_ZONE: ${{ secrets.COSMIC_ZONE }}
+      COSMIC_DISK_OFFERING: MCC_v1.CWPS
+      COSMIC_DISK_OFFERING_1: MCC_v1.CWPS
+      COSMIC_SERVICE_OFFERING_1: MCC_v2.1vCPU.2GB.SBP1
+      COSMIC_SERVICE_OFFERING_2: MCC_v2.2vCPU.2GB.SBP1
+      COSMIC_TEMPLATE: cosmic_tinyvm-KVM-17.3.3
+      COSMIC_VPC_NETWORK_OFFERING: MCC-VPC-LB
+      COSMIC_VPC_OFFERING: MCC-KVM-VPC-Red
