@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 )
@@ -22,7 +23,7 @@ func TestAccCosmicVPNConnection_basic(t *testing.T) {
 		CheckDestroy: testAccCheckCosmicVPNConnectionDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCosmicVPNConnection_basic,
+				Config: testAccCosmicVPNConnection_basic(acctest.RandString(5)),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCosmicVPNConnectionExists(
 						"cosmic_vpn_connection.foo-bar", &vpnConnection),
@@ -84,7 +85,8 @@ func testAccCheckCosmicVPNConnectionDestroy(s *terraform.State) error {
 	return nil
 }
 
-var testAccCosmicVPNConnection_basic = fmt.Sprintf(`
+func testAccCosmicVPNConnection_basic(rand string) string {
+	return fmt.Sprintf(`
 resource "cosmic_vpc" "foo" {
   name         = "terraform-vpc-foo"
   cidr         = "10.0.10.0/22"
@@ -108,7 +110,7 @@ resource "cosmic_vpn_gateway" "bar" {
 }
 
 resource "cosmic_vpn_customer_gateway" "foo" {
-  name       = "terraform-foo"
+  name       = "terraform-foo-%s"
   cidr_list  = ["${cosmic_vpc.foo.cidr}"]
   esp_policy = "aes256-sha1"
   gateway    = "${cosmic_vpn_gateway.foo.public_ip}"
@@ -117,7 +119,7 @@ resource "cosmic_vpn_customer_gateway" "foo" {
 }
 
 resource "cosmic_vpn_customer_gateway" "bar" {
-  name       = "terraform-bar"
+  name       = "terraform-bar-%s"
   cidr_list  = ["${cosmic_vpc.bar.cidr}"]
   esp_policy = "aes256-sha1"
   gateway    = "${cosmic_vpn_gateway.bar.public_ip}"
@@ -133,9 +135,13 @@ resource "cosmic_vpn_connection" "foo-bar" {
 resource "cosmic_vpn_connection" "bar-foo" {
   customer_gateway_id = "${cosmic_vpn_customer_gateway.bar.id}"
   vpn_gateway_id      = "${cosmic_vpn_gateway.foo.id}"
-}`,
-	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
-	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
-)
+}
+`,
+		COSMIC_VPC_OFFERING,
+		COSMIC_ZONE,
+		COSMIC_VPC_OFFERING,
+		COSMIC_ZONE,
+		rand,
+		rand,
+	)
+}
