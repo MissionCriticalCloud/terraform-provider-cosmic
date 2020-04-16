@@ -681,10 +681,9 @@ func verifyNetworkACLRuleParams(d *schema.ResourceData, rule map[string]interfac
 	return nil
 }
 
-func retryableACLCreationFunc(
-	cs *cosmic.CosmicClient,
-	p *cosmic.CreateNetworkACLParams) func() (interface{}, error) {
+func retryableACLCreationFunc(cs *cosmic.CosmicClient, p *cosmic.CreateNetworkACLParams) func() (interface{}, error) {
 	return func() (interface{}, error) {
+
 		r, err := cs.NetworkACL.CreateNetworkACL(p)
 		if err != nil {
 			return nil, err

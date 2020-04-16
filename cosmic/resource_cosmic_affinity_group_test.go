@@ -12,7 +12,7 @@ import (
 func TestAccCosmicAffinityGroup_basic(t *testing.T) {
 	var affinityGroup cosmic.AffinityGroup
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicAffinityGroupDestroy,
@@ -28,9 +28,9 @@ func TestAccCosmicAffinityGroup_basic(t *testing.T) {
 	})
 }
 
-func testAccCheckCosmicAffinityGroupExists(
-	n string, affinityGroup *cosmic.AffinityGroup) resource.TestCheckFunc {
+func testAccCheckCosmicAffinityGroupExists(n string, affinityGroup *cosmic.AffinityGroup) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
+
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
@@ -57,8 +57,7 @@ func testAccCheckCosmicAffinityGroupExists(
 	}
 }
 
-func testAccCheckCosmicAffinityGroupAttributes(
-	affinityGroup *cosmic.AffinityGroup) resource.TestCheckFunc {
+func testAccCheckCosmicAffinityGroupAttributes(affinityGroup *cosmic.AffinityGroup) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		if affinityGroup.Name != "terraform-affinity-group" {

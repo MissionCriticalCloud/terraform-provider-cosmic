@@ -10,13 +10,13 @@ import (
 )
 
 func TestAccCosmicVPC_basic(t *testing.T) {
-	if COSMIC_VPC_ID == "" {
-		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	if COSMIC_VPC_OFFERING == "" {
+		t.Skip("This test requires an existing VPC offering (set it by exporting COSMIC_VPC_OFFERING)")
 	}
 
 	var vpc cosmic.VPC
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicVPCDestroy,
@@ -35,9 +35,9 @@ func TestAccCosmicVPC_basic(t *testing.T) {
 	})
 }
 
-func testAccCheckCosmicVPCExists(
-	n string, vpc *cosmic.VPC) resource.TestCheckFunc {
+func testAccCheckCosmicVPCExists(n string, vpc *cosmic.VPC) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
+
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
@@ -64,8 +64,7 @@ func testAccCheckCosmicVPCExists(
 	}
 }
 
-func testAccCheckCosmicVPCAttributes(
-	vpc *cosmic.VPC) resource.TestCheckFunc {
+func testAccCheckCosmicVPCAttributes(vpc *cosmic.VPC) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		if vpc.Name != "terraform-vpc" {
@@ -119,4 +118,5 @@ resource "cosmic_vpc" "foo" {
   zone           = "%s"
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE)
+	COSMIC_ZONE,
+)

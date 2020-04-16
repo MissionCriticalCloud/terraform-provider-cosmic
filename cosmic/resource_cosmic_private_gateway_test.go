@@ -10,13 +10,13 @@ import (
 )
 
 func TestAccCosmicPrivateGateway_basic(t *testing.T) {
-	if COSMIC_VPC_ID == "" {
-		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	if COSMIC_VPC_OFFERING == "" {
+		t.Skip("This test requires an existing VPC offering (set it by exporting COSMIC_VPC_OFFERING)")
 	}
 
 	var gateway cosmic.PrivateGateway
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicPrivateGatewayDestroy,
@@ -94,16 +94,25 @@ func testAccCheckCosmicPrivateGatewayDestroy(s *terraform.State) error {
 }
 
 var testAccCosmicPrivateGateway_basic = fmt.Sprintf(`
+resource "cosmic_vpc" "foo" {
+  name           = "terraform-vpc"
+  display_text   = "terraform-vpc"
+  cidr           = "10.0.10.0/22"
+  vpc_offering   = "%s"
+  network_domain = "terraform-domain"
+  zone           = "%s"
+}
+
 resource "cosmic_network" "foo" {
   name             = "terraform-network"
   cidr             = "10.0.252.0/24"
   network_offering = "DefaultPrivateGatewayNetworkOffering"
-  zone             = "%s"
+  zone             = "${cosmic_vpc.foo.zone}"
 }
 
 resource "cosmic_network_acl" "foo" {
   name   = "terraform-acl"
-  vpc_id = "%s"
+  vpc_id = "${cosmic_vpc.foo.id}"
 }
 
 resource "cosmic_private_gateway" "foo" {
@@ -112,5 +121,6 @@ resource "cosmic_private_gateway" "foo" {
   acl_id     = "${cosmic_network_acl.foo.id}"
   vpc_id     = "${cosmic_network_acl.foo.vpc_id}"
 }`,
+	COSMIC_VPC_OFFERING,
 	COSMIC_ZONE,
-	COSMIC_VPC_ID)
+)

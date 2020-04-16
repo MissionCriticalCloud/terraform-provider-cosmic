@@ -5,32 +5,35 @@ import (
 	"testing"
 
 	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
+	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 )
 
 func TestAccCosmicVPNCustomerGateway_basic(t *testing.T) {
-	if COSMIC_VPC_ID == "" {
-		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	if COSMIC_VPC_OFFERING == "" {
+		t.Skip("This test requires an existing VPC offering (set it by exporting COSMIC_VPC_OFFERING)")
 	}
 
 	var vpnCustomerGateway cosmic.VpnCustomerGateway
 
-	resource.Test(t, resource.TestCase{
+	randString := acctest.RandString(5)
+
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicVPNCustomerGatewayDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCosmicVPNCustomerGateway_basic,
+				Config: testAccCosmicVPNCustomerGateway_basic(randString),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCosmicVPNCustomerGatewayExists(
 						"cosmic_vpn_customer_gateway.foo", &vpnCustomerGateway),
 					testAccCheckCosmicVPNCustomerGatewayAttributes(&vpnCustomerGateway),
 					resource.TestCheckResourceAttr(
-						"cosmic_vpn_customer_gateway.foo", "name", "terraform-foo"),
+						"cosmic_vpn_customer_gateway.foo", "name", fmt.Sprintf("terraform-foo-%s", randString)),
 					resource.TestCheckResourceAttr(
-						"cosmic_vpn_customer_gateway.bar", "name", "terraform-bar"),
+						"cosmic_vpn_customer_gateway.bar", "name", fmt.Sprintf("terraform-bar-%s", randString)),
 					resource.TestCheckResourceAttr(
 						"cosmic_vpn_customer_gateway.bar", "esp_policy", "aes256-sha1"),
 					resource.TestCheckResourceAttr(
@@ -41,9 +44,9 @@ func TestAccCosmicVPNCustomerGateway_basic(t *testing.T) {
 	})
 }
 
-func testAccCheckCosmicVPNCustomerGatewayExists(
-	n string, vpnCustomerGateway *cosmic.VpnCustomerGateway) resource.TestCheckFunc {
+func testAccCheckCosmicVPNCustomerGatewayExists(n string, vpnCustomerGateway *cosmic.VpnCustomerGateway) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
+
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
@@ -70,8 +73,7 @@ func testAccCheckCosmicVPNCustomerGatewayExists(
 	}
 }
 
-func testAccCheckCosmicVPNCustomerGatewayAttributes(
-	vpnCustomerGateway *cosmic.VpnCustomerGateway) resource.TestCheckFunc {
+func testAccCheckCosmicVPNCustomerGatewayAttributes(vpnCustomerGateway *cosmic.VpnCustomerGateway) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		if vpnCustomerGateway.Esppolicy != "aes256-sha1" {
@@ -111,7 +113,8 @@ func testAccCheckCosmicVPNCustomerGatewayDestroy(s *terraform.State) error {
 	return nil
 }
 
-var testAccCosmicVPNCustomerGateway_basic = fmt.Sprintf(`
+func testAccCosmicVPNCustomerGateway_basic(rand string) string {
+	return fmt.Sprintf(`
 resource "cosmic_vpc" "foo" {
   name         = "terraform-vpc-foo"
   cidr         = "10.0.10.0/22"
@@ -135,7 +138,7 @@ resource "cosmic_vpn_gateway" "bar" {
 }
 
 resource "cosmic_vpn_customer_gateway" "foo" {
-  name       = "terraform-foo"
+  name       = "terraform-foo-%s"
   cidr_list  = ["${cosmic_vpc.foo.cidr}"]
   gateway    = "${cosmic_vpn_gateway.foo.public_ip}"
   esp_policy = "aes256-sha1"
@@ -144,14 +147,18 @@ resource "cosmic_vpn_customer_gateway" "foo" {
 }
 
 resource "cosmic_vpn_customer_gateway" "bar" {
-  name       = "terraform-bar"
+  name       = "terraform-bar-%s"
   cidr_list  = ["${cosmic_vpc.bar.cidr}"]
   gateway    = "${cosmic_vpn_gateway.bar.public_ip}"
   esp_policy = "aes256-sha1"
   ike_policy = "aes256-sha1;modp1024"
   ipsec_psk  = "terraform"
 }`,
-	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
-	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE)
+		COSMIC_VPC_OFFERING,
+		COSMIC_ZONE,
+		COSMIC_VPC_OFFERING,
+		COSMIC_ZONE,
+		rand,
+		rand,
+	)
+}

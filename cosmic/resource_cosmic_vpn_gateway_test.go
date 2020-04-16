@@ -10,13 +10,13 @@ import (
 )
 
 func TestAccCosmicVPNGateway_basic(t *testing.T) {
-	if COSMIC_VPC_ID == "" {
-		t.Skip("This test requires an existing VPC ID (set it by exporting COSMIC_VPC_ID)")
+	if COSMIC_VPC_OFFERING == "" {
+		t.Skip("This test requires an existing VPC offering (set it by exporting COSMIC_VPC_OFFERING)")
 	}
 
 	var vpnGateway cosmic.VpnGateway
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicVPNGatewayDestroy,
@@ -32,9 +32,9 @@ func TestAccCosmicVPNGateway_basic(t *testing.T) {
 	})
 }
 
-func testAccCheckCosmicVPNGatewayExists(
-	n string, vpnGateway *cosmic.VpnGateway) resource.TestCheckFunc {
+func testAccCheckCosmicVPNGatewayExists(n string, vpnGateway *cosmic.VpnGateway) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
+
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
@@ -83,6 +83,18 @@ func testAccCheckCosmicVPNGatewayDestroy(s *terraform.State) error {
 }
 
 var testAccCosmicVPNGateway_basic = fmt.Sprintf(`
+resource "cosmic_vpc" "foo" {
+  name           = "terraform-vpc"
+  display_text   = "terraform-vpc"
+  cidr           = "10.0.10.0/22"
+  vpc_offering   = "%s"
+  network_domain = "terraform-domain"
+  zone           = "%s"
+}
+
 resource "cosmic_vpn_gateway" "foo" {
-  vpc_id = "%s"
-}`, COSMIC_VPC_ID)
+  vpc_id = "${cosmic_vpc.foo.id}"
+}`,
+	COSMIC_VPC_OFFERING,
+	COSMIC_ZONE,
+)
