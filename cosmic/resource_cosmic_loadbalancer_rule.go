@@ -51,11 +51,13 @@ func resourceCosmicLoadBalancerRule() *schema.Resource {
 			"private_port": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
+				ForceNew: true,
 			},
 
 			"public_port": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
+				ForceNew: true,
 			},
 
 			"protocol": &schema.Schema{

@@ -134,6 +134,80 @@ func TestAccCosmicLoadBalancerRule_update(t *testing.T) {
 	})
 }
 
+func TestAccCosmicLoadBalancerRule_updatePorts(t *testing.T) {
+	if COSMIC_SERVICE_OFFERING_1 == "" {
+		t.Skip("This test requires an existing service offering (set it by exporting COSMIC_SERVICE_OFFERING_1)")
+	}
+
+	if COSMIC_TEMPLATE == "" {
+		t.Skip("This test requires an existing instance template (set it by exporting COSMIC_TEMPLATE)")
+	}
+
+	if COSMIC_VPC_NETWORK_OFFERING == "" {
+		t.Skip("This test requires an existing VPC network offering (set it by exporting COSMIC_VPC_NETWORK_OFFERING)")
+	}
+
+	if COSMIC_VPC_OFFERING == "" {
+		t.Skip("This test requires an existing VPC offering (set it by exporting COSMIC_VPC_OFFERING)")
+	}
+
+	var id string
+	var rule cosmic.LoadBalancerRule
+
+	createAttributes := &testAccCheckCosmicLoadBalancerRuleExpectedAttributes{
+		Name:        "terraform-lb",
+		Algorithm:   "roundrobin",
+		PrivatePort: "8080",
+		PublicPort:  "80",
+	}
+
+	updateAttributes := &testAccCheckCosmicLoadBalancerRuleExpectedAttributes{
+		Name:        "terraform-lb",
+		Algorithm:   "roundrobin",
+		PrivatePort: "8443",
+		PublicPort:  "443",
+	}
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckCosmicLoadBalancerRuleDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCosmicLoadBalancerRule_basic(createAttributes),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					testAccCheckCosmicLoadBalancerRuleExist("cosmic_loadbalancer_rule.foo", &id, &rule, true),
+					testAccCheckCosmicLoadBalancerRuleAttributes(&rule, createAttributes),
+					resource.TestCheckResourceAttr(
+						"cosmic_loadbalancer_rule.foo", "name", createAttributes.Name),
+					resource.TestCheckResourceAttr(
+						"cosmic_loadbalancer_rule.foo", "algorithm", createAttributes.Algorithm),
+					resource.TestCheckResourceAttr(
+						"cosmic_loadbalancer_rule.foo", "private_port", createAttributes.PrivatePort),
+					resource.TestCheckResourceAttr(
+						"cosmic_loadbalancer_rule.foo", "public_port", createAttributes.PublicPort),
+				),
+			},
+
+			{
+				Config: testAccCosmicLoadBalancerRule_basic(updateAttributes),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					testAccCheckCosmicLoadBalancerRuleExist("cosmic_loadbalancer_rule.foo", &id, &rule, true),
+					testAccCheckCosmicLoadBalancerRuleAttributes(&rule, updateAttributes),
+					resource.TestCheckResourceAttr(
+						"cosmic_loadbalancer_rule.foo", "name", updateAttributes.Name),
+					resource.TestCheckResourceAttr(
+						"cosmic_loadbalancer_rule.foo", "algorithm", updateAttributes.Algorithm),
+					resource.TestCheckResourceAttr(
+						"cosmic_loadbalancer_rule.foo", "private_port", updateAttributes.PrivatePort),
+					resource.TestCheckResourceAttr(
+						"cosmic_loadbalancer_rule.foo", "public_port", updateAttributes.PublicPort),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckCosmicLoadBalancerRuleExist(n string, id *string, rule *cosmic.LoadBalancerRule, shouldChange bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
