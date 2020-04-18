@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ## Unreleased
 
 - Fix bug where changing `cosmic_loadbalancer_rule` private or public ports did not recreate the resource
+- Fix bug where changing `cosmic_loadbalancer_rule` protocol did not recreate the resource
 
 ## 0.4.1 (2019-11-19)
 
