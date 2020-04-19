@@ -14,7 +14,18 @@ func TestAccCosmicNetworkACL_basic(t *testing.T) {
 		t.Skip("This test requires an existing VPC offering (set it by exporting COSMIC_VPC_OFFERING)")
 	}
 
+	var id string
 	var acl cosmic.NetworkACLList
+
+	createAttributes := &testAccCheckCosmicNetworkACLExpectedAttributes{
+		Name:        "terraform-acl",
+		Description: "terraform-acl-text",
+	}
+
+	updateAttributes := &testAccCheckCosmicNetworkACLExpectedAttributes{
+		Name:        "terraform-acl-updated",
+		Description: "terraform-acl-text-updated",
+	}
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -22,18 +33,33 @@ func TestAccCosmicNetworkACL_basic(t *testing.T) {
 		CheckDestroy: testAccCheckCosmicNetworkACLDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCosmicNetworkACL_basic,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckCosmicNetworkACLExists(
-						"cosmic_network_acl.foo", &acl),
-					testAccCheckCosmicNetworkACLBasicAttributes(&acl),
+				Config: testAccCosmicNetworkACL_basic(createAttributes),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					testAccCheckCosmicNetworkACLExists("cosmic_network_acl.foo", &id, &acl),
+					testAccCheckCosmicNetworkACLBasicAttributes(&acl, createAttributes),
+					resource.TestCheckResourceAttr(
+						"cosmic_network_acl.foo", "name", createAttributes.Name),
+					resource.TestCheckResourceAttr(
+						"cosmic_network_acl.foo", "description", createAttributes.Description),
+				),
+			},
+
+			{
+				Config: testAccCosmicNetworkACL_basic(updateAttributes),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					testAccCheckCosmicNetworkACLExists("cosmic_network_acl.foo", &id, &acl),
+					testAccCheckCosmicNetworkACLBasicAttributes(&acl, updateAttributes),
+					resource.TestCheckResourceAttr(
+						"cosmic_network_acl.foo", "name", updateAttributes.Name),
+					resource.TestCheckResourceAttr(
+						"cosmic_network_acl.foo", "description", updateAttributes.Description),
 				),
 			},
 		},
 	})
 }
 
-func testAccCheckCosmicNetworkACLExists(n string, acl *cosmic.NetworkACLList) resource.TestCheckFunc {
+func testAccCheckCosmicNetworkACLExists(n string, id *string, acl *cosmic.NetworkACLList) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		rs, ok := s.RootModule().Resources[n]
@@ -45,13 +71,21 @@ func testAccCheckCosmicNetworkACLExists(n string, acl *cosmic.NetworkACLList) re
 			return fmt.Errorf("No network ACL ID is set")
 		}
 
+		if id != nil {
+			if *id != "" && *id != rs.Primary.ID {
+				return fmt.Errorf("Resource ID has changed")
+			}
+
+			*id = rs.Primary.ID
+		}
+
 		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		acllist, _, err := cs.NetworkACL.GetNetworkACLListByID(rs.Primary.ID)
+		acllist, count, err := cs.NetworkACL.GetNetworkACLListByID(rs.Primary.ID)
 		if err != nil {
 			return err
 		}
 
-		if acllist.Id != rs.Primary.ID {
+		if count == 0 {
 			return fmt.Errorf("Network ACL not found")
 		}
 
@@ -61,15 +95,20 @@ func testAccCheckCosmicNetworkACLExists(n string, acl *cosmic.NetworkACLList) re
 	}
 }
 
-func testAccCheckCosmicNetworkACLBasicAttributes(acl *cosmic.NetworkACLList) resource.TestCheckFunc {
+type testAccCheckCosmicNetworkACLExpectedAttributes struct {
+	Description string
+	Name        string
+}
+
+func testAccCheckCosmicNetworkACLBasicAttributes(acl *cosmic.NetworkACLList, want *testAccCheckCosmicNetworkACLExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
-		if acl.Name != "terraform-acl" {
-			return fmt.Errorf("Bad name: %s", acl.Name)
+		if acl.Name != want.Name {
+			return fmt.Errorf("Bad name: got %s; want %s", acl.Name, want.Name)
 		}
 
-		if acl.Description != "terraform-acl-text" {
-			return fmt.Errorf("Bad description: %s", acl.Description)
+		if acl.Description != want.Description {
+			return fmt.Errorf("Bad name: got %s; want %s", acl.Description, want.Description)
 		}
 
 		return nil
@@ -97,7 +136,8 @@ func testAccCheckCosmicNetworkACLDestroy(s *terraform.State) error {
 	return nil
 }
 
-var testAccCosmicNetworkACL_basic = fmt.Sprintf(`
+func testAccCosmicNetworkACL_basic(attr *testAccCheckCosmicNetworkACLExpectedAttributes) string {
+	return fmt.Sprintf(`
 resource "cosmic_vpc" "foo" {
   name           = "terraform-vpc"
   display_text   = "terraform-vpc"
@@ -108,10 +148,13 @@ resource "cosmic_vpc" "foo" {
 }
 
 resource "cosmic_network_acl" "foo" {
-  name        = "terraform-acl"
-  description = "terraform-acl-text"
+  name        = "%s"
+  description = "%s"
   vpc_id      = "${cosmic_vpc.foo.id}"
 }`,
-	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
-)
+		COSMIC_VPC_OFFERING,
+		COSMIC_ZONE,
+		attr.Name,
+		attr.Description,
+	)
+}

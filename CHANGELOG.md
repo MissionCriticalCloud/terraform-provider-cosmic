@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## Unreleased
 
+- Add ability to rename `cosmic_network_acl`'s `name` and `description` fields
 - Add `client_timeout` and `server_timeout` fields to `cosmic_loadbalancer_rule`
 - Fix bug where changing `cosmic_loadbalancer_rule` private or public ports did not recreate the resource
 - Fix bug where changing `cosmic_loadbalancer_rule` protocol did not recreate the resource

@@ -23,11 +23,9 @@ resource "cosmic_network_acl" "default" {
 
 The following arguments are supported:
 
-* `name` - (Required) The name of the ACL. Changing this forces a new resource
-    to be created.
+* `name` - (Required) The name of the ACL.
 
-* `description` - (Optional) The description of the ACL. Changing this forces a
-    new resource to be created.
+* `description` - (Optional) The description of the ACL.
 
 * `vpc_id` - (Required) The ID of the VPC to create this ACL for. Changing this
    forces a new resource to be created.
