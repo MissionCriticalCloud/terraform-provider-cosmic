@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+- Add `client_timeout` and `server_timeout` fields to `cosmic_loadbalancer_rule`
+- Fix bug where changing `cosmic_loadbalancer_rule` private or public ports did not recreate the resource
+- Fix bug where changing `cosmic_loadbalancer_rule` protocol did not recreate the resource
+
 ## 0.4.1 (2019-11-19)
 
 - Add `source_nat_ip_id` field to `cosmic_vpc` resource

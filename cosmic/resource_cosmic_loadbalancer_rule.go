@@ -3,6 +3,7 @@ package cosmic
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
@@ -48,20 +49,33 @@ func resourceCosmicLoadBalancerRule() *schema.Resource {
 				Required: true,
 			},
 
+			"client_timeout": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+
+			"server_timeout": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+
 			"private_port": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
+				ForceNew: true,
 			},
 
 			"public_port": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
+				ForceNew: true,
 			},
 
 			"protocol": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
+				ForceNew: true,
 				ValidateFunc: func(val interface{}, key string) (warns []string, errs []error) {
 					v := val.(string)
 					switch v {
@@ -114,6 +128,23 @@ func resourceCosmicLoadBalancerRuleCreate(d *schema.ResourceData, meta interface
 	// Set the protocol
 	if protocol, ok := d.GetOk("protocol"); ok {
 		p.SetProtocol(protocol.(string))
+	}
+
+	// Set timeouts
+	if clientTimeout, ok := d.GetOk("client_timeout"); ok {
+		t, err := strconv.Atoi(clientTimeout.(string))
+		if err != nil {
+			return err
+		}
+		p.SetClienttimeout(t)
+	}
+
+	if serverTimeout, ok := d.GetOk("server_timeout"); ok {
+		t, err := strconv.Atoi(serverTimeout.(string))
+		if err != nil {
+			return err
+		}
+		p.SetServertimeout(t)
 	}
 
 	// Set the ipaddress id
@@ -182,13 +213,22 @@ func resourceCosmicLoadBalancerRuleRead(d *schema.ResourceData, meta interface{}
 		d.Set("network_id", lb.Networkid)
 	}
 
+	// Only set client and server timeout if user specified them to avoid spurious diffs
+	if _, ok := d.GetOk("client_timeout"); ok {
+		d.Set("client_timeout", lb.Clienttimeout)
+	}
+
+	if _, ok := d.GetOk("server_timeout"); ok {
+		d.Set("server_timeout", lb.Servertimeout)
+	}
+
 	return nil
 }
 
 func resourceCosmicLoadBalancerRuleUpdate(d *schema.ResourceData, meta interface{}) error {
 	cs := meta.(*cosmic.CosmicClient)
 
-	if d.HasChange("name") || d.HasChange("description") || d.HasChange("algorithm") {
+	if d.HasChange("name") || d.HasChange("description") || d.HasChange("algorithm") || d.HasChange("client_timeout") || d.HasChange("server_timeout") {
 		name := d.Get("name").(string)
 
 		// Create new parameter struct
@@ -220,12 +260,33 @@ func resourceCosmicLoadBalancerRuleUpdate(d *schema.ResourceData, meta interface
 			p.SetAlgorithm(algorithm)
 		}
 
+		if d.HasChange("client_timeout") {
+			t, err := strconv.Atoi(d.Get("client_timeout").(string))
+			if err != nil {
+				return err
+			}
+
+			log.Printf("[DEBUG] Client timeout has changed to %d for load balancer rule %s, starting update", t, name)
+			p.SetClienttimeout(t)
+		}
+
+		if d.HasChange("server_timeout") {
+			t, err := strconv.Atoi(d.Get("server_timeout").(string))
+			if err != nil {
+				return err
+			}
+
+			log.Printf("[DEBUG] Server timeout has changed to %d for load balancer rule %s, starting update", t, name)
+			p.SetServertimeout(t)
+		}
+
 		_, err := cs.LoadBalancer.UpdateLoadBalancerRule(p)
 		if err != nil {
 			return fmt.Errorf(
 				"Error updating load balancer rule %s", name)
 		}
 	}
+
 	return resourceCosmicLoadBalancerRuleRead(d, meta)
 }
 
