@@ -2,6 +2,7 @@ package cosmic
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
@@ -117,6 +118,6 @@ resource "cosmic_vpc" "foo" {
   network_domain = "terraform-domain"
   zone           = "%s"
 }`,
-	COSMIC_VPC_OFFERING,
+	strings.ToLower(COSMIC_VPC_OFFERING),
 	COSMIC_ZONE,
 )

@@ -2,6 +2,7 @@ package cosmic
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
@@ -344,7 +345,7 @@ resource "cosmic_disk" "foo" {
   disk_offering = "%s"
   zone          = "%s"
 }`,
-	COSMIC_DISK_OFFERING,
+	strings.ToLower(COSMIC_DISK_OFFERING),
 	COSMIC_ZONE,
 )
 

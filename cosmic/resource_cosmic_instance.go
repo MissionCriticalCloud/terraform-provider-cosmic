@@ -38,6 +38,9 @@ func resourceCosmicInstance() *schema.Resource {
 			"service_offering": {
 				Type:     schema.TypeString,
 				Required: true,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					return strings.EqualFold(old, new)
+				},
 			},
 
 			"network_id": {

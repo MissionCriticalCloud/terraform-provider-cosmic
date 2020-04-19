@@ -40,6 +40,9 @@ func resourceCosmicVPC() *schema.Resource {
 			"vpc_offering": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					return strings.EqualFold(old, new)
+				},
 			},
 
 			"network_domain": &schema.Schema{

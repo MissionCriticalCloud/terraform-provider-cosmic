@@ -2,6 +2,7 @@ package cosmic
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
@@ -388,7 +389,7 @@ resource "cosmic_instance" "foo" {
 	COSMIC_VPC_OFFERING,
 	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
-	COSMIC_SERVICE_OFFERING_1,
+	strings.ToLower(COSMIC_SERVICE_OFFERING_1),
 	COSMIC_TEMPLATE,
 )
 
