@@ -2,6 +2,7 @@ package cosmic
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
@@ -263,7 +264,7 @@ resource "cosmic_network" "foo" {
     terraform-tag = "true"
   }
 }`,
-	COSMIC_VPC_OFFERING,
+	strings.ToLower(COSMIC_VPC_OFFERING),
 	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 )
