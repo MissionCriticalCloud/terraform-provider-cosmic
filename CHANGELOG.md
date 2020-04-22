@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## 0.4.2 (2020-04-22)
 
 - Add ability to rename `cosmic_network_acl`'s `name` and `description` fields
 - Add `client_timeout` and `server_timeout` fields to `cosmic_loadbalancer_rule`
