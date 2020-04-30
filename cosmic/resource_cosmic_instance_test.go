@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
@@ -201,18 +202,20 @@ func TestAccCosmicInstance_keyPair(t *testing.T) {
 
 	var instance cosmic.VirtualMachine
 
+	keyPairName := fmt.Sprintf("terraform-test-keypair-%v", acctest.RandString(5))
+
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicInstanceDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCosmicInstance_keyPair,
+				Config: testAccCosmicInstance_keyPair(keyPairName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCosmicInstanceExists(
 						"cosmic_instance.foo", &instance),
 					resource.TestCheckResourceAttr(
-						"cosmic_instance.foo", "keypair", "terraform-test-keypair"),
+						"cosmic_instance.foo", "keypair", keyPairName),
 				),
 			},
 		},
@@ -502,7 +505,8 @@ resource "cosmic_instance" "foo" {
 	COSMIC_TEMPLATE,
 )
 
-var testAccCosmicInstance_keyPair = fmt.Sprintf(`
+func testAccCosmicInstance_keyPair(keyPairName string) string {
+	return fmt.Sprintf(`
 resource "cosmic_vpc" "foo" {
   name           = "terraform-vpc"
   display_text   = "terraform-vpc"
@@ -522,7 +526,7 @@ resource "cosmic_network" "foo" {
 }
 
 resource "cosmic_ssh_keypair" "foo" {
-  name = "terraform-test-keypair"
+  name = "%s"
 }
 
 resource "cosmic_instance" "foo" {
@@ -536,9 +540,11 @@ resource "cosmic_instance" "foo" {
   keypair          = "${cosmic_ssh_keypair.foo.name}"
   expunge          = true
 }`,
-	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
-	COSMIC_VPC_NETWORK_OFFERING,
-	COSMIC_SERVICE_OFFERING_1,
-	COSMIC_TEMPLATE,
-)
+		COSMIC_VPC_OFFERING,
+		COSMIC_ZONE,
+		COSMIC_VPC_NETWORK_OFFERING,
+		keyPairName,
+		COSMIC_SERVICE_OFFERING_1,
+		COSMIC_TEMPLATE,
+	)
+}
