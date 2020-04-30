@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 // tagsSchema returns the schema to use for tags

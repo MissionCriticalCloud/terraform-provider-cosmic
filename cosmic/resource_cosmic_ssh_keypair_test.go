@@ -6,12 +6,15 @@ import (
 	"testing"
 
 	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
-	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 func TestAccCosmicSSHKeyPair_basic(t *testing.T) {
 	var sshkey cosmic.SSHKeyPair
+
+	keyPairName := fmt.Sprintf("terraform-test-keypair-%v", acctest.RandString(5))
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -19,11 +22,11 @@ func TestAccCosmicSSHKeyPair_basic(t *testing.T) {
 		CheckDestroy: testAccCheckCosmicSSHKeyPairDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCosmicSSHKeyPair_create,
+				Config: testAccCosmicSSHKeyPair_create(keyPairName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCosmicSSHKeyPairExists("cosmic_ssh_keypair.foo", &sshkey),
 					testAccCheckCosmicSSHKeyPairAttributes(&sshkey),
-					testAccCheckCosmicSSHKeyPairCreateAttributes("terraform-test-keypair"),
+					testAccCheckCosmicSSHKeyPairCreateAttributes(keyPairName),
 				),
 			},
 		},
@@ -33,13 +36,16 @@ func TestAccCosmicSSHKeyPair_basic(t *testing.T) {
 func TestAccCosmicSSHKeyPair_register(t *testing.T) {
 	var sshkey cosmic.SSHKeyPair
 
+	keyPairName := fmt.Sprintf("terraform-test-keypair-%v", acctest.RandString(5))
+	publicKey, _, _ := acctest.RandSSHKeyPair("terraform-test-keypair")
+
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicSSHKeyPairDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCosmicSSHKeyPair_register,
+				Config: testAccCosmicSSHKeyPair_register(keyPairName, publicKey),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCosmicSSHKeyPairExists("cosmic_ssh_keypair.foo", &sshkey),
 					testAccCheckCosmicSSHKeyPairAttributes(&sshkey),
@@ -154,21 +160,22 @@ func testAccCheckCosmicSSHKeyPairDestroy(s *terraform.State) error {
 	return nil
 }
 
-const testAccCosmicSSHKeyPair_create = `
+func testAccCosmicSSHKeyPair_create(keyPairName string) string {
+	return fmt.Sprintf(`
 resource "cosmic_ssh_keypair" "foo" {
-  name = "terraform-test-keypair"
-}`
+  name = "%s"
+}`,
+		keyPairName,
+	)
+}
 
-var testAccCosmicSSHKeyPair_register = fmt.Sprintf(`
+func testAccCosmicSSHKeyPair_register(keyPairName, publicKey string) string {
+	return fmt.Sprintf(`
 resource "cosmic_ssh_keypair" "foo" {
-  name       = "terraform-test-registered-keypair"
+  name       = "%s"
   public_key = "%s"
 }`,
-	publicKey,
-)
-
-const publicKey = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSPcjvm/QSl+dtYa1RFWqJfDZcr5GMxegiPjefHz" +
-	"57zvTn/FXN4V5V5pS2nmmEfztm3TLEVSCA6kRWJHFf5A9cSAqc/NqGX5qb8J8wbuLzdKA+LvMfru3HoUeWrBPgzMu2rb" +
-	"16JqPYM6AGTSAmh93YabuuJW4HQ3NpvphtBS3XozYL5DUUzLpUtPrkzutyfQmfC71OSIO6Lxkt/uYfZALZ4u5hOhXfGQ" +
-	"Gx/M9aRHQyRuoyPTXEuzY2JH5H4Z++y1g/rVrb2TaSKXyaACnmYh2/s65qSiaZZ3P9WdfzCPOUMePaSLZLSj0ZhMjlS9" +
-	"OBT35VHz2tZ0p4VL8uOXNGyI/P user@host"
+		keyPairName,
+		publicKey,
+	)
+}

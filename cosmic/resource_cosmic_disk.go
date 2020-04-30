@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func resourceCosmicDisk() *schema.Resource {

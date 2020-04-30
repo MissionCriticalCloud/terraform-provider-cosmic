@@ -10,7 +10,7 @@ import (
 
 	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/go-multierror"
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func resourceCosmicNetworkACLRule() *schema.Resource {

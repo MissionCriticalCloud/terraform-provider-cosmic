@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/MissionCriticalCloud/terraform-provider-cosmic/cosmic"
-	"github.com/hashicorp/terraform/plugin"
+	"github.com/hashicorp/terraform-plugin-sdk/plugin"
 )
 
 func main() {

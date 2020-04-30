@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
-	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 func TestAccCosmicIPAddress_basic(t *testing.T) {
