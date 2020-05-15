@@ -42,10 +42,10 @@ func resourceCosmicNIC() *schema.Resource {
 }
 
 func resourceCosmicNICCreate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.VirtualMachine.NewAddNicToVirtualMachineParams(
+	p := client.VirtualMachine.NewAddNicToVirtualMachineParams(
 		d.Get("network_id").(string),
 		d.Get("virtual_machine_id").(string),
 	)
@@ -56,7 +56,7 @@ func resourceCosmicNICCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	// Create and attach the new NIC
-	r, err := Retry(10, retryableAddNicFunc(cs, p))
+	r, err := Retry(10, retryableAddNicFunc(client, p))
 	if err != nil {
 		return fmt.Errorf("Error creating the new NIC: %s", err)
 	}
@@ -78,10 +78,10 @@ func resourceCosmicNICCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceCosmicNICRead(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Get the virtual machine details
-	vm, count, err := cs.VirtualMachine.GetVirtualMachineByID(d.Get("virtual_machine_id").(string))
+	vm, count, err := client.VirtualMachine.GetVirtualMachineByID(d.Get("virtual_machine_id").(string))
 	if err != nil {
 		if count == 0 {
 			log.Printf("[DEBUG] Instance %s does no longer exist", d.Get("virtual_machine_id").(string))
@@ -113,16 +113,16 @@ func resourceCosmicNICRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceCosmicNICDelete(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.VirtualMachine.NewRemoveNicFromVirtualMachineParams(
+	p := client.VirtualMachine.NewRemoveNicFromVirtualMachineParams(
 		d.Id(),
 		d.Get("virtual_machine_id").(string),
 	)
 
 	// Remove the NIC
-	_, err := cs.VirtualMachine.RemoveNicFromVirtualMachine(p)
+	_, err := client.VirtualMachine.RemoveNicFromVirtualMachine(p)
 	if err != nil {
 		// This is a very poor way to be told the ID does no longer exist :(
 		if strings.Contains(err.Error(), fmt.Sprintf(
@@ -137,9 +137,9 @@ func resourceCosmicNICDelete(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func retryableAddNicFunc(cs *cosmic.CosmicClient, p *cosmic.AddNicToVirtualMachineParams) func() (interface{}, error) {
+func retryableAddNicFunc(client *CosmicClient, p *cosmic.AddNicToVirtualMachineParams) func() (interface{}, error) {
 	return func() (interface{}, error) {
-		r, err := cs.VirtualMachine.AddNicToVirtualMachine(p)
+		r, err := client.VirtualMachine.AddNicToVirtualMachine(p)
 		if err != nil {
 			return nil, err
 		}

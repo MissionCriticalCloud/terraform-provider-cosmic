@@ -5,7 +5,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
@@ -133,8 +132,8 @@ func testAccCheckCosmicPortForwardsExist(n string) resource.TestCheckFunc {
 				continue
 			}
 
-			cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-			_, count, err := cs.Firewall.GetPortForwardingRuleByID(id)
+			client := testAccProvider.Meta().(*CosmicClient)
+			_, count, err := client.Firewall.GetPortForwardingRuleByID(id)
 
 			if err != nil {
 				return err
@@ -150,7 +149,7 @@ func testAccCheckCosmicPortForwardsExist(n string) resource.TestCheckFunc {
 }
 
 func testAccCheckCosmicPortForwardDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_port_forward" {
@@ -166,7 +165,7 @@ func testAccCheckCosmicPortForwardDestroy(s *terraform.State) error {
 				continue
 			}
 
-			_, _, err := cs.Firewall.GetPortForwardingRuleByID(id)
+			_, _, err := client.Firewall.GetPortForwardingRuleByID(id)
 			if err == nil {
 				return fmt.Errorf("Port forward %s still exists", rs.Primary.ID)
 			}
@@ -183,7 +182,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -192,7 +190,6 @@ resource "cosmic_network" "foo" {
   gateway          = "10.0.10.1"
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 }
 
 resource "cosmic_instance" "foo" {
@@ -200,7 +197,6 @@ resource "cosmic_instance" "foo" {
   service_offering = "%s"
   network_id       = "${cosmic_network.foo.id}"
   template         = "%s"
-  zone             = "${cosmic_network.foo.zone}"
   expunge          = true
 }
 
@@ -227,7 +223,6 @@ resource "cosmic_port_forward" "foo" {
   }
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE,
@@ -240,7 +235,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -249,7 +243,6 @@ resource "cosmic_network" "foo" {
   gateway          = "10.0.10.1"
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 }
 
 resource "cosmic_instance" "foo" {
@@ -257,7 +250,6 @@ resource "cosmic_instance" "foo" {
   service_offering = "%s"
   network_id       = "${cosmic_network.foo.id}"
   template         = "%s"
-  zone             = "${cosmic_network.foo.zone}"
   expunge          = true
 }
 
@@ -291,7 +283,6 @@ resource "cosmic_port_forward" "foo" {
   }
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE,
@@ -304,7 +295,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -313,7 +303,6 @@ resource "cosmic_network" "foo" {
   gateway          = "10.0.10.1"
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 }
 
 resource "cosmic_instance" "foo" {
@@ -321,7 +310,6 @@ resource "cosmic_instance" "foo" {
   service_offering = "%s"
   network_id       = "${cosmic_network.foo.id}"
   template         = "%s"
-  zone             = "${cosmic_network.foo.zone}"
   expunge          = true
 }
 
@@ -350,7 +338,6 @@ resource "cosmic_port_forward" "foo" {
   }
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE,

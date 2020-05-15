@@ -5,7 +5,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -74,10 +73,10 @@ func resourceCosmicVPNCustomerGateway() *schema.Resource {
 }
 
 func resourceCosmicVPNCustomerGatewayCreate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.VPN.NewCreateVpnCustomerGatewayParams(
+	p := client.VPN.NewCreateVpnCustomerGatewayParams(
 		createCidrList(d.Get("cidr_list").(*schema.Set)),
 		d.Get("esp_policy").(string),
 		d.Get("gateway").(string),
@@ -100,7 +99,7 @@ func resourceCosmicVPNCustomerGatewayCreate(d *schema.ResourceData, meta interfa
 	}
 
 	// Create the new VPN Customer Gateway
-	v, err := cs.VPN.CreateVpnCustomerGateway(p)
+	v, err := client.VPN.CreateVpnCustomerGateway(p)
 	if err != nil {
 		return fmt.Errorf("Error creating VPN Customer Gateway %s: %s", d.Get("name").(string), err)
 	}
@@ -111,10 +110,10 @@ func resourceCosmicVPNCustomerGatewayCreate(d *schema.ResourceData, meta interfa
 }
 
 func resourceCosmicVPNCustomerGatewayRead(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Get the VPN Customer Gateway details
-	v, count, err := cs.VPN.GetVpnCustomerGatewayByID(d.Id())
+	v, count, err := client.VPN.GetVpnCustomerGatewayByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf(
@@ -140,10 +139,10 @@ func resourceCosmicVPNCustomerGatewayRead(d *schema.ResourceData, meta interface
 }
 
 func resourceCosmicVPNCustomerGatewayUpdate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.VPN.NewUpdateVpnCustomerGatewayParams(
+	p := client.VPN.NewUpdateVpnCustomerGatewayParams(
 		createCidrList(d.Get("cidr_list").(*schema.Set)),
 		d.Get("esp_policy").(string),
 		d.Get("gateway").(string),
@@ -167,7 +166,7 @@ func resourceCosmicVPNCustomerGatewayUpdate(d *schema.ResourceData, meta interfa
 	}
 
 	// Update the VPN Customer Gateway
-	_, err := cs.VPN.UpdateVpnCustomerGateway(p)
+	_, err := client.VPN.UpdateVpnCustomerGateway(p)
 	if err != nil {
 		return fmt.Errorf("Error updating VPN Customer Gateway %s: %s", d.Get("name").(string), err)
 	}
@@ -176,13 +175,13 @@ func resourceCosmicVPNCustomerGatewayUpdate(d *schema.ResourceData, meta interfa
 }
 
 func resourceCosmicVPNCustomerGatewayDelete(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.VPN.NewDeleteVpnCustomerGatewayParams(d.Id())
+	p := client.VPN.NewDeleteVpnCustomerGatewayParams(d.Id())
 
 	// Delete the VPN Customer Gateway
-	_, err := cs.VPN.DeleteVpnCustomerGateway(p)
+	_, err := client.VPN.DeleteVpnCustomerGateway(p)
 	if err != nil {
 		// This is a very poor way to be told the ID does no longer exist :(
 		if strings.Contains(err.Error(), fmt.Sprintf(

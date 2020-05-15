@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -54,12 +53,6 @@ func resourceCosmicTemplate() *schema.Resource {
 				ForceNew: true,
 			},
 
-			"zone": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-
 			"is_dynamically_scalable": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -102,12 +95,20 @@ func resourceCosmicTemplate() *schema.Resource {
 				Optional: true,
 				Default:  300,
 			},
+
+			"zone": &schema.Schema{
+				Type:       schema.TypeString,
+				Optional:   true,
+				Computed:   true,
+				ForceNew:   true,
+				Deprecated: deprecatedZoneMsg(),
+			},
 		},
 	}
 }
 
 func resourceCosmicTemplateCreate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	if err := verifyTemplateParams(d); err != nil {
 		return err
@@ -122,19 +123,19 @@ func resourceCosmicTemplateCreate(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	// Retrieve the os_type ID
-	ostypeid, e := retrieveID(cs, "os_type", d.Get("os_type").(string))
+	ostypeid, e := retrieveID(client, "os_type", d.Get("os_type").(string))
 	if e != nil {
 		return e.Error()
 	}
 
 	// Retrieve the zone ID
-	zoneid, e := retrieveID(cs, "zone", d.Get("zone").(string))
+	zoneid, e := retrieveID(client, "zone", client.ZoneName)
 	if e != nil {
 		return e.Error()
 	}
 
 	// Create a new parameter struct
-	p := cs.Template.NewRegisterTemplateParams(
+	p := client.Template.NewRegisterTemplateParams(
 		displaytext,
 		d.Get("format").(string),
 		d.Get("hypervisor").(string),
@@ -165,7 +166,7 @@ func resourceCosmicTemplateCreate(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	// Create the new template
-	r, err := cs.Template.RegisterTemplate(p)
+	r, err := client.Template.RegisterTemplate(p)
 	if err != nil {
 		return fmt.Errorf("Error creating template %s: %s", name, err)
 	}
@@ -196,10 +197,10 @@ func resourceCosmicTemplateCreate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceCosmicTemplateRead(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Get the template details
-	t, count, err := cs.Template.GetTemplateByID(d.Id(), "executable")
+	t, count, err := client.Template.GetTemplateByID(d.Id(), "executable")
 	if err != nil {
 		if count == 0 {
 			log.Printf(
@@ -229,11 +230,11 @@ func resourceCosmicTemplateRead(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceCosmicTemplateUpdate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 	name := d.Get("name").(string)
 
 	// Create a new parameter struct
-	p := cs.Template.NewUpdateTemplateParams(d.Id())
+	p := client.Template.NewUpdateTemplateParams(d.Id())
 
 	if d.HasChange("name") {
 		p.SetName(name)
@@ -252,7 +253,7 @@ func resourceCosmicTemplateUpdate(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	if d.HasChange("os_type") {
-		ostypeid, e := retrieveID(cs, "os_type", d.Get("os_type").(string))
+		ostypeid, e := retrieveID(client, "os_type", d.Get("os_type").(string))
 		if e != nil {
 			return e.Error()
 		}
@@ -263,7 +264,7 @@ func resourceCosmicTemplateUpdate(d *schema.ResourceData, meta interface{}) erro
 		p.SetPasswordenabled(d.Get("password_enabled").(bool))
 	}
 
-	_, err := cs.Template.UpdateTemplate(p)
+	_, err := client.Template.UpdateTemplate(p)
 	if err != nil {
 		return fmt.Errorf("Error updating template %s: %s", name, err)
 	}
@@ -272,14 +273,14 @@ func resourceCosmicTemplateUpdate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceCosmicTemplateDelete(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.Template.NewDeleteTemplateParams(d.Id())
+	p := client.Template.NewDeleteTemplateParams(d.Id())
 
 	// Delete the template
 	log.Printf("[INFO] Deleting template: %s", d.Get("name").(string))
-	_, err := cs.Template.DeleteTemplate(p)
+	_, err := client.Template.DeleteTemplate(p)
 	if err != nil {
 		// This is a very poor way to be told the ID does no longer exist :(
 		if strings.Contains(err.Error(), fmt.Sprintf(

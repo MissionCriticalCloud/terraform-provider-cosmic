@@ -175,8 +175,8 @@ func testAccCheckCosmicNetworkExists(n string, network *cosmic.Network) resource
 			return fmt.Errorf("No network ID is set")
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		ntwrk, _, err := cs.Network.GetNetworkByID(rs.Primary.ID)
+		client := testAccProvider.Meta().(*CosmicClient)
+		ntwrk, _, err := client.Network.GetNetworkByID(rs.Primary.ID)
 
 		if err != nil {
 			return err
@@ -222,7 +222,7 @@ func testAccCheckNetworkTags(n *cosmic.Network, key string, value string) resour
 }
 
 func testAccCheckCosmicNetworkDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_network" {
@@ -233,7 +233,7 @@ func testAccCheckCosmicNetworkDestroy(s *terraform.State) error {
 			return fmt.Errorf("No network ID is set")
 		}
 
-		_, _, err := cs.Network.GetNetworkByID(rs.Primary.ID)
+		_, _, err := client.Network.GetNetworkByID(rs.Primary.ID)
 		if err == nil {
 			return fmt.Errorf("Network %s still exists", rs.Primary.ID)
 		}
@@ -249,7 +249,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -258,14 +257,12 @@ resource "cosmic_network" "foo" {
   gateway          = "10.0.10.1"
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 
   tags = {
     terraform-tag = "true"
   }
 }`,
 	strings.ToLower(COSMIC_VPC_OFFERING),
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 )
 
@@ -276,7 +273,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -286,14 +282,12 @@ resource "cosmic_network" "foo" {
   dns              = ["10.10.10.10"]
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 
   tags = {
     terraform-tag = "true"
   }
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 )
 
@@ -304,7 +298,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -314,14 +307,12 @@ resource "cosmic_network" "foo" {
   dns              = ["10.10.10.10"]
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 
   tags = {
     terraform-tag = "true"
   }
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 )
 
@@ -332,7 +323,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network_acl" "foo" {
@@ -347,10 +337,8 @@ resource "cosmic_network" "foo" {
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
   acl_id           = "${cosmic_network_acl.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 )
 
@@ -361,7 +349,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network_acl" "bar" {
@@ -376,9 +363,7 @@ resource "cosmic_network" "foo" {
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
   acl_id           = "${cosmic_network_acl.bar.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 )

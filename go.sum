@@ -9,6 +9,8 @@ cloud.google.com/go/bigquery v1.0.1/go.mod h1:i/xbL2UlR5RvWAURpBYZTtm/cXjCha9lbf
 cloud.google.com/go/datastore v1.0.0/go.mod h1:LXYbyblFSglQ5pkeyhO+Qmw7ukd3C+pD7TKLgZqpHYE=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
+github.com/MissionCriticalCloud/go-cosmic v6.2.6+incompatible h1:J8sN+/TYyKQJcQqWcDnOy5OM+hXQtiotTDvjeUPt6FI=
+github.com/MissionCriticalCloud/go-cosmic v6.2.6+incompatible/go.mod h1:DFavzFQBiLwlyfp0i73GjpKU5GNouDKUfzCL+fMzpKc=
 github.com/MissionCriticalCloud/go-cosmic/v6 v6.2.8 h1:zr0CBe+oqFsbVUjULWfhGivm6aKrMKncAZvSDS8Tua8=
 github.com/MissionCriticalCloud/go-cosmic/v6 v6.2.8/go.mod h1:K/NK6dPjUBesEKUkfSZXYckHUv4FYPd4oKl42BO4eBI=
 github.com/agext/levenshtein v1.2.1 h1:QmvMAjj2aEICytGiWzmxoE0x2KZvE0fvmqMOfy2tjT8=

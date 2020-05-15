@@ -5,7 +5,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -73,27 +72,29 @@ func resourceCosmicVPC() *schema.Resource {
 			},
 
 			"zone": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:       schema.TypeString,
+				Optional:   true,
+				Computed:   true,
+				ForceNew:   true,
+				Deprecated: deprecatedZoneMsg(),
 			},
 		},
 	}
 }
 
 func resourceCosmicVPCCreate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	name := d.Get("name").(string)
 
 	// Retrieve the vpc_offering ID
-	vpcofferingid, e := retrieveID(cs, "vpc_offering", d.Get("vpc_offering").(string))
+	vpcofferingid, e := retrieveID(client, "vpc_offering", d.Get("vpc_offering").(string))
 	if e != nil {
 		return e.Error()
 	}
 
 	// Retrieve the zone ID
-	zoneid, e := retrieveID(cs, "zone", d.Get("zone").(string))
+	zoneid, e := retrieveID(client, "zone", client.ZoneName)
 	if e != nil {
 		return e.Error()
 	}
@@ -105,7 +106,7 @@ func resourceCosmicVPCCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	// Create a new parameter struct
-	p := cs.VPC.NewCreateVPCParams(
+	p := client.VPC.NewCreateVPCParams(
 		d.Get("cidr").(string),
 		displaytext.(string),
 		name,
@@ -132,7 +133,7 @@ func resourceCosmicVPCCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	// Create the new VPC
-	r, err := cs.VPC.CreateVPC(p)
+	r, err := client.VPC.CreateVPC(p)
 	if err != nil {
 		return fmt.Errorf("Error creating VPC %s: %s", name, err)
 	}
@@ -143,10 +144,10 @@ func resourceCosmicVPCCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceCosmicVPCRead(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Get the VPC details
-	v, count, err := cs.VPC.GetVPCByID(d.Id())
+	v, count, err := client.VPC.GetVPCByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf(
@@ -166,7 +167,7 @@ func resourceCosmicVPCRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("syslogserverlist", v.Syslogserverlist)
 
 	// Get the VPC offering details
-	o, _, err := cs.VPC.GetVPCOfferingByID(v.Vpcofferingid)
+	o, _, err := client.VPC.GetVPCOfferingByID(v.Vpcofferingid)
 	if err != nil {
 		return err
 	}
@@ -175,12 +176,12 @@ func resourceCosmicVPCRead(d *schema.ResourceData, meta interface{}) error {
 	setValueOrID(d, "zone", v.Zonename, v.Zoneid)
 
 	// Create a new parameter struct
-	p := cs.PublicIPAddress.NewListPublicIpAddressesParams()
+	p := client.PublicIPAddress.NewListPublicIpAddressesParams()
 	p.SetVpcid(d.Id())
 	p.SetIssourcenat(true)
 
 	// Get the source NAT IP assigned to the VPC
-	l, err := cs.PublicIPAddress.ListPublicIpAddresses(p)
+	l, err := client.PublicIPAddress.ListPublicIpAddresses(p)
 	if err != nil {
 		return err
 	}
@@ -194,12 +195,12 @@ func resourceCosmicVPCRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceCosmicVPCUpdate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	name := d.Get("name").(string)
 
 	// Create a new parameter struct
-	p := cs.VPC.NewUpdateVPCParams(d.Id())
+	p := client.VPC.NewUpdateVPCParams(d.Id())
 
 	// Check if the name is changed
 	if d.HasChange("name") {
@@ -240,7 +241,7 @@ func resourceCosmicVPCUpdate(d *schema.ResourceData, meta interface{}) error {
 	// Check if the VPC offering is changed
 	if d.HasChange("vpc_offering") {
 		// Retrieve the VPC offering ID
-		o, _, err := cs.VPC.GetVPCOfferingByName(d.Get("vpc_offering").(string))
+		o, _, err := client.VPC.GetVPCOfferingByName(d.Get("vpc_offering").(string))
 		if err != nil {
 			return err
 		}
@@ -249,7 +250,7 @@ func resourceCosmicVPCUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	// Update the VPC
-	_, err := cs.VPC.UpdateVPC(p)
+	_, err := client.VPC.UpdateVPC(p)
 	if err != nil {
 		return fmt.Errorf("Error updating name of VPC %s: %s", name, err)
 	}
@@ -258,13 +259,13 @@ func resourceCosmicVPCUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceCosmicVPCDelete(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.VPC.NewDeleteVPCParams(d.Id())
+	p := client.VPC.NewDeleteVPCParams(d.Id())
 
 	// Delete the VPC
-	_, err := cs.VPC.DeleteVPC(p)
+	_, err := client.VPC.DeleteVPC(p)
 	if err != nil {
 		// This is a very poor way to be told the ID does no longer exist :(
 		if strings.Contains(err.Error(), fmt.Sprintf(

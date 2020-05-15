@@ -57,8 +57,8 @@ func testAccCheckCosmicStaticNATExists(n string, ipaddr *cosmic.PublicIpAddress)
 			return fmt.Errorf("No static NAT ID is set")
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		ip, _, err := cs.PublicIPAddress.GetPublicIpAddressByID(rs.Primary.ID)
+		client := testAccProvider.Meta().(*CosmicClient)
+		ip, _, err := client.PublicIPAddress.GetPublicIpAddressByID(rs.Primary.ID)
 
 		if err != nil {
 			return err
@@ -89,7 +89,7 @@ func testAccCheckCosmicStaticNATAttributes(ipaddr *cosmic.PublicIpAddress) resou
 }
 
 func testAccCheckCosmicStaticNATDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_static_nat" {
@@ -100,7 +100,7 @@ func testAccCheckCosmicStaticNATDestroy(s *terraform.State) error {
 			return fmt.Errorf("No static NAT ID is set")
 		}
 
-		ip, _, err := cs.PublicIPAddress.GetPublicIpAddressByID(rs.Primary.ID)
+		ip, _, err := client.PublicIPAddress.GetPublicIpAddressByID(rs.Primary.ID)
 		if err == nil && ip.Isstaticnat {
 			return fmt.Errorf("Static NAT %s still enabled", rs.Primary.ID)
 		}
@@ -116,7 +116,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -125,7 +124,6 @@ resource "cosmic_network" "foo" {
   gateway          = "10.0.10.1"
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 }
 
 resource "cosmic_instance" "foo" {
@@ -134,7 +132,6 @@ resource "cosmic_instance" "foo" {
   service_offering = "%s"
   network_id       = "${cosmic_network.foo.id}"
   template         = "%s"
-  zone             = "${cosmic_network.foo.zone}"
   user_data        = "foobar\nfoo\nbar"
   expunge          = true
 }
@@ -156,7 +153,6 @@ resource "cosmic_static_nat" "foo" {
   virtual_machine_id = "${cosmic_instance.foo.id}"
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE,

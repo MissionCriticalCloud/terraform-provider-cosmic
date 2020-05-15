@@ -5,7 +5,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -61,14 +60,14 @@ func resourceCosmicIPAddress() *schema.Resource {
 }
 
 func resourceCosmicIPAddressCreate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	if err := verifyIPAddressParams(d); err != nil {
 		return err
 	}
 
 	// Create a new parameter struct
-	p := cs.PublicIPAddress.NewAssociateIpAddressParams()
+	p := client.PublicIPAddress.NewAssociateIpAddressParams()
 
 	if networkid, ok := d.GetOk("network_id"); ok {
 		// Set the networkid
@@ -81,7 +80,7 @@ func resourceCosmicIPAddressCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	// Associate a new IP address
-	r, err := cs.PublicIPAddress.AssociateIpAddress(p)
+	r, err := client.PublicIPAddress.AssociateIpAddress(p)
 	if err != nil {
 		return fmt.Errorf("Error associating a new IP address: %s", err)
 	}
@@ -91,10 +90,10 @@ func resourceCosmicIPAddressCreate(d *schema.ResourceData, meta interface{}) err
 	// Set the ACL if we are on a VPC and acl_id is supplied
 	if _, ok := d.GetOk("vpc_id"); ok {
 		if aclid, ok := d.GetOk("acl_id"); ok && aclid.(string) != none {
-			p := cs.NetworkACL.NewReplaceNetworkACLListParams(aclid.(string))
+			p := client.NetworkACL.NewReplaceNetworkACLListParams(aclid.(string))
 			p.SetPublicipid(d.Id())
 
-			_, err := cs.NetworkACL.ReplaceNetworkACLList(p)
+			_, err := client.NetworkACL.ReplaceNetworkACLList(p)
 			if err != nil {
 				return fmt.Errorf("Error replacing ACL: %s", err)
 			}
@@ -105,10 +104,10 @@ func resourceCosmicIPAddressCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceCosmicIPAddressRead(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Get the IP address details
-	ip, count, err := cs.PublicIPAddress.GetPublicIpAddressByID(d.Id())
+	ip, count, err := client.PublicIPAddress.GetPublicIpAddressByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf(
@@ -140,14 +139,14 @@ func resourceCosmicIPAddressRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceCosmicIPAddressUpdate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Replace the ACL if the ID has changed
 	if d.HasChange("acl_id") {
-		p := cs.NetworkACL.NewReplaceNetworkACLListParams(d.Get("acl_id").(string))
+		p := client.NetworkACL.NewReplaceNetworkACLListParams(d.Get("acl_id").(string))
 		p.SetPublicipid(d.Id())
 
-		_, err := cs.NetworkACL.ReplaceNetworkACLList(p)
+		_, err := client.NetworkACL.ReplaceNetworkACLList(p)
 		if err != nil {
 			return fmt.Errorf("Error replacing ACL: %s", err)
 		}
@@ -157,13 +156,13 @@ func resourceCosmicIPAddressUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceCosmicIPAddressDelete(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.PublicIPAddress.NewDisassociateIpAddressParams(d.Id())
+	p := client.PublicIPAddress.NewDisassociateIpAddressParams(d.Id())
 
 	// Disassociate the IP address
-	if _, err := cs.PublicIPAddress.DisassociateIpAddress(p); err != nil {
+	if _, err := client.PublicIPAddress.DisassociateIpAddress(p); err != nil {
 		// This is a very poor way to be told the ID does no longer exist :(
 		if strings.Contains(err.Error(), fmt.Sprintf(
 			"Invalid parameter id value=%s due to incorrect long value format, "+
@@ -178,8 +177,8 @@ func resourceCosmicIPAddressDelete(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceCosmicIPAddressImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	cs := meta.(*cosmic.CosmicClient)
-	ip, _, _ := cs.PublicIPAddress.GetPublicIpAddressByID(d.Id())
+	client := meta.(*CosmicClient)
+	ip, _, _ := client.PublicIPAddress.GetPublicIpAddressByID(d.Id())
 
 	// Set the vpc_id if the IP is attached to a VPC.
 	if ip.Vpcid != "" {

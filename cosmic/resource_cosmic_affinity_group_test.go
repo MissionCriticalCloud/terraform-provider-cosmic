@@ -40,8 +40,8 @@ func testAccCheckCosmicAffinityGroupExists(n string, affinityGroup *cosmic.Affin
 			return fmt.Errorf("No affinity group ID is set")
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		ag, _, err := cs.AffinityGroup.GetAffinityGroupByID(rs.Primary.ID)
+		client := testAccProvider.Meta().(*CosmicClient)
+		ag, _, err := client.AffinityGroup.GetAffinityGroupByID(rs.Primary.ID)
 
 		if err != nil {
 			return err
@@ -77,7 +77,7 @@ func testAccCheckCosmicAffinityGroupAttributes(affinityGroup *cosmic.AffinityGro
 }
 
 func testAccCheckCosmicAffinityGroupDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_affinity_group" {
@@ -88,7 +88,7 @@ func testAccCheckCosmicAffinityGroupDestroy(s *terraform.State) error {
 			return fmt.Errorf("No affinity group ID is set")
 		}
 
-		_, _, err := cs.AffinityGroup.GetAffinityGroupByID(rs.Primary.ID)
+		_, _, err := client.AffinityGroup.GetAffinityGroupByID(rs.Primary.ID)
 		if err == nil {
 			return fmt.Errorf("Affinity group %s still exists", rs.Primary.ID)
 		}

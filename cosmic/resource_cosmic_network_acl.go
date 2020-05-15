@@ -5,7 +5,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -41,12 +40,12 @@ func resourceCosmicNetworkACL() *schema.Resource {
 }
 
 func resourceCosmicNetworkACLCreate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	name := d.Get("name").(string)
 
 	// Create a new parameter struct
-	p := cs.NetworkACL.NewCreateNetworkACLListParams(name, d.Get("vpc_id").(string))
+	p := client.NetworkACL.NewCreateNetworkACLListParams(name, d.Get("vpc_id").(string))
 
 	// Set the description
 	if description, ok := d.GetOk("description"); ok {
@@ -56,7 +55,7 @@ func resourceCosmicNetworkACLCreate(d *schema.ResourceData, meta interface{}) er
 	}
 
 	// Create the new network ACL list
-	r, err := cs.NetworkACL.CreateNetworkACLList(p)
+	r, err := client.NetworkACL.CreateNetworkACLList(p)
 	if err != nil {
 		return fmt.Errorf("Error creating network ACL list %s: %s", name, err)
 	}
@@ -67,10 +66,10 @@ func resourceCosmicNetworkACLCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceCosmicNetworkACLRead(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Get the network ACL list details
-	f, count, err := cs.NetworkACL.GetNetworkACLListByID(d.Id())
+	f, count, err := client.NetworkACL.GetNetworkACLListByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf(
@@ -90,11 +89,11 @@ func resourceCosmicNetworkACLRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceCosmicNetworkACLUpdate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 	name := d.Get("name").(string)
 
 	// Create a new parameter struct
-	p := cs.NetworkACL.NewUpdateNetworkACLListParams(d.Id())
+	p := client.NetworkACL.NewUpdateNetworkACLListParams(d.Id())
 
 	// Check if the name or description is changed
 	if d.HasChange("name") || d.HasChange("description") {
@@ -109,7 +108,7 @@ func resourceCosmicNetworkACLUpdate(d *schema.ResourceData, meta interface{}) er
 	}
 
 	// Update the network ACL
-	_, err := cs.NetworkACL.UpdateNetworkACLList(p)
+	_, err := client.NetworkACL.UpdateNetworkACLList(p)
 	if err != nil {
 		return fmt.Errorf(
 			"Error updating network ACL %s: %s", name, err)
@@ -119,14 +118,14 @@ func resourceCosmicNetworkACLUpdate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceCosmicNetworkACLDelete(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.NetworkACL.NewDeleteNetworkACLListParams(d.Id())
+	p := client.NetworkACL.NewDeleteNetworkACLListParams(d.Id())
 
 	// Delete the network ACL list
 	_, err := Retry(3, func() (interface{}, error) {
-		return cs.NetworkACL.DeleteNetworkACLList(p)
+		return client.NetworkACL.DeleteNetworkACLList(p)
 	})
 	if err != nil {
 		// This is a very poor way to be told the ID does no longer exist :(

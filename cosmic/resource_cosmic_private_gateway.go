@@ -5,7 +5,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -47,12 +46,12 @@ func resourceCosmicPrivateGateway() *schema.Resource {
 }
 
 func resourceCosmicPrivateGatewayCreate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	ipaddress := d.Get("ip_address").(string)
 
 	// Create a new parameter struct
-	p := cs.VPC.NewCreatePrivateGatewayParams(
+	p := client.VPC.NewCreatePrivateGatewayParams(
 		ipaddress,
 		d.Get("network_id").(string),
 		d.Get("vpc_id").(string),
@@ -62,7 +61,7 @@ func resourceCosmicPrivateGatewayCreate(d *schema.ResourceData, meta interface{}
 	p.SetAclid(d.Get("acl_id").(string))
 
 	// Create the new private gateway
-	r, err := cs.VPC.CreatePrivateGateway(p)
+	r, err := client.VPC.CreatePrivateGateway(p)
 	if err != nil {
 		return fmt.Errorf("Error creating private gateway for %s: %s", ipaddress, err)
 	}
@@ -73,10 +72,10 @@ func resourceCosmicPrivateGatewayCreate(d *schema.ResourceData, meta interface{}
 }
 
 func resourceCosmicPrivateGatewayRead(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Get the private gateway details
-	gw, count, err := cs.VPC.GetPrivateGatewayByID(d.Id())
+	gw, count, err := client.VPC.GetPrivateGatewayByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf("[DEBUG] Private gateway %s does no longer exist", d.Id())
@@ -96,13 +95,13 @@ func resourceCosmicPrivateGatewayRead(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceCosmicPrivateGatewayDelete(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.VPC.NewDeletePrivateGatewayParams(d.Id())
+	p := client.VPC.NewDeletePrivateGatewayParams(d.Id())
 
 	// Delete the private gateway
-	_, err := cs.VPC.DeletePrivateGateway(p)
+	_, err := client.VPC.DeletePrivateGateway(p)
 	if err != nil {
 		// This is a very poor way to be told the ID does no longer exist :(
 		if strings.Contains(err.Error(), fmt.Sprintf(

@@ -72,8 +72,8 @@ func testAccCheckCosmicTemplateExists(n string, template *cosmic.Template) resou
 			return fmt.Errorf("No template ID is set")
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		tmpl, _, err := cs.Template.GetTemplateByID(rs.Primary.ID, "executable")
+		client := testAccProvider.Meta().(*CosmicClient)
+		tmpl, _, err := client.Template.GetTemplateByID(rs.Primary.ID, "executable")
 
 		if err != nil {
 			return err
@@ -108,10 +108,6 @@ func testAccCheckCosmicTemplateBasicAttributes(template *cosmic.Template) resour
 			return fmt.Errorf("Bad os type: %s", template.Ostypename)
 		}
 
-		if template.Zonename != COSMIC_ZONE {
-			return fmt.Errorf("Bad zone: %s", template.Zonename)
-		}
-
 		return nil
 	}
 }
@@ -136,7 +132,7 @@ func testAccCheckCosmicTemplateUpdatedAttributes(template *cosmic.Template) reso
 }
 
 func testAccCheckCosmicTemplateDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_template" {
@@ -147,7 +143,7 @@ func testAccCheckCosmicTemplateDestroy(s *terraform.State) error {
 			return fmt.Errorf("No template ID is set")
 		}
 
-		_, _, err := cs.Template.GetTemplateByID(rs.Primary.ID, "executable")
+		_, _, err := client.Template.GetTemplateByID(rs.Primary.ID, "executable")
 		if err == nil {
 			return fmt.Errorf("Template %s still exists", rs.Primary.ID)
 		}
@@ -163,10 +159,7 @@ resource "cosmic_template" "foo" {
   hypervisor = "KVM"
   os_type    = "Other PV (64-bit)"
   url        = "http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2"
-  zone       = "%s"
-}`,
-	COSMIC_ZONE,
-)
+}`)
 
 var testAccCosmicTemplate_update = fmt.Sprintf(`
 resource "cosmic_template" "foo" {
@@ -176,9 +169,6 @@ resource "cosmic_template" "foo" {
   hypervisor              = "KVM"
   os_type                 = "Other PV (64-bit)"
   url                     = "http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2"
-  zone                    = "%s"
   is_dynamically_scalable = true
   password_enabled        = true
-}`,
-	COSMIC_ZONE,
-)
+}`)

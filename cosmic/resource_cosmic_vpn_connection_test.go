@@ -47,8 +47,8 @@ func testAccCheckCosmicVPNConnectionExists(n string, vpnConnection *cosmic.VpnCo
 			return fmt.Errorf("No VPN Connection ID is set")
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		v, _, err := cs.VPN.GetVpnConnectionByID(rs.Primary.ID)
+		client := testAccProvider.Meta().(*CosmicClient)
+		v, _, err := client.VPN.GetVpnConnectionByID(rs.Primary.ID)
 
 		if err != nil {
 			return err
@@ -65,7 +65,7 @@ func testAccCheckCosmicVPNConnectionExists(n string, vpnConnection *cosmic.VpnCo
 }
 
 func testAccCheckCosmicVPNConnectionDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_vpn_connection" {
@@ -76,7 +76,7 @@ func testAccCheckCosmicVPNConnectionDestroy(s *terraform.State) error {
 			return fmt.Errorf("No VPN Connection ID is set")
 		}
 
-		_, _, err := cs.VPN.GetVpnConnectionByID(rs.Primary.ID)
+		_, _, err := client.VPN.GetVpnConnectionByID(rs.Primary.ID)
 		if err == nil {
 			return fmt.Errorf("VPN Connection %s still exists", rs.Primary.ID)
 		}
@@ -91,14 +91,12 @@ resource "cosmic_vpc" "foo" {
   name         = "terraform-vpc-foo"
   cidr         = "10.0.10.0/22"
   vpc_offering = "%s"
-  zone         = "%s"
 }
 
 resource "cosmic_vpc" "bar" {
   name         = "terraform-vpc-bar"
   cidr         = "10.0.20.0/22"
   vpc_offering = "%s"
-  zone         = "%s"
 }
 
 resource "cosmic_vpn_gateway" "foo" {
@@ -138,9 +136,7 @@ resource "cosmic_vpn_connection" "bar-foo" {
 }
 `,
 		COSMIC_VPC_OFFERING,
-		COSMIC_ZONE,
 		COSMIC_VPC_OFFERING,
-		COSMIC_ZONE,
 		rand,
 		rand,
 	)

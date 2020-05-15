@@ -82,6 +82,3 @@ var COSMIC_VPC_NETWORK_OFFERING = os.Getenv("COSMIC_VPC_NETWORK_OFFERING")
 
 // Name of a template that exists already for building VMs
 var COSMIC_TEMPLATE = os.Getenv("COSMIC_TEMPLATE")
-
-// Name of a zone that exists already
-var COSMIC_ZONE = os.Getenv("COSMIC_ZONE")

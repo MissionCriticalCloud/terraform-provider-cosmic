@@ -5,7 +5,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -34,13 +33,13 @@ func resourceCosmicVPNGateway() *schema.Resource {
 }
 
 func resourceCosmicVPNGatewayCreate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	vpcid := d.Get("vpc_id").(string)
-	p := cs.VPN.NewCreateVpnGatewayParams(vpcid)
+	p := client.VPN.NewCreateVpnGatewayParams(vpcid)
 
 	// Create the new VPN Gateway
-	v, err := cs.VPN.CreateVpnGateway(p)
+	v, err := client.VPN.CreateVpnGateway(p)
 	if err != nil {
 		return fmt.Errorf("Error creating VPN Gateway for VPC ID %s: %s", vpcid, err)
 	}
@@ -51,10 +50,10 @@ func resourceCosmicVPNGatewayCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceCosmicVPNGatewayRead(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Get the VPN Gateway details
-	v, count, err := cs.VPN.GetVpnGatewayByID(d.Id())
+	v, count, err := client.VPN.GetVpnGatewayByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf(
@@ -73,13 +72,13 @@ func resourceCosmicVPNGatewayRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceCosmicVPNGatewayDelete(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.VPN.NewDeleteVpnGatewayParams(d.Id())
+	p := client.VPN.NewDeleteVpnGatewayParams(d.Id())
 
 	// Delete the VPN Gateway
-	_, err := cs.VPN.DeleteVpnGateway(p)
+	_, err := client.VPN.DeleteVpnGateway(p)
 	if err != nil {
 		// This is a very poor way to be told the ID does no longer exist :(
 		if strings.Contains(err.Error(), fmt.Sprintf(

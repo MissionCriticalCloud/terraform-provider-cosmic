@@ -5,7 +5,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -45,24 +44,24 @@ func resourceCosmicSSHKeyPair() *schema.Resource {
 }
 
 func resourceCosmicSSHKeyPairCreate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	name := d.Get("name").(string)
 	publicKey := d.Get("public_key").(string)
 
 	if publicKey != "" {
 		// Register supplied key
-		p := cs.SSH.NewRegisterSSHKeyPairParams(name, publicKey)
+		p := client.SSH.NewRegisterSSHKeyPairParams(name, publicKey)
 
-		_, err := cs.SSH.RegisterSSHKeyPair(p)
+		_, err := client.SSH.RegisterSSHKeyPair(p)
 		if err != nil {
 			return err
 		}
 	} else {
 		// No key supplied, must create one and return the private key
-		p := cs.SSH.NewCreateSSHKeyPairParams(name)
+		p := client.SSH.NewCreateSSHKeyPairParams(name)
 
-		r, err := cs.SSH.CreateSSHKeyPair(p)
+		r, err := client.SSH.CreateSSHKeyPair(p)
 		if err != nil {
 			return err
 		}
@@ -76,14 +75,14 @@ func resourceCosmicSSHKeyPairCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceCosmicSSHKeyPairRead(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	log.Printf("[DEBUG] looking for key pair with name %s", d.Id())
 
-	p := cs.SSH.NewListSSHKeyPairsParams()
+	p := client.SSH.NewListSSHKeyPairsParams()
 	p.SetName(d.Id())
 
-	r, err := cs.SSH.ListSSHKeyPairs(p)
+	r, err := client.SSH.ListSSHKeyPairs(p)
 	if err != nil {
 		return err
 	}
@@ -101,13 +100,13 @@ func resourceCosmicSSHKeyPairRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceCosmicSSHKeyPairDelete(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.SSH.NewDeleteSSHKeyPairParams(d.Id())
+	p := client.SSH.NewDeleteSSHKeyPairParams(d.Id())
 
 	// Remove the SSH Keypair
-	_, err := cs.SSH.DeleteSSHKeyPair(p)
+	_, err := client.SSH.DeleteSSHKeyPair(p)
 	if err != nil {
 		// This is a very poor way to be told the ID does no longer exist :(
 		if strings.Contains(err.Error(), fmt.Sprintf(

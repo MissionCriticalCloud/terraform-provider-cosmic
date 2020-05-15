@@ -80,26 +80,28 @@ func resourceCosmicDisk() *schema.Resource {
 			},
 
 			"zone": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:       schema.TypeString,
+				Optional:   true,
+				Computed:   true,
+				ForceNew:   true,
+				Deprecated: deprecatedZoneMsg(),
 			},
 		},
 	}
 }
 
 func resourceCosmicDiskCreate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 	d.Partial(true)
 
 	name := d.Get("name").(string)
 
 	// Create a new parameter struct
-	p := cs.Volume.NewCreateVolumeParams()
+	p := client.Volume.NewCreateVolumeParams()
 	p.SetName(name)
 
 	// Retrieve the disk_offering ID
-	diskofferingid, e := retrieveID(cs, "disk_offering", d.Get("disk_offering").(string))
+	diskofferingid, e := retrieveID(client, "disk_offering", d.Get("disk_offering").(string))
 	if e != nil {
 		return e.Error()
 	}
@@ -117,7 +119,7 @@ func resourceCosmicDiskCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	// Retrieve the zone ID
-	zoneid, e := retrieveID(cs, "zone", d.Get("zone").(string))
+	zoneid, e := retrieveID(client, "zone", client.ZoneName)
 	if e != nil {
 		return e.Error()
 	}
@@ -125,7 +127,7 @@ func resourceCosmicDiskCreate(d *schema.ResourceData, meta interface{}) error {
 	p.SetZoneid(zoneid)
 
 	// Create the new volume
-	r, err := cs.Volume.CreateVolume(p)
+	r, err := client.Volume.CreateVolume(p)
 	if err != nil {
 		return fmt.Errorf("Error creating the new disk %s: %s", name, err)
 	}
@@ -155,10 +157,10 @@ func resourceCosmicDiskCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceCosmicDiskRead(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Get the volume details
-	v, count, err := cs.Volume.GetVolumeByID(d.Id())
+	v, count, err := client.Volume.GetVolumeByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			d.SetId("")
@@ -185,17 +187,17 @@ func resourceCosmicDiskRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceCosmicDiskUpdate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 	d.Partial(true)
 
 	name := d.Get("name").(string)
 
 	if d.HasChange("disk_offering") || d.HasChange("size") {
 		// Create a new parameter struct
-		p := cs.Volume.NewResizeVolumeParams(d.Id())
+		p := client.Volume.NewResizeVolumeParams(d.Id())
 
 		// Retrieve the disk_offering ID
-		diskofferingid, e := retrieveID(cs, "disk_offering", d.Get("disk_offering").(string))
+		diskofferingid, e := retrieveID(client, "disk_offering", d.Get("disk_offering").(string))
 		if e != nil {
 			return e.Error()
 		}
@@ -212,7 +214,7 @@ func resourceCosmicDiskUpdate(d *schema.ResourceData, meta interface{}) error {
 		p.SetShrinkok(d.Get("shrink_ok").(bool))
 
 		// Change the disk_offering
-		r, err := cs.Volume.ResizeVolume(p)
+		r, err := client.Volume.ResizeVolume(p)
 		if err != nil {
 			return fmt.Errorf("Error changing disk offering/size for disk %s: %s", name, err)
 		}
@@ -255,7 +257,7 @@ func resourceCosmicDiskUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceCosmicDiskDelete(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Detach the volume
 	if err := resourceCosmicDiskDetach(d, meta); err != nil {
@@ -263,10 +265,10 @@ func resourceCosmicDiskDelete(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	// Create a new parameter struct
-	p := cs.Volume.NewDeleteVolumeParams(d.Id())
+	p := client.Volume.NewDeleteVolumeParams(d.Id())
 
 	// Delete the voluem
-	if _, err := cs.Volume.DeleteVolume(p); err != nil {
+	if _, err := client.Volume.DeleteVolume(p); err != nil {
 		// This is a very poor way to be told the ID does no longer exist :(
 		if strings.Contains(err.Error(), fmt.Sprintf(
 			"Invalid parameter id value=%s due to incorrect long value format, "+
@@ -281,7 +283,7 @@ func resourceCosmicDiskDelete(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceCosmicDiskAttach(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	if virtualmachineid, ok := d.GetOk("virtual_machine_id"); ok {
 		// First check if the disk isn't already attached
@@ -290,14 +292,14 @@ func resourceCosmicDiskAttach(d *schema.ResourceData, meta interface{}) error {
 		}
 
 		// Create a new parameter struct
-		p := cs.Volume.NewAttachVolumeParams(d.Id(), virtualmachineid.(string))
+		p := client.Volume.NewAttachVolumeParams(d.Id(), virtualmachineid.(string))
 
 		if deviceid, ok := d.GetOk("device_id"); ok {
 			p.SetDeviceid(int64(deviceid.(int)))
 		}
 
 		// Attach the new volume
-		r, err := Retry(10, retryableAttachVolumeFunc(cs, p))
+		r, err := Retry(10, retryableAttachVolumeFunc(client, p))
 		if err != nil {
 			return fmt.Errorf("Error attaching volume to VM: %s", err)
 		}
@@ -309,7 +311,7 @@ func resourceCosmicDiskAttach(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceCosmicDiskDetach(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Check if the volume is actually attached, before detaching
 	if attached, err := isAttached(d, meta); err != nil || !attached {
@@ -317,33 +319,33 @@ func resourceCosmicDiskDetach(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	// Create a new parameter struct
-	p := cs.Volume.NewDetachVolumeParams()
+	p := client.Volume.NewDetachVolumeParams()
 
 	// Set the volume ID
 	p.SetId(d.Id())
 
 	// Detach the currently attached volume
-	_, err := cs.Volume.DetachVolume(p)
+	_, err := client.Volume.DetachVolume(p)
 	if err != nil {
 		if virtualmachineid, ok := d.GetOk("virtual_machine_id"); ok {
 			// Create a new parameter struct
-			pd := cs.VirtualMachine.NewStopVirtualMachineParams(virtualmachineid.(string))
+			pd := client.VirtualMachine.NewStopVirtualMachineParams(virtualmachineid.(string))
 
 			// Stop the virtual machine in order to be able to detach the disk
-			if _, err := cs.VirtualMachine.StopVirtualMachine(pd); err != nil {
+			if _, err := client.VirtualMachine.StopVirtualMachine(pd); err != nil {
 				return err
 			}
 
 			// Try again to detach the currently attached volume
-			if _, err := cs.Volume.DetachVolume(p); err != nil {
+			if _, err := client.Volume.DetachVolume(p); err != nil {
 				return err
 			}
 
 			// Create a new parameter struct
-			pu := cs.VirtualMachine.NewStartVirtualMachineParams(virtualmachineid.(string))
+			pu := client.VirtualMachine.NewStartVirtualMachineParams(virtualmachineid.(string))
 
 			// Start the virtual machine again
-			if _, err := cs.VirtualMachine.StartVirtualMachine(pu); err != nil {
+			if _, err := client.VirtualMachine.StartVirtualMachine(pu); err != nil {
 				return err
 			}
 		}
@@ -353,10 +355,10 @@ func resourceCosmicDiskDetach(d *schema.ResourceData, meta interface{}) error {
 }
 
 func isAttached(d *schema.ResourceData, meta interface{}) (bool, error) {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Get the volume details
-	v, _, err := cs.Volume.GetVolumeByID(d.Id())
+	v, _, err := client.Volume.GetVolumeByID(d.Id())
 	if err != nil {
 		return false, err
 	}
@@ -364,10 +366,10 @@ func isAttached(d *schema.ResourceData, meta interface{}) (bool, error) {
 	return v.Attached != "", nil
 }
 
-func retryableAttachVolumeFunc(cs *cosmic.CosmicClient, p *cosmic.AttachVolumeParams) func() (interface{}, error) {
+func retryableAttachVolumeFunc(client *CosmicClient, p *cosmic.AttachVolumeParams) func() (interface{}, error) {
 	return func() (interface{}, error) {
 
-		r, err := cs.Volume.AttachVolume(p)
+		r, err := client.Volume.AttachVolume(p)
 		if err != nil {
 			return nil, err
 		}

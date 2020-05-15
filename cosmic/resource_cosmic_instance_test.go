@@ -270,8 +270,8 @@ func testAccCheckCosmicInstanceExists(n string, instance *cosmic.VirtualMachine)
 			return fmt.Errorf("No instance ID is set")
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		vm, _, err := cs.VirtualMachine.GetVirtualMachineByID(rs.Primary.ID)
+		client := testAccProvider.Meta().(*CosmicClient)
+		vm, _, err := client.VirtualMachine.GetVirtualMachineByID(rs.Primary.ID)
 
 		if err != nil {
 			return err
@@ -340,7 +340,7 @@ func testAccCheckCosmicInstanceRenamedAndResized(instance *cosmic.VirtualMachine
 }
 
 func testAccCheckCosmicInstanceDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_instance" {
@@ -351,7 +351,7 @@ func testAccCheckCosmicInstanceDestroy(s *terraform.State) error {
 			return fmt.Errorf("No instance ID is set")
 		}
 
-		_, _, err := cs.VirtualMachine.GetVirtualMachineByID(rs.Primary.ID)
+		_, _, err := client.VirtualMachine.GetVirtualMachineByID(rs.Primary.ID)
 		if err == nil {
 			return fmt.Errorf("Virtual Machine %s still exists", rs.Primary.ID)
 		}
@@ -367,7 +367,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -376,7 +375,6 @@ resource "cosmic_network" "foo" {
   gateway          = "10.0.10.1"
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 }
 
 resource "cosmic_instance" "foo" {
@@ -385,12 +383,10 @@ resource "cosmic_instance" "foo" {
   service_offering = "%s"
   network_id       = "${cosmic_network.foo.id}"
   template         = "%s"
-  zone             = "${cosmic_vpc.foo.zone}"
   user_data        = "foobar\nfoo\nbar"
   expunge          = true
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 	strings.ToLower(COSMIC_SERVICE_OFFERING_1),
 	COSMIC_TEMPLATE,
@@ -403,7 +399,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -412,7 +407,6 @@ resource "cosmic_network" "foo" {
   gateway          = "10.0.10.1"
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 }
 
 resource "cosmic_instance" "foo" {
@@ -421,12 +415,10 @@ resource "cosmic_instance" "foo" {
   service_offering = "%s"
   network_id       = "${cosmic_network.foo.id}"
   template         = "%s"
-  zone             = "${cosmic_vpc.foo.zone}"
   user_data        = "foobar\nfoo\nbar"
   expunge          = true
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_2,
 	COSMIC_TEMPLATE,
@@ -439,7 +431,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -448,7 +439,6 @@ resource "cosmic_network" "foo" {
   gateway          = "10.0.10.1"
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 }
 
 resource "cosmic_instance" "foo" {
@@ -457,13 +447,11 @@ resource "cosmic_instance" "foo" {
   service_offering = "%s"
   network_id       = "${cosmic_network.foo.id}"
   template         = "%s"
-  zone             = "${cosmic_vpc.foo.zone}"
   disk_controller  = "SCSI"
   user_data        = "foobar\nfoo\nbar"
   expunge          = true
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE,
@@ -476,7 +464,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -485,7 +472,6 @@ resource "cosmic_network" "foo" {
   gateway          = "10.0.10.1"
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 }
 
 resource "cosmic_instance" "foo" {
@@ -495,11 +481,9 @@ resource "cosmic_instance" "foo" {
   network_id       = "${cosmic_network.foo.id}"
   ip_address       = "10.0.10.10"
   template         = "%s"
-  zone             = "${cosmic_vpc.foo.zone}"
   expunge          = true
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE,
@@ -513,7 +497,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -522,7 +505,6 @@ resource "cosmic_network" "foo" {
   gateway          = "10.0.10.1"
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 }
 
 resource "cosmic_ssh_keypair" "foo" {
@@ -536,12 +518,10 @@ resource "cosmic_instance" "foo" {
   network_id       = "${cosmic_network.foo.id}"
   ip_address       = "10.0.10.10"
   template         = "%s"
-  zone             = "${cosmic_vpc.foo.zone}"
   keypair          = "${cosmic_ssh_keypair.foo.name}"
   expunge          = true
 }`,
 		COSMIC_VPC_OFFERING,
-		COSMIC_ZONE,
 		COSMIC_VPC_NETWORK_OFFERING,
 		keyPairName,
 		COSMIC_SERVICE_OFFERING_1,

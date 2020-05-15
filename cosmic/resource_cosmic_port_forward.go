@@ -146,20 +146,20 @@ func createPortForwards(d *schema.ResourceData, meta interface{}, forwards *sche
 }
 
 func createPortForward(d *schema.ResourceData, meta interface{}, forward map[string]interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Make sure all required parameters are there
 	if err := verifyPortForwardParams(d, forward); err != nil {
 		return err
 	}
 
-	vm, _, err := cs.VirtualMachine.GetVirtualMachineByID(forward["virtual_machine_id"].(string))
+	vm, _, err := client.VirtualMachine.GetVirtualMachineByID(forward["virtual_machine_id"].(string))
 	if err != nil {
 		return err
 	}
 
 	// Create a new parameter struct
-	p := cs.Firewall.NewCreatePortForwardingRuleParams(d.Id(), forward["private_port"].(int),
+	p := client.Firewall.NewCreatePortForwardingRuleParams(d.Id(), forward["private_port"].(int),
 		forward["protocol"].(string), forward["public_port"].(int), vm.Id)
 
 	if privateEndPort, ok := forward["private_end_port"]; ok && privateEndPort.(int) != 0 {
@@ -196,7 +196,7 @@ func createPortForward(d *schema.ResourceData, meta interface{}, forward map[str
 	// Do not open the firewall automatically in any case
 	p.SetOpenfirewall(false)
 
-	r, err := cs.Firewall.CreatePortForwardingRule(p)
+	r, err := client.Firewall.CreatePortForwardingRule(p)
 	if err != nil {
 		return err
 	}
@@ -207,10 +207,10 @@ func createPortForward(d *schema.ResourceData, meta interface{}, forward map[str
 }
 
 func resourceCosmicPortForwardRead(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// First check if the IP address is still associated
-	_, count, err := cs.PublicIPAddress.GetPublicIpAddressByID(d.Id())
+	_, count, err := client.PublicIPAddress.GetPublicIpAddressByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf(
@@ -223,11 +223,11 @@ func resourceCosmicPortForwardRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	// Get all the forwards from the running environment
-	p := cs.Firewall.NewListPortForwardingRulesParams()
+	p := client.Firewall.NewListPortForwardingRulesParams()
 	p.SetIpaddressid(d.Id())
 	p.SetListall(true)
 
-	l, err := cs.Firewall.ListPortForwardingRules(p)
+	l, err := client.Firewall.ListPortForwardingRules(p)
 	if err != nil {
 		return err
 	}
@@ -433,13 +433,13 @@ func deletePortForwards(d *schema.ResourceData, meta interface{}, forwards *sche
 }
 
 func deletePortForward(d *schema.ResourceData, meta interface{}, forward map[string]interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create the parameter struct
-	p := cs.Firewall.NewDeletePortForwardingRuleParams(forward["uuid"].(string))
+	p := client.Firewall.NewDeletePortForwardingRuleParams(forward["uuid"].(string))
 
 	// Delete the forward
-	if _, err := cs.Firewall.DeletePortForwardingRule(p); err != nil {
+	if _, err := client.Firewall.DeletePortForwardingRule(p); err != nil {
 		// This is a very poor way to be told the ID does no longer exist :(
 		if !strings.Contains(err.Error(), fmt.Sprintf(
 			"Invalid parameter id value=%s due to incorrect long value format, "+
@@ -464,7 +464,7 @@ func verifyPortForwardParams(d *schema.ResourceData, forward map[string]interfac
 }
 
 func resourceCosmicPortForwardImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	client := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	forwards := d.Get("forward").(*schema.Set)
 	ipid := ""

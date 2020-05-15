@@ -28,6 +28,7 @@ provider "cosmic" {
   api_url    = "${var.cosmic_api_url}"
   api_key    = "${var.cosmic_api_key}"
   secret_key = "${var.cosmic_secret_key}"
+  zone       = "${var.cosmic_zone}"
 }
 
 # Create a web server
@@ -49,8 +50,11 @@ The following arguments are supported:
 * `secret_key` - (Optional) This is the Cosmic secret key. It can also be
   sourced from the `COSMIC_SECRET_KEY` environment variable.
 
+* `zone` - (Optional) This is the Cosmic zone It can also be
+  sourced from the `COSMIC_ZONE` environment variable.
+
 * `config` - (Optional) The path to a `CloudMonkey` config file. If set the API
-  URL, key and secret will be retrieved from this file. It can also be
+  URL, key, secret and zone will be retrieved from this file. It can also be
   sourced from the `COSMIC_CONFIG` environment variable.
 
 * `profile` - (Optional) Used together with the `config` option. Specifies which

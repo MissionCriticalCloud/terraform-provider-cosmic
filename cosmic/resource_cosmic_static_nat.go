@@ -5,7 +5,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -43,17 +42,17 @@ func resourceCosmicStaticNAT() *schema.Resource {
 }
 
 func resourceCosmicStaticNATCreate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	ipaddressid := d.Get("ip_address_id").(string)
 
-	vm, _, err := cs.VirtualMachine.GetVirtualMachineByID(d.Get("virtual_machine_id").(string))
+	vm, _, err := client.VirtualMachine.GetVirtualMachineByID(d.Get("virtual_machine_id").(string))
 	if err != nil {
 		return err
 	}
 
 	// Create a new parameter struct
-	p := cs.NAT.NewEnableStaticNatParams(ipaddressid, vm.Id)
+	p := client.NAT.NewEnableStaticNatParams(ipaddressid, vm.Id)
 
 	if vmGuestIP, ok := d.GetOk("vm_guest_ip"); ok {
 		p.SetVmguestip(vmGuestIP.(string))
@@ -78,7 +77,7 @@ func resourceCosmicStaticNATCreate(d *schema.ResourceData, meta interface{}) err
 		p.SetNetworkid(vm.Nic[0].Networkid)
 	}
 
-	_, err = cs.NAT.EnableStaticNat(p)
+	_, err = client.NAT.EnableStaticNat(p)
 	if err != nil {
 		return fmt.Errorf("Error enabling static NAT: %s", err)
 	}
@@ -89,10 +88,10 @@ func resourceCosmicStaticNATCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceCosmicStaticNATExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Get the IP address details
-	ip, count, err := cs.PublicIPAddress.GetPublicIpAddressByID(d.Id())
+	ip, count, err := client.PublicIPAddress.GetPublicIpAddressByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf("[DEBUG] IP address with ID %s no longer exists", d.Id())
@@ -106,10 +105,10 @@ func resourceCosmicStaticNATExists(d *schema.ResourceData, meta interface{}) (bo
 }
 
 func resourceCosmicStaticNATRead(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Get the IP address details
-	ip, count, err := cs.PublicIPAddress.GetPublicIpAddressByID(d.Id())
+	ip, count, err := client.PublicIPAddress.GetPublicIpAddressByID(d.Id())
 	if err != nil {
 		if count == 0 {
 			log.Printf("[DEBUG] IP address with ID %s no longer exists", d.Id())
@@ -133,13 +132,13 @@ func resourceCosmicStaticNATRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceCosmicStaticNATDelete(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cosmic.CosmicClient)
+	client := meta.(*CosmicClient)
 
 	// Create a new parameter struct
-	p := cs.NAT.NewDisableStaticNatParams(d.Id())
+	p := client.NAT.NewDisableStaticNatParams(d.Id())
 
 	// Disable static NAT
-	_, err := cs.NAT.DisableStaticNat(p)
+	_, err := client.NAT.DisableStaticNat(p)
 	if err != nil {
 		// This is a very poor way to be told the ID does no longer exist :(
 		if strings.Contains(err.Error(), fmt.Sprintf(

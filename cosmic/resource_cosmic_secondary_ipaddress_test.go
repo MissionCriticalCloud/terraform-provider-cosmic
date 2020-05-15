@@ -62,7 +62,7 @@ func testAccCheckCosmicSecondaryIPAddressExists(n string, ip *cosmic.AddIpToNicR
 			return fmt.Errorf("No IP address ID is set")
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+		client := testAccProvider.Meta().(*CosmicClient)
 
 		virtualmachine, ok := rs.Primary.Attributes["virtual_machine_id"]
 		if !ok {
@@ -70,13 +70,13 @@ func testAccCheckCosmicSecondaryIPAddressExists(n string, ip *cosmic.AddIpToNicR
 		}
 
 		// Retrieve the virtual_machine ID
-		virtualmachineid, e := retrieveID(cs, "virtual_machine", virtualmachine)
+		virtualmachineid, e := retrieveID(client, "virtual_machine", virtualmachine)
 		if e != nil {
 			return e.Error()
 		}
 
 		// Get the virtual machine details
-		vm, count, err := cs.VirtualMachine.GetVirtualMachineByID(virtualmachineid)
+		vm, count, err := client.VirtualMachine.GetVirtualMachineByID(virtualmachineid)
 		if err != nil {
 			if count == 0 {
 				return fmt.Errorf("Instance not found")
@@ -92,10 +92,10 @@ func testAccCheckCosmicSecondaryIPAddressExists(n string, ip *cosmic.AddIpToNicR
 			nicid = vm.Nic[0].Id
 		}
 
-		p := cs.Nic.NewListNicsParams(virtualmachineid)
+		p := client.Nic.NewListNicsParams(virtualmachineid)
 		p.SetNicid(nicid)
 
-		l, err := cs.Nic.ListNics(p)
+		l, err := client.Nic.ListNics(p)
 		if err != nil {
 			return err
 		}
@@ -131,7 +131,7 @@ func testAccCheckCosmicSecondaryIPAddressAttributes(ip *cosmic.AddIpToNicRespons
 }
 
 func testAccCheckCosmicSecondaryIPAddressDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_secondary_ipaddress" {
@@ -148,13 +148,13 @@ func testAccCheckCosmicSecondaryIPAddressDestroy(s *terraform.State) error {
 		}
 
 		// Retrieve the virtual_machine ID
-		virtualmachineid, e := retrieveID(cs, "virtual_machine", virtualmachine)
+		virtualmachineid, e := retrieveID(client, "virtual_machine", virtualmachine)
 		if e != nil {
 			return e.Error()
 		}
 
 		// Get the virtual machine details
-		vm, count, err := cs.VirtualMachine.GetVirtualMachineByID(virtualmachineid)
+		vm, count, err := client.VirtualMachine.GetVirtualMachineByID(virtualmachineid)
 		if err != nil {
 			if count == 0 {
 				return nil
@@ -170,10 +170,10 @@ func testAccCheckCosmicSecondaryIPAddressDestroy(s *terraform.State) error {
 			nicid = vm.Nic[0].Id
 		}
 
-		p := cs.Nic.NewListNicsParams(virtualmachineid)
+		p := client.Nic.NewListNicsParams(virtualmachineid)
 		p.SetNicid(nicid)
 
-		l, err := cs.Nic.ListNics(p)
+		l, err := client.Nic.ListNics(p)
 		if err != nil {
 			return err
 		}
@@ -205,7 +205,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -214,7 +213,6 @@ resource "cosmic_network" "foo" {
   gateway          = "10.0.10.1"
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 }
 
 resource "cosmic_instance" "foo" {
@@ -223,7 +221,6 @@ resource "cosmic_instance" "foo" {
   service_offering = "%s"
   network_id       = "${cosmic_network.foo.id}"
   template         = "%s"
-  zone             = "${cosmic_vpc.foo.zone}"
   user_data        = "foobar\nfoo\nbar"
   expunge          = true
 }
@@ -232,7 +229,6 @@ resource "cosmic_secondary_ipaddress" "foo" {
   virtual_machine_id = "${cosmic_instance.foo.id}"
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE,
@@ -245,7 +241,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   network_domain = "terraform-domain"
   vpc_offering   = "%s"
-  zone           = "%s"
 }
 
 resource "cosmic_network" "foo" {
@@ -254,7 +249,6 @@ resource "cosmic_network" "foo" {
   gateway          = "10.0.10.1"
   network_offering = "%s"
   vpc_id           = "${cosmic_vpc.foo.id}"
-  zone             = "${cosmic_vpc.foo.zone}"
 }
 
 resource "cosmic_instance" "foo" {
@@ -263,7 +257,6 @@ resource "cosmic_instance" "foo" {
   service_offering = "%s"
   network_id       = "${cosmic_network.foo.id}"
   template         = "%s"
-  zone             = "${cosmic_vpc.foo.zone}"
   user_data        = "foobar\nfoo\nbar"
   expunge          = true
 }
@@ -273,7 +266,6 @@ resource "cosmic_secondary_ipaddress" "foo" {
   virtual_machine_id = "${cosmic_instance.foo.id}"
 }`,
 	COSMIC_VPC_OFFERING,
-	COSMIC_ZONE,
 	COSMIC_VPC_NETWORK_OFFERING,
 	COSMIC_SERVICE_OFFERING_1,
 	COSMIC_TEMPLATE,

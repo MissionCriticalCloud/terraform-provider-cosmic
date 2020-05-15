@@ -48,8 +48,8 @@ func testAccCheckCosmicVPCExists(n string, vpc *cosmic.VPC) resource.TestCheckFu
 			return fmt.Errorf("No VPC ID is set")
 		}
 
-		cs := testAccProvider.Meta().(*cosmic.CosmicClient)
-		v, _, err := cs.VPC.GetVPCByID(rs.Primary.ID)
+		client := testAccProvider.Meta().(*CosmicClient)
+		v, _, err := client.VPC.GetVPCByID(rs.Primary.ID)
 
 		if err != nil {
 			return err
@@ -89,7 +89,7 @@ func testAccCheckCosmicVPCAttributes(vpc *cosmic.VPC) resource.TestCheckFunc {
 }
 
 func testAccCheckCosmicVPCDestroy(s *terraform.State) error {
-	cs := testAccProvider.Meta().(*cosmic.CosmicClient)
+	client := testAccProvider.Meta().(*CosmicClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cosmic_vpc" {
@@ -100,7 +100,7 @@ func testAccCheckCosmicVPCDestroy(s *terraform.State) error {
 			return fmt.Errorf("No VPC ID is set")
 		}
 
-		_, _, err := cs.VPC.GetVPCByID(rs.Primary.ID)
+		_, _, err := client.VPC.GetVPCByID(rs.Primary.ID)
 		if err == nil {
 			return fmt.Errorf("VPC %s still exists", rs.Primary.ID)
 		}
@@ -116,8 +116,6 @@ resource "cosmic_vpc" "foo" {
   cidr           = "10.0.10.0/22"
   vpc_offering   = "%s"
   network_domain = "terraform-domain"
-  zone           = "%s"
 }`,
 	strings.ToLower(COSMIC_VPC_OFFERING),
-	COSMIC_ZONE,
 )
