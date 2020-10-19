@@ -20,57 +20,57 @@ func resourceCosmicLoadBalancerRule() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"ip_address_id": &schema.Schema{
+			"ip_address_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"network_id": &schema.Schema{
+			"network_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"algorithm": &schema.Schema{
+			"algorithm": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"client_timeout": &schema.Schema{
+			"client_timeout": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"server_timeout": &schema.Schema{
+			"server_timeout": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"private_port": &schema.Schema{
+			"private_port": {
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"public_port": &schema.Schema{
+			"public_port": {
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"protocol": &schema.Schema{
+			"protocol": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -87,7 +87,7 @@ func resourceCosmicLoadBalancerRule() *schema.Resource {
 				},
 			},
 
-			"member_ids": &schema.Schema{
+			"member_ids": {
 				Type:     schema.TypeList,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},

@@ -22,7 +22,7 @@ func TestAccCosmicVPC_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCosmicVPCDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCosmicVPC_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCosmicVPCExists(

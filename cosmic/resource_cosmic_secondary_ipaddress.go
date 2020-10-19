@@ -19,21 +19,21 @@ func resourceCosmicSecondaryIPAddress() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"ip_address": &schema.Schema{
+			"ip_address": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"nic_id": &schema.Schema{
+			"nic_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"virtual_machine_id": &schema.Schema{
+			"virtual_machine_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,

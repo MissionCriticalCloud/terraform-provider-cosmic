@@ -18,13 +18,13 @@ func resourceCosmicVPNConnection() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"customer_gateway_id": &schema.Schema{
+			"customer_gateway_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"vpn_gateway_id": &schema.Schema{
+			"vpn_gateway_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,

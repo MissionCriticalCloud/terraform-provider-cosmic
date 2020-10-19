@@ -18,19 +18,19 @@ func resourceCosmicStaticRoute() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"cidr": &schema.Schema{
+			"cidr": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"nexthop": &schema.Schema{
+			"nexthop": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"vpc_id": &schema.Schema{
+			"vpc_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,

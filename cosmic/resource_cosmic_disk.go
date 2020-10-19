@@ -19,13 +19,13 @@ func resourceCosmicDisk() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"disk_offering": &schema.Schema{
+			"disk_offering": {
 				Type:     schema.TypeString,
 				Required: true,
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
@@ -33,31 +33,31 @@ func resourceCosmicDisk() *schema.Resource {
 				},
 			},
 
-			"attach": &schema.Schema{
+			"attach": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"device_id": &schema.Schema{
+			"device_id": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
 
-			"size": &schema.Schema{
+			"size": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
 
-			"shrink_ok": &schema.Schema{
+			"shrink_ok": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"disk_controller": &schema.Schema{
+			"disk_controller": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -74,12 +74,12 @@ func resourceCosmicDisk() *schema.Resource {
 				},
 			},
 
-			"virtual_machine_id": &schema.Schema{
+			"virtual_machine_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"zone": &schema.Schema{
+			"zone": {
 				Type:       schema.TypeString,
 				Optional:   true,
 				Computed:   true,

@@ -109,7 +109,7 @@ func resourceCosmicInstance() *schema.Resource {
 				},
 			},
 
-			"disk_controller": &schema.Schema{
+			"disk_controller": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,

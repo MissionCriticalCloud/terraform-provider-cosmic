@@ -18,13 +18,13 @@ func resourceCosmicVPNGateway() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"vpc_id": &schema.Schema{
+			"vpc_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"public_ip": &schema.Schema{
+			"public_ip": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
