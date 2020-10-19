@@ -155,16 +155,8 @@ func resourceCosmicLoadBalancerRuleCreate(d *schema.ResourceData, meta interface
 		return err
 	}
 
-	// Set the load balancer rule ID and set partials
+	// Set the load balancer rule ID
 	d.SetId(r.Id)
-	d.SetPartial("name")
-	d.SetPartial("description")
-	d.SetPartial("ip_address_id")
-	d.SetPartial("network_id")
-	d.SetPartial("algorithm")
-	d.SetPartial("private_port")
-	d.SetPartial("public_port")
-	d.SetPartial("protocol")
 
 	// Create a new parameter struct
 	ap := client.LoadBalancer.NewAssignToLoadBalancerRuleParams(r.Id)
@@ -178,11 +170,9 @@ func resourceCosmicLoadBalancerRuleCreate(d *schema.ResourceData, meta interface
 
 	_, err = client.LoadBalancer.AssignToLoadBalancerRule(ap)
 	if err != nil {
+		d.Partial(true)
 		return err
 	}
-
-	d.SetPartial("member_ids")
-	d.Partial(false)
 
 	return resourceCosmicLoadBalancerRuleRead(d, meta)
 }
