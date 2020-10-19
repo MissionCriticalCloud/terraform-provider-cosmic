@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceCosmicVPNConnection() *schema.Resource {
@@ -14,7 +14,7 @@ func resourceCosmicVPNConnection() *schema.Resource {
 		Read:   resourceCosmicVPNConnectionRead,
 		Delete: resourceCosmicVPNConnectionDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{

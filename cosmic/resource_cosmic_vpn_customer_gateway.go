@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceCosmicVPNCustomerGateway() *schema.Resource {
@@ -15,7 +15,7 @@ func resourceCosmicVPNCustomerGateway() *schema.Resource {
 		Update: resourceCosmicVPNCustomerGatewayUpdate,
 		Delete: resourceCosmicVPNCustomerGatewayDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{

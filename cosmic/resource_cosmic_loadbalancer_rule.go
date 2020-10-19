@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceCosmicLoadBalancerRule() *schema.Resource {
@@ -16,7 +16,7 @@ func resourceCosmicLoadBalancerRule() *schema.Resource {
 		Update: resourceCosmicLoadBalancerRuleUpdate,
 		Delete: resourceCosmicLoadBalancerRuleDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{

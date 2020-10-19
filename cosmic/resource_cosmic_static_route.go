@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceCosmicStaticRoute() *schema.Resource {
@@ -14,7 +14,7 @@ func resourceCosmicStaticRoute() *schema.Resource {
 		Read:   resourceCosmicStaticRouteRead,
 		Delete: resourceCosmicStaticRouteDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{

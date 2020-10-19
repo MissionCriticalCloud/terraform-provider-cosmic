@@ -1,11 +1,12 @@
 package cosmic
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceCosmicSecondaryIPAddress() *schema.Resource {
@@ -14,7 +15,7 @@ func resourceCosmicSecondaryIPAddress() *schema.Resource {
 		Read:   resourceCosmicSecondaryIPAddressRead,
 		Delete: resourceCosmicSecondaryIPAddressDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceCosmicSecondaryIPAddressImporter,
+			StateContext: resourceCosmicSecondaryIPAddressImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -155,7 +156,7 @@ func resourceCosmicSecondaryIPAddressDelete(d *schema.ResourceData, meta interfa
 	return nil
 }
 
-func resourceCosmicSecondaryIPAddressImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceCosmicSecondaryIPAddressImporter(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	s := strings.Split(d.Id(), "/")
 	if len(s) != 2 {
 		return nil, fmt.Errorf(

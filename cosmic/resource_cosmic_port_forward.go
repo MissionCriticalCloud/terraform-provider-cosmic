@@ -1,6 +1,7 @@
 package cosmic
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
@@ -10,7 +11,7 @@ import (
 
 	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/go-multierror"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceCosmicPortForward() *schema.Resource {
@@ -20,7 +21,7 @@ func resourceCosmicPortForward() *schema.Resource {
 		Update: resourceCosmicPortForwardUpdate,
 		Delete: resourceCosmicPortForwardDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceCosmicPortForwardImporter,
+			StateContext: resourceCosmicPortForwardImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -463,7 +464,7 @@ func verifyPortForwardParams(d *schema.ResourceData, forward map[string]interfac
 	return nil
 }
 
-func resourceCosmicPortForwardImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceCosmicPortForwardImporter(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	client := meta.(*CosmicClient)
 
 	forwards := d.Get("forward").(*schema.Set)

@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceCosmicNIC() *schema.Resource {
@@ -15,7 +15,7 @@ func resourceCosmicNIC() *schema.Resource {
 		Read:   resourceCosmicNICRead,
 		Delete: resourceCosmicNICDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{

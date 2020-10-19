@@ -8,7 +8,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceCosmicInstance() *schema.Resource {
@@ -18,7 +18,7 @@ func resourceCosmicInstance() *schema.Resource {
 		Update: resourceCosmicInstanceUpdate,
 		Delete: resourceCosmicInstanceDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
