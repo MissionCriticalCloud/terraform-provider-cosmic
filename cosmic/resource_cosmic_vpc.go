@@ -163,8 +163,8 @@ func resourceCosmicVPCRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("display_text", v.Displaytext)
 	d.Set("cidr", v.Cidr)
 	d.Set("network_domain", v.Networkdomain)
-	d.Set("sourcenatlist", v.Sourcenatlist)
-	d.Set("syslogserverlist", v.Syslogserverlist)
+	d.Set("source_nat_list", v.Sourcenatlist)
+	d.Set("syslog_server_list", v.Syslogserverlist)
 
 	// Get the VPC offering details
 	o, _, err := client.VPC.GetVPCOfferingByID(v.Vpcofferingid)

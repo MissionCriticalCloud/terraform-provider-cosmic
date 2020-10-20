@@ -126,7 +126,7 @@ func resourceCosmicVPNCustomerGatewayRead(d *schema.ResourceData, meta interface
 	}
 
 	d.Set("name", v.Name)
-	d.Set("cidr", v.Cidrlist)
+	d.Set("cidr_list", v.Cidrlist)
 	d.Set("esp_policy", v.Esppolicy)
 	d.Set("gateway", v.Gateway)
 	d.Set("ike_policy", v.Ikepolicy)
