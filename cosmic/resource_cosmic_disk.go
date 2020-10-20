@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceCosmicDisk() *schema.Resource {
@@ -15,17 +15,17 @@ func resourceCosmicDisk() *schema.Resource {
 		Update: resourceCosmicDiskUpdate,
 		Delete: resourceCosmicDiskDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"disk_offering": &schema.Schema{
+			"disk_offering": {
 				Type:     schema.TypeString,
 				Required: true,
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
@@ -33,31 +33,31 @@ func resourceCosmicDisk() *schema.Resource {
 				},
 			},
 
-			"attach": &schema.Schema{
+			"attach": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"device_id": &schema.Schema{
+			"device_id": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
 
-			"size": &schema.Schema{
+			"size": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
 
-			"shrink_ok": &schema.Schema{
+			"shrink_ok": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"disk_controller": &schema.Schema{
+			"disk_controller": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -74,12 +74,12 @@ func resourceCosmicDisk() *schema.Resource {
 				},
 			},
 
-			"virtual_machine_id": &schema.Schema{
+			"virtual_machine_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"zone": &schema.Schema{
+			"zone": {
 				Type:       schema.TypeString,
 				Optional:   true,
 				Computed:   true,
@@ -92,8 +92,6 @@ func resourceCosmicDisk() *schema.Resource {
 
 func resourceCosmicDiskCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*CosmicClient)
-	d.Partial(true)
-
 	name := d.Get("name").(string)
 
 	// Create a new parameter struct
@@ -132,27 +130,17 @@ func resourceCosmicDiskCreate(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error creating the new disk %s: %s", name, err)
 	}
 
-	// Set the volume ID and partials
+	// Set the volume ID
 	d.SetId(r.Id)
-	d.SetPartial("name")
-	d.SetPartial("device_id")
-	d.SetPartial("disk_offering")
-	d.SetPartial("size")
-	d.SetPartial("disk_controller")
-	d.SetPartial("virtual_machine_id")
-	d.SetPartial("zone")
 
 	if d.Get("attach").(bool) {
 		err := resourceCosmicDiskAttach(d, meta)
 		if err != nil {
+			d.Partial(true)
 			return fmt.Errorf("Error attaching the new disk %s to virtual machine: %s", name, err)
 		}
-
-		// Set the additional partial
-		d.SetPartial("attach")
 	}
 
-	d.Partial(false)
 	return resourceCosmicDiskRead(d, meta)
 }
 
@@ -188,8 +176,6 @@ func resourceCosmicDiskRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceCosmicDiskUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*CosmicClient)
-	d.Partial(true)
-
 	name := d.Get("name").(string)
 
 	if d.HasChange("disk_offering") || d.HasChange("size") {
@@ -219,10 +205,8 @@ func resourceCosmicDiskUpdate(d *schema.ResourceData, meta interface{}) error {
 			return fmt.Errorf("Error changing disk offering/size for disk %s: %s", name, err)
 		}
 
-		// Update the volume ID and set partials
+		// Update the volume ID
 		d.SetId(r.Id)
-		d.SetPartial("disk_offering")
-		d.SetPartial("size")
 	}
 
 	// If the device ID changed, just detach here so we can re-attach the
@@ -230,6 +214,7 @@ func resourceCosmicDiskUpdate(d *schema.ResourceData, meta interface{}) error {
 	if d.HasChange("device_id") || d.HasChange("virtual_machine") {
 		// Detach the volume
 		if err := resourceCosmicDiskDetach(d, meta); err != nil {
+			d.Partial(true)
 			return fmt.Errorf("Error detaching disk %s from virtual machine: %s", name, err)
 		}
 	}
@@ -238,21 +223,17 @@ func resourceCosmicDiskUpdate(d *schema.ResourceData, meta interface{}) error {
 		// Attach the volume
 		err := resourceCosmicDiskAttach(d, meta)
 		if err != nil {
+			d.Partial(true)
 			return fmt.Errorf("Error attaching disk %s to virtual machine: %s", name, err)
 		}
-
-		// Set the additional partials
-		d.SetPartial("attach")
-		d.SetPartial("device_id")
-		d.SetPartial("virtual_machine_id")
 	} else {
 		// Detach the volume
 		if err := resourceCosmicDiskDetach(d, meta); err != nil {
+			d.Partial(true)
 			return fmt.Errorf("Error detaching disk %s from virtual machine: %s", name, err)
 		}
 	}
 
-	d.Partial(false)
 	return resourceCosmicDiskRead(d, meta)
 }
 

@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceCosmicVPC() *schema.Resource {
@@ -15,28 +15,28 @@ func resourceCosmicVPC() *schema.Resource {
 		Update: resourceCosmicVPCUpdate,
 		Delete: resourceCosmicVPCDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"display_text": &schema.Schema{
+			"display_text": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"cidr": &schema.Schema{
+			"cidr": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"vpc_offering": &schema.Schema{
+			"vpc_offering": {
 				Type:     schema.TypeString,
 				Required: true,
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
@@ -44,34 +44,34 @@ func resourceCosmicVPC() *schema.Resource {
 				},
 			},
 
-			"network_domain": &schema.Schema{
+			"network_domain": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"source_nat_ip": &schema.Schema{
+			"source_nat_ip": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"source_nat_ip_id": &schema.Schema{
+			"source_nat_ip_id": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"source_nat_list": &schema.Schema{
+			"source_nat_list": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"syslog_server_list": &schema.Schema{
+			"syslog_server_list": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"zone": &schema.Schema{
+			"zone": {
 				Type:       schema.TypeString,
 				Optional:   true,
 				Computed:   true,
@@ -163,8 +163,8 @@ func resourceCosmicVPCRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("display_text", v.Displaytext)
 	d.Set("cidr", v.Cidr)
 	d.Set("network_domain", v.Networkdomain)
-	d.Set("sourcenatlist", v.Sourcenatlist)
-	d.Set("syslogserverlist", v.Syslogserverlist)
+	d.Set("source_nat_list", v.Sourcenatlist)
+	d.Set("syslog_server_list", v.Syslogserverlist)
 
 	// Get the VPC offering details
 	o, _, err := client.VPC.GetVPCOfferingByID(v.Vpcofferingid)

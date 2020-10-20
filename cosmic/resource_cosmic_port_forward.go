@@ -1,6 +1,7 @@
 package cosmic
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
@@ -10,7 +11,7 @@ import (
 
 	"github.com/MissionCriticalCloud/go-cosmic/v6/cosmic"
 	"github.com/hashicorp/go-multierror"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceCosmicPortForward() *schema.Resource {
@@ -20,63 +21,63 @@ func resourceCosmicPortForward() *schema.Resource {
 		Update: resourceCosmicPortForwardUpdate,
 		Delete: resourceCosmicPortForwardDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceCosmicPortForwardImporter,
+			StateContext: resourceCosmicPortForwardImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
-			"ip_address_id": &schema.Schema{
+			"ip_address_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"managed": &schema.Schema{
+			"managed": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"forward": &schema.Schema{
+			"forward": {
 				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"protocol": &schema.Schema{
+						"protocol": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"private_port": &schema.Schema{
+						"private_port": {
 							Type:     schema.TypeInt,
 							Required: true,
 						},
 
-						"private_end_port": &schema.Schema{
+						"private_end_port": {
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
 
-						"public_port": &schema.Schema{
+						"public_port": {
 							Type:     schema.TypeInt,
 							Required: true,
 						},
 
-						"public_end_port": &schema.Schema{
+						"public_end_port": {
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
 
-						"virtual_machine_id": &schema.Schema{
+						"virtual_machine_id": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"vm_guest_ip": &schema.Schema{
+						"vm_guest_ip": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"uuid": &schema.Schema{
+						"uuid": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
@@ -463,7 +464,7 @@ func verifyPortForwardParams(d *schema.ResourceData, forward map[string]interfac
 	return nil
 }
 
-func resourceCosmicPortForwardImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceCosmicPortForwardImporter(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	client := meta.(*CosmicClient)
 
 	forwards := d.Get("forward").(*schema.Set)

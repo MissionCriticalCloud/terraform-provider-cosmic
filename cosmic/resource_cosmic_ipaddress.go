@@ -1,11 +1,12 @@
 package cosmic
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceCosmicIPAddress() *schema.Resource {
@@ -33,23 +34,23 @@ func resourceCosmicIPAddress() *schema.Resource {
 		Update: resourceCosmicIPAddressUpdate,
 		Delete: resourceCosmicIPAddressDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceCosmicIPAddressImporter,
+			StateContext: resourceCosmicIPAddressImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
-			"network_id": &schema.Schema{
+			"network_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"vpc_id": &schema.Schema{
+			"vpc_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"ip_address": &schema.Schema{
+			"ip_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -176,7 +177,7 @@ func resourceCosmicIPAddressDelete(d *schema.ResourceData, meta interface{}) err
 	return nil
 }
 
-func resourceCosmicIPAddressImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceCosmicIPAddressImporter(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	client := meta.(*CosmicClient)
 	ip, _, _ := client.PublicIPAddress.GetPublicIpAddressByID(d.Id())
 

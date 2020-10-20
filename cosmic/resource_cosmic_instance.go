@@ -8,7 +8,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceCosmicInstance() *schema.Resource {
@@ -18,7 +18,7 @@ func resourceCosmicInstance() *schema.Resource {
 		Update: resourceCosmicInstanceUpdate,
 		Delete: resourceCosmicInstanceDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -109,7 +109,7 @@ func resourceCosmicInstance() *schema.Resource {
 				},
 			},
 
-			"disk_controller": &schema.Schema{
+			"disk_controller": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -329,8 +329,6 @@ func resourceCosmicInstanceRead(d *schema.ResourceData, meta interface{}) error 
 
 func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*CosmicClient)
-	d.Partial(true)
-
 	name := d.Get("name").(string)
 
 	// Check if the display name is changed and if so, update the virtual machine
@@ -346,11 +344,10 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 		// Update the display name
 		_, err := client.VirtualMachine.UpdateVirtualMachine(p)
 		if err != nil {
+			d.Partial(true)
 			return fmt.Errorf(
 				"Error updating the display name for instance %s: %s", name, err)
 		}
-
-		d.SetPartial("display_name")
 	}
 
 	// Check if the group is changed and if so, update the virtual machine
@@ -366,11 +363,10 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 		// Update the display name
 		_, err := client.VirtualMachine.UpdateVirtualMachine(p)
 		if err != nil {
+			d.Partial(true)
 			return fmt.Errorf(
 				"Error updating the group for instance %s: %s", name, err)
 		}
-
-		d.SetPartial("group")
 	}
 
 	// Attributes that require reboot to update
@@ -381,6 +377,7 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 		_, err := client.VirtualMachine.StopVirtualMachine(
 			client.VirtualMachine.NewStopVirtualMachineParams(d.Id()))
 		if err != nil {
+			d.Partial(true)
 			return fmt.Errorf(
 				"Error stopping instance %s before making changes: %s", name, err)
 		}
@@ -401,8 +398,6 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 				return fmt.Errorf(
 					"Error updating the name for instance %s: %s", name, err)
 			}
-
-			d.SetPartial("name")
 		}
 
 		// Check if the service offering is changed and if so, update the offering
@@ -424,7 +419,6 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 				return fmt.Errorf(
 					"Error changing the service offering for instance %s: %s", name, err)
 			}
-			d.SetPartial("service_offering")
 		}
 
 		// Check if the affinity group IDs have changed and if so, update the IDs
@@ -444,10 +438,10 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 			// Update the affinity groups
 			_, err = client.AffinityGroup.UpdateVMAffinityGroup(p)
 			if err != nil {
+				d.Partial(true)
 				return fmt.Errorf(
 					"Error updating the affinity groups for instance %s: %s", name, err)
 			}
-			d.SetPartial("affinity_group_ids")
 		}
 
 		// Check if the affinity group names have changed and if so, update the names
@@ -467,10 +461,10 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 			// Update the affinity groups
 			_, err = client.AffinityGroup.UpdateVMAffinityGroup(p)
 			if err != nil {
+				d.Partial(true)
 				return fmt.Errorf(
 					"Error updating the affinity groups for instance %s: %s", name, err)
 			}
-			d.SetPartial("affinity_group_names")
 		}
 
 		// Check if the keypair has changed and if so, update the keypair
@@ -482,10 +476,10 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 			// Change the ssh keypair
 			_, err = client.SSH.ResetSSHKeyForVirtualMachine(p)
 			if err != nil {
+				d.Partial(true)
 				return fmt.Errorf(
 					"Error changing the SSH keypair for instance %s: %s", name, err)
 			}
-			d.SetPartial("keypair")
 		}
 
 		// Check if the user data has changed and if so, update the user data
@@ -501,10 +495,10 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 			p.SetUserdata(ud)
 			_, err = client.VirtualMachine.UpdateVirtualMachine(p)
 			if err != nil {
+				d.Partial(true)
 				return fmt.Errorf(
 					"Error updating user_data for instance %s: %s", name, err)
 			}
-			d.SetPartial("user_data")
 		}
 
 		// Check if the user data has changed and if so, update the user data
@@ -520,10 +514,10 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 			p.SetOptimisefor(ud)
 			_, err = client.VirtualMachine.UpdateVirtualMachine(p)
 			if err != nil {
+				d.Partial(true)
 				return fmt.Errorf(
 					"Error updating optimise_for for instance %s: %s", name, err)
 			}
-			d.SetPartial("optimise_for")
 		}
 
 		// Start the virtual machine again
@@ -534,8 +528,6 @@ func resourceCosmicInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 				"Error starting instance %s after making changes", name)
 		}
 	}
-
-	d.Partial(false)
 
 	return resourceCosmicInstanceRead(d, meta)
 }

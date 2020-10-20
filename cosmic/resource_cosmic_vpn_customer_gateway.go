@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceCosmicVPNCustomerGateway() *schema.Resource {
@@ -15,55 +15,55 @@ func resourceCosmicVPNCustomerGateway() *schema.Resource {
 		Update: resourceCosmicVPNCustomerGatewayUpdate,
 		Delete: resourceCosmicVPNCustomerGatewayDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"cidr_list": &schema.Schema{
+			"cidr_list": {
 				Type:     schema.TypeSet,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
 
-			"esp_policy": &schema.Schema{
+			"esp_policy": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"gateway": &schema.Schema{
+			"gateway": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"ike_policy": &schema.Schema{
+			"ike_policy": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"ipsec_psk": &schema.Schema{
+			"ipsec_psk": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"dpd": &schema.Schema{
+			"dpd": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 			},
 
-			"esp_lifetime": &schema.Schema{
+			"esp_lifetime": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
 
-			"ike_lifetime": &schema.Schema{
+			"ike_lifetime": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
@@ -126,7 +126,7 @@ func resourceCosmicVPNCustomerGatewayRead(d *schema.ResourceData, meta interface
 	}
 
 	d.Set("name", v.Name)
-	d.Set("cidr", v.Cidrlist)
+	d.Set("cidr_list", v.Cidrlist)
 	d.Set("esp_policy", v.Esppolicy)
 	d.Set("gateway", v.Gateway)
 	d.Set("ike_policy", v.Ikepolicy)

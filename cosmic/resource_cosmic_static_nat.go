@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceCosmicStaticNAT() *schema.Resource {
@@ -15,23 +15,23 @@ func resourceCosmicStaticNAT() *schema.Resource {
 		Read:   resourceCosmicStaticNATRead,
 		Delete: resourceCosmicStaticNATDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
-			"ip_address_id": &schema.Schema{
+			"ip_address_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"virtual_machine_id": &schema.Schema{
+			"virtual_machine_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"vm_guest_ip": &schema.Schema{
+			"vm_guest_ip": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,

@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceCosmicLoadBalancerRule() *schema.Resource {
@@ -16,61 +16,61 @@ func resourceCosmicLoadBalancerRule() *schema.Resource {
 		Update: resourceCosmicLoadBalancerRuleUpdate,
 		Delete: resourceCosmicLoadBalancerRuleDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"ip_address_id": &schema.Schema{
+			"ip_address_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"network_id": &schema.Schema{
+			"network_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"algorithm": &schema.Schema{
+			"algorithm": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"client_timeout": &schema.Schema{
+			"client_timeout": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"server_timeout": &schema.Schema{
+			"server_timeout": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"private_port": &schema.Schema{
+			"private_port": {
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"public_port": &schema.Schema{
+			"public_port": {
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"protocol": &schema.Schema{
+			"protocol": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -87,7 +87,7 @@ func resourceCosmicLoadBalancerRule() *schema.Resource {
 				},
 			},
 
-			"member_ids": &schema.Schema{
+			"member_ids": {
 				Type:     schema.TypeList,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -155,16 +155,8 @@ func resourceCosmicLoadBalancerRuleCreate(d *schema.ResourceData, meta interface
 		return err
 	}
 
-	// Set the load balancer rule ID and set partials
+	// Set the load balancer rule ID
 	d.SetId(r.Id)
-	d.SetPartial("name")
-	d.SetPartial("description")
-	d.SetPartial("ip_address_id")
-	d.SetPartial("network_id")
-	d.SetPartial("algorithm")
-	d.SetPartial("private_port")
-	d.SetPartial("public_port")
-	d.SetPartial("protocol")
 
 	// Create a new parameter struct
 	ap := client.LoadBalancer.NewAssignToLoadBalancerRuleParams(r.Id)
@@ -178,11 +170,9 @@ func resourceCosmicLoadBalancerRuleCreate(d *schema.ResourceData, meta interface
 
 	_, err = client.LoadBalancer.AssignToLoadBalancerRule(ap)
 	if err != nil {
+		d.Partial(true)
 		return err
 	}
-
-	d.SetPartial("member_ids")
-	d.Partial(false)
 
 	return resourceCosmicLoadBalancerRuleRead(d, meta)
 }
